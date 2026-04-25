@@ -1,8 +1,6 @@
 import "./style.css";
-import { initApp } from "./app";
-import { initResizablePanes } from "./utils/resizable-panes";
+import { ApiExplorerElement } from "./element";
 
-document.addEventListener("DOMContentLoaded", () => {
-  initResizablePanes();
-  initApp();
-});
+if (!customElements.get("api-explorer")) {
+  customElements.define("api-explorer", ApiExplorerElement);
+}

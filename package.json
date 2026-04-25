@@ -1,12 +1,22 @@
 {
-  "name": "swagger-alternative",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@openapi-explorer/ui",
+  "version": "0.1.0",
+  "description": "A modern OpenAPI / Swagger UI as a Web Component",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:lib": "tsc && vite build --mode lib",
     "preview": "vite preview"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/loader.js"
+    },
+    "./style": "./dist/loader.css"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",

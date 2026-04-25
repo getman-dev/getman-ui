@@ -35,7 +35,7 @@ export function resolveSchema(schema: Schema | undefined, components: Components
 
 export function resolveParameter(param: Parameter, components: Components | undefined): Parameter {
   if ((param as { $ref?: string }).$ref) {
-    const resolved = resolveRef<Parameter>((param as { $ref: string }).$ref, components);
+    const resolved = resolveRef<Parameter>((param as unknown as { $ref: string }).$ref, components);
     return resolved ?? param;
   }
   return param;

@@ -29,24 +29,23 @@ function persist(w: StoredWidths): void {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(w)); } catch { /* ignore */ }
 }
 
-export function initResizablePanes(): void {
-  const container = document.getElementById("pane-container");
-  const nav = document.getElementById("nav-pane");
-  const tryIt = document.getElementById("try-pane");
-  const leftHandle = document.getElementById("handle-left");
-  const rightHandle = document.getElementById("handle-right");
+export function initResizablePanes(root: HTMLElement = document.documentElement): void {
+  const container = root.querySelector<HTMLElement>("#pane-container");
+  const nav = root.querySelector<HTMLElement>("#nav-pane");
+  const tryIt = root.querySelector<HTMLElement>("#try-pane");
+  const leftHandle = root.querySelector<HTMLElement>("#handle-left");
+  const rightHandle = root.querySelector<HTMLElement>("#handle-right");
 
   if (!container || !nav || !tryIt || !leftHandle || !rightHandle) return;
 
-  // Capture as non-nullable — guarded above
-  const root = container as HTMLElement;
+  const containerEl = container as HTMLElement;
   const navEl = nav as HTMLElement;
   const tryItEl = tryIt as HTMLElement;
 
   const state = load();
 
   function usableWidth(): number {
-    return root.getBoundingClientRect().width - HANDLE_TOTAL_PX;
+    return containerEl.getBoundingClientRect().width - HANDLE_TOTAL_PX;
   }
 
   function applyWidths(): void {

@@ -7,6 +7,7 @@ import {
   schemaToExample,
 } from "../parser/spec-parser";
 import { methodBadgeClasses, escapeHtml } from "./nav";
+import { highlightJson } from "../utils/highlight";
 
 // ─── Status code colors ───────────────────────────────────────────────────────
 
@@ -239,7 +240,9 @@ function renderRequestBody(endpoint: EndpointEntry, components: Components | und
         ${jsonContent.schema ? `<div class="p-3">${renderSchema(jsonContent.schema, components)}</div>` : ""}
         <div class="px-3 pb-3">
           <p class="text-[10px] text-gray-400 mb-1 mt-1">Example</p>
-          <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed">${escapeHtml(example)}</pre>
+          <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed"
+            style="--hl-key:#2563eb;--hl-str:#16a34a;--hl-bool:#9333ea;--hl-null:#9ca3af;--hl-num:#d97706"
+          >${highlightJson(example)}</pre>
         </div>
       </div>
     </div>`;
@@ -273,7 +276,9 @@ function renderResponses(
               </button>
               ${hasContent ? `
                 <div class="response-body hidden px-3 pb-3 pt-1">
-                  <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed">${escapeHtml(example)}</pre>
+                  <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed"
+                    style="--hl-key:#2563eb;--hl-str:#16a34a;--hl-bool:#9333ea;--hl-null:#9ca3af;--hl-num:#d97706"
+                  >${highlightJson(example)}</pre>
                 </div>` : ""}
             </div>`;
         }).join("")}
@@ -364,7 +369,9 @@ export function renderSchemaDetail(name: string, schema: Schema, components: Com
         ${exampleJson ? `
           <div class="mb-6">
             <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Example</h3>
-            <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed border border-gray-100">${escapeHtml(exampleJson)}</pre>
+            <pre class="text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed border border-gray-100"
+            style="--hl-key:#2563eb;--hl-str:#16a34a;--hl-bool:#9333ea;--hl-null:#9ca3af;--hl-num:#d97706"
+          >${highlightJson(exampleJson)}</pre>
           </div>` : ""}
       </div>
     </div>`;

@@ -7,6 +7,7 @@ import type {
 } from "../types/openapi";
 import { resolveParameter, buildUrl, getRequestBodyExample } from "../parser/spec-parser";
 import { escapeHtml, escapeAttr, methodBadgeClasses } from "./nav";
+import { highlightJson } from "../utils/highlight";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -156,7 +157,9 @@ function renderResponsePanel(state: TryItState): string {
       </div>
       <!-- Body tab -->
       <div id="try-tab-body" class="flex-1 overflow-auto bg-white">
-        <pre class="text-[11px] p-3 text-gray-700 font-mono leading-relaxed">${escapeHtml(body)}</pre>
+        <pre class="text-[11px] p-3 text-gray-700 font-mono leading-relaxed"
+          style="--hl-key:#2563eb;--hl-str:#16a34a;--hl-bool:#9333ea;--hl-null:#9ca3af;--hl-num:#d97706"
+        >${highlightJson(body)}</pre>
       </div>
       <!-- Headers tab -->
       <div id="try-tab-headers" class="hidden flex-1 overflow-auto bg-white">
@@ -230,6 +233,7 @@ export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: Au
           <button
             id="try-execute"
             ${!canExecute ? "disabled" : ""}
+            title="${canExecute ? "Send request (⌘ Enter)" : "Fill required path parameters first"}"
             class="shrink-0 px-4 rounded-lg text-xs font-semibold transition-all
               ${canExecute
                 ? "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white shadow-sm"

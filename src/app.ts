@@ -37,6 +37,7 @@ interface AppState {
   authModalVisible: boolean;
   sidebarTab: "endpoints" | "schemas";
   activeSchema: string | null;
+  shortcutsVisible: boolean;
 }
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     authModalVisible: false,
     sidebarTab: "endpoints",
     activeSchema: null,
+    shortcutsVisible: false,
   };
 
   // ─── Scoped DOM helpers ───────────────────────────────────────────────────
@@ -122,8 +124,48 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
   }
 
   function renderModalPane() {
-    $modal().innerHTML = renderLoadModal(state.modalVisible, state.modalUrlValue, state.modalError);
-    bindModalEvents();
+    if (state.shortcutsVisible) {
+      $modal().innerHTML = renderShortcutsOverlay();
+      bindShortcutsOverlayEvents();
+    } else {
+      $modal().innerHTML = renderLoadModal(state.modalVisible, state.modalUrlValue, state.modalError);
+      bindModalEvents();
+    }
+  }
+
+  function renderShortcutsOverlay(): string {
+    const rows: [string, string][] = [
+      ["/",      "Focus search"],
+      ["↑ ↓",   "Navigate endpoints"],
+      ["Enter",  "Select endpoint"],
+      ["Esc",    "Close / dismiss"],
+      ["⌘ K",   "Load spec"],
+      ["⌘ ↵",   "Execute request"],
+      ["?",      "Toggle this panel"],
+    ];
+    const rowsHtml = rows.map(([key, desc]) => `
+      <div class="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
+        <span class="text-xs text-gray-600">${desc}</span>
+        <kbd class="text-[10px] font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded border border-gray-200 shrink-0">${key}</kbd>
+      </div>`).join("");
+    return `
+      <div id="shortcuts-backdrop" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+            <span class="text-sm font-semibold text-gray-800">Keyboard shortcuts</span>
+            <button id="shortcuts-close" class="text-gray-400 hover:text-gray-600 text-xl leading-none transition-colors">×</button>
+          </div>
+          <div class="px-5 py-2">${rowsHtml}</div>
+        </div>
+      </div>`;
+  }
+
+  function bindShortcutsOverlayEvents() {
+    const close = () => { state.shortcutsVisible = false; renderModalPane(); };
+    $<HTMLElement>("#shortcuts-close")?.addEventListener("click", close);
+    $<HTMLElement>("#shortcuts-backdrop")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) close();
+    });
   }
 
   function renderAuthModalPane() {
@@ -549,15 +591,105 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     applyPageLayout();
   }
 
+  // ─── Keyboard shortcuts ───────────────────────────────────────────────────
+
+  function navigateNav(dir: "up" | "down") {
+    const buttons = Array.from($$<HTMLButtonElement>(".nav-endpoint"));
+    if (!buttons.length) return;
+    const focused = root.querySelector<HTMLButtonElement>(".nav-endpoint:focus");
+    const idx = focused ? buttons.indexOf(focused) : -1;
+    const next = dir === "down"
+      ? (idx + 1) % buttons.length
+      : (idx - 1 + buttons.length) % buttons.length;
+    buttons[next]?.focus();
+    buttons[next]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    const target = e.target as HTMLElement;
+    const tag = target.tagName;
+    const inInput = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+    const isMeta = e.metaKey || e.ctrlKey;
+
+    // ⌘/Ctrl shortcuts — fire even inside inputs
+    if (isMeta && e.key === "Enter") {
+      if (state.tryIt.endpoint && !state.tryIt.loading) {
+        e.preventDefault();
+        handleExecute();
+      }
+      return;
+    }
+    if (isMeta && (e.key === "k" || e.key === "K")) {
+      e.preventDefault();
+      state.shortcutsVisible = false;
+      state.modalVisible = true;
+      state.modalError = "";
+      renderModalPane();
+      return;
+    }
+
+    // Escape — dismiss whatever is open
+    if (e.key === "Escape") {
+      if (state.shortcutsVisible) { state.shortcutsVisible = false; renderModalPane(); return; }
+      if (state.modalVisible)     { closeModal(); return; }
+      if (state.authModalVisible) {
+        state.authModalVisible = false;
+        renderAuthModalPane(); renderTopBarPane(); renderTryItPane();
+        return;
+      }
+      if (root.contains(document.activeElement)) {
+        (document.activeElement as HTMLElement).blur();
+      }
+      return;
+    }
+
+    // Arrow-key nav — works from anywhere (including search input)
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (inInput && target.id !== "search-input") return;
+      e.preventDefault();
+      navigateNav(e.key === "ArrowDown" ? "down" : "up");
+      return;
+    }
+
+    // Single-key shortcuts — skip when typing
+    if (inInput) return;
+
+    if (e.key === "/") {
+      e.preventDefault();
+      const search = $<HTMLInputElement>("#search-input");
+      search?.focus();
+      search?.select();
+      return;
+    }
+
+    if (e.key === "?") {
+      e.preventDefault();
+      state.shortcutsVisible = !state.shortcutsVisible;
+      if (state.shortcutsVisible) { state.modalVisible = false; state.authModalVisible = false; }
+      renderModalPane();
+      return;
+    }
+  }
+
   // ─── Bootstrap ────────────────────────────────────────────────────────────
 
   const onHashChange = () => restoreFromHash();
   window.addEventListener("hashchange", onHashChange);
+  document.addEventListener("keydown", onKeyDown);
 
   renderModalPane();
   $<HTMLElement>("#load-spec-btn-initial")?.addEventListener("click", () => {
     state.modalVisible = true;
     renderModalPane();
+  });
+  // Delegated click for the shortcuts button — works in both initial and loaded top bar
+  root.addEventListener("click", (e) => {
+    if ((e.target as Element).closest("#shortcuts-btn")) {
+      state.shortcutsVisible = true;
+      state.modalVisible = false;
+      state.authModalVisible = false;
+      renderModalPane();
+    }
   });
 
   if (initialUrl) {
@@ -568,6 +700,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     loadUrl: loadSpecFromUrl,
     destroy() {
       window.removeEventListener("hashchange", onHashChange);
+      document.removeEventListener("keydown", onKeyDown);
     },
   };
 }

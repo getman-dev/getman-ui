@@ -51,7 +51,9 @@ export function renderNav(
           placeholder="Filter endpoints…"
           class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 rounded-md bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
         />
-        ${searchQuery ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 leading-none text-sm">×</button>` : ""}
+        ${searchQuery
+          ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 leading-none text-sm">×</button>`
+          : `<kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 border border-gray-200 rounded px-1 font-mono pointer-events-none leading-none">/</kbd>`}
       </div>
     </div>`;
 

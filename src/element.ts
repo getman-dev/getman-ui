@@ -19,6 +19,13 @@ const TEMPLATE = /* html */ `
         <span class="text-sm font-semibold text-gray-400">API Explorer</span>
       </div>
       <div class="flex-1"></div>
+      <button id="shortcuts-btn" title="Keyboard shortcuts"
+        class="flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-gray-600 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm0 4h18M7 15h.01M12 15h.01M17 15h.01M7 11h.01M12 11h.01M17 11h.01"/>
+        </svg>
+        Shortcuts
+      </button>
       <button
         id="load-spec-btn-initial"
         class="flex items-center gap-1.5 text-xs text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 px-3 py-1.5 rounded-md font-medium transition-colors shadow-sm"
@@ -27,6 +34,7 @@ const TEMPLATE = /* html */ `
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
         </svg>
         Load OpenAPI spec
+        <kbd class="ml-0.5 text-[9px] opacity-60 font-mono">⌘K</kbd>
       </button>
     </header>
   </div>

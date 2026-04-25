@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@layer base {
+  :root {
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Thin scrollbars */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  /* Smooth focus rings */
+  :focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+  }
+}
+
+@layer components {
+  /* Resizable pane handles */
+  .pane-handle {
+    width: 6px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 10;
+  }
+
+  .pane-handle-line {
+    width: 1px;
+    background: rgb(243, 244, 246); /* gray-100 */
+    transition: background-color 0.15s ease, width 0.1s ease;
+    flex: 1;
+  }
+
+  .pane-handle:hover .pane-handle-line {
+    background: rgb(147, 197, 253); /* blue-300 */
+    width: 2px;
+  }
+
+  .pane-handle.dragging .pane-handle-line {
+    background: rgb(59, 130, 246); /* blue-500 */
+    width: 2px;
+  }
+
+
+  /* Nav chevron transition */
+  .nav-tag-chevron {
+    transition: transform 150ms ease;
+  }
+
+  /* Response chevron */
+  .response-chevron {
+    transition: transform 150ms ease;
+  }
+
+  /* Endpoint active highlight bar */
+  .nav-endpoint.active {
+    position: relative;
+  }
+  .nav-endpoint.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #3b82f6;
+    border-radius: 0 1px 1px 0;
+  }
+}

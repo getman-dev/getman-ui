@@ -1,4 +1,4 @@
-import { escapeHtml } from "../renderer/nav";
+import { escapeHtml } from "../components/nav";
 
 // Regex matches (in order): keys, strings, true/false, null, numbers
 // Operates on already-HTML-escaped text, so quotes appear as &quot;

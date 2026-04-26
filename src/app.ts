@@ -6,10 +6,10 @@ import type {
   AuthValues,
 } from "./types/openapi";
 import { parseSpec, resolveParameter, buildUrl } from "./parser/spec-parser";
-import { renderNav } from "./renderer/nav";
-import { renderEndpointDetail, renderDetailEmpty } from "./pages/EndpointDetailPage";
-import { renderSchemaDetail } from "./pages/SchemaDetailPage";
-import { renderTryIt } from "./renderer/try-it";
+import { renderNav } from "./components/nav";
+import { renderEndpointDetail, renderDetailEmpty } from "./pages/endpoint-detail";
+import { renderSchemaDetail } from "./pages/schema-detail";
+import { renderTryIt } from "./components/try-it";
 import { renderTopBar } from "./components/top-bar";
 import { renderLoadModal } from "./components/load-modal";
 import { renderAuthModal } from "./components/auth-modal";

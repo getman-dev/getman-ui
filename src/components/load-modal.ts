@@ -1,4 +1,4 @@
-import { escapeAttr } from "../renderer/nav";
+import { escapeAttr } from "./nav";
 
 export function renderLoadModal(visible: boolean, urlValue = "", error = ""): string {
   if (!visible) return "";

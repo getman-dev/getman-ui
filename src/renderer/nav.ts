@@ -3,13 +3,13 @@ import type { TagGroup, EndpointEntry, HttpMethod, Schema } from "../types/opena
 // ─── Method badge colors (Tailwind classes) ───────────────────────────────────
 
 const METHOD_CLASSES: Record<HttpMethod | string, { bg: string; text: string }> = {
-  get:     { bg: "bg-blue-50",   text: "text-blue-700" },
-  post:    { bg: "bg-green-50",  text: "text-green-700" },
-  put:     { bg: "bg-amber-50",  text: "text-amber-700" },
-  delete:  { bg: "bg-red-50",    text: "text-red-700" },
-  patch:   { bg: "bg-pink-50",   text: "text-pink-700" },
-  options: { bg: "bg-gray-100",  text: "text-gray-600" },
-  head:    { bg: "bg-gray-100",  text: "text-gray-600" },
+  get:     { bg: "bg-blue-50 dark:bg-blue-900/30",    text: "text-blue-700 dark:text-blue-400" },
+  post:    { bg: "bg-green-50 dark:bg-green-900/30",  text: "text-green-700 dark:text-green-400" },
+  put:     { bg: "bg-amber-50 dark:bg-amber-900/30",  text: "text-amber-700 dark:text-amber-400" },
+  delete:  { bg: "bg-red-50 dark:bg-red-900/30",      text: "text-red-700 dark:text-red-400" },
+  patch:   { bg: "bg-pink-50 dark:bg-pink-900/30",    text: "text-pink-700 dark:text-pink-400" },
+  options: { bg: "bg-gray-100 dark:bg-gray-700",      text: "text-gray-600 dark:text-gray-400" },
+  head:    { bg: "bg-gray-100 dark:bg-gray-700",      text: "text-gray-600 dark:text-gray-400" },
 };
 
 export function methodBadgeClasses(method: string): string {
@@ -28,7 +28,7 @@ export function renderNav(
   activeSchema: string | null = null
 ): string {
   const tabs = `
-    <div class="flex border-b border-gray-100 shrink-0">
+    <div class="flex border-b border-gray-100 dark:border-gray-700 shrink-0">
       ${renderTab("endpoints", "Endpoints", activeTab)}
       ${renderTab("schemas", "Schemas", activeTab)}
     </div>`;
@@ -38,9 +38,9 @@ export function renderNav(
   }
 
   const searchBar = `
-    <div class="px-3 py-2.5 border-b border-gray-100 shrink-0">
+    <div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
       <div class="relative">
-        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input
@@ -49,11 +49,11 @@ export function renderNav(
           value="${escapeAttr(searchQuery)}"
           autocomplete="off"
           placeholder="Filter endpoints…"
-          class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 rounded-md bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
         />
         ${searchQuery
-          ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 leading-none text-sm">×</button>`
-          : `<kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 border border-gray-200 rounded px-1 font-mono pointer-events-none leading-none">/</kbd>`}
+          ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 leading-none text-sm">×</button>`
+          : `<kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 rounded px-1 font-mono pointer-events-none leading-none">/</kbd>`}
       </div>
     </div>`;
 
@@ -63,7 +63,7 @@ export function renderNav(
       return `
         <div class="nav-group" data-tag="${escapeAttr(group.name)}">
           <button
-            class="nav-tag-toggle w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors"
+            class="nav-tag-toggle w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-expanded="true"
           >
             <span>${escapeHtml(group.name)}</span>
@@ -87,8 +87,8 @@ function renderTab(id: "endpoints" | "schemas", label: string, active: "endpoint
     <button
       class="sidebar-tab flex-1 py-2 text-[11px] font-medium transition-colors border-b-2 ${
         isActive
-          ? "border-blue-500 text-blue-600"
-          : "border-transparent text-gray-400 hover:text-gray-600"
+          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+          : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
       }"
       data-tab="${id}"
     >${label}</button>`;
@@ -107,14 +107,14 @@ function renderSchemasPane(schemas: Record<string, Schema>, activeSchema: string
     const isActive = name === activeSchema;
     return `
       <button
-        class="nav-schema w-full text-left px-3 py-2 border-b border-gray-50 transition-colors ${isActive ? "bg-gray-100" : "hover:bg-gray-50"}"
+        class="nav-schema w-full text-left px-3 py-2 border-b border-gray-50 dark:border-gray-700/50 transition-colors ${isActive ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-700/50"}"
         data-name="${escapeAttr(name)}"
       >
         <div class="flex items-center gap-2">
-          <span class="shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-50 text-purple-700 uppercase">${escapeHtml(typeLabel || "obj")}</span>
-          <span class="truncate text-[11px] font-mono ${isActive ? "text-gray-900" : "text-gray-700"}">${escapeHtml(name)}</span>
+          <span class="shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 uppercase">${escapeHtml(typeLabel || "obj")}</span>
+          <span class="truncate text-[11px] font-mono ${isActive ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300"}">${escapeHtml(name)}</span>
         </div>
-        ${schema.description ? `<p class="mt-0.5 text-[10px] text-gray-400 truncate pl-[38px]">${escapeHtml(schema.description)}</p>` : ""}
+        ${schema.description ? `<p class="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500 truncate pl-[38px]">${escapeHtml(schema.description)}</p>` : ""}
       </button>`;
   }).join("");
 
@@ -124,8 +124,8 @@ function renderSchemasPane(schemas: Record<string, Schema>, activeSchema: string
 function renderNavItem(ep: EndpointEntry, active: EndpointEntry | null): string {
   const isActive = active?.path === ep.path && active?.method === ep.method;
   const activeClass = isActive
-    ? "bg-gray-100 text-gray-900"
-    : "text-gray-500 hover:bg-gray-50 hover:text-gray-800";
+    ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-800 dark:hover:text-gray-200";
 
   return `
     <button

@@ -7,7 +7,8 @@ import type {
 } from "./types/openapi";
 import { parseSpec, resolveParameter, buildUrl } from "./parser/spec-parser";
 import { renderNav } from "./renderer/nav";
-import { renderDetail, renderDetailEmpty, renderSchemaDetail } from "./renderer/detail";
+import { renderEndpointDetail, renderDetailEmpty } from "./pages/EndpointDetailPage";
+import { renderSchemaDetail } from "./pages/SchemaDetailPage";
 import { renderTryIt } from "./renderer/try-it";
 import { renderTopBar } from "./components/top-bar";
 import { renderLoadModal } from "./components/load-modal";
@@ -112,7 +113,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     if (!state.activeEndpoint) {
       $detail().innerHTML = renderDetailEmpty();
     } else {
-      $detail().innerHTML = renderDetail(state.activeEndpoint, state.spec.components);
+      $detail().innerHTML = renderEndpointDetail(state.activeEndpoint, state.spec.components);
       bindDetailEvents();
     }
   }
@@ -144,16 +145,16 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       ["?",      "Toggle this panel"],
     ];
     const rowsHtml = rows.map(([key, desc]) => `
-      <div class="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-        <span class="text-xs text-gray-600">${desc}</span>
-        <kbd class="text-[10px] font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded border border-gray-200 shrink-0">${key}</kbd>
+      <div class="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
+        <span class="text-xs text-gray-600 dark:text-gray-300">${desc}</span>
+        <kbd class="text-[10px] font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded border border-gray-200 dark:border-gray-600 shrink-0">${key}</kbd>
       </div>`).join("");
     return `
-      <div id="shortcuts-backdrop" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
-          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-            <span class="text-sm font-semibold text-gray-800">Keyboard shortcuts</span>
-            <button id="shortcuts-close" class="text-gray-400 hover:text-gray-600 text-xl leading-none transition-colors">×</button>
+      <div id="shortcuts-backdrop" class="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Keyboard shortcuts</span>
+            <button id="shortcuts-close" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none transition-colors">×</button>
           </div>
           <div class="px-5 py-2">${rowsHtml}</div>
         </div>
@@ -339,11 +340,15 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         $$<HTMLButtonElement>(".try-tab").forEach((t) => {
           const active = t === tab;
           t.classList.toggle("bg-white", active);
+          t.classList.toggle("dark:bg-gray-700", active);
           t.classList.toggle("shadow-sm", active);
           t.classList.toggle("text-gray-700", active);
+          t.classList.toggle("dark:text-gray-200", active);
           t.classList.toggle("border", active);
           t.classList.toggle("border-gray-200", active);
+          t.classList.toggle("dark:border-gray-600", active);
           t.classList.toggle("text-gray-400", !active);
+          t.classList.toggle("dark:text-gray-500", !active);
         });
         $<HTMLElement>("#try-tab-body")?.classList.toggle("hidden", target !== "body");
         $<HTMLElement>("#try-tab-headers")?.classList.toggle("hidden", target !== "headers");
@@ -544,19 +549,19 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   function setEndpointHash(endpoint: { method: string; path: string; operation: { operationId?: string } }) {
     const id = endpoint.operation.operationId ?? `${endpoint.method}:${endpoint.path}`;
-    history.replaceState(null, "", `#${encodeURIComponent(id)}`);
+    history.replaceState(null, "", `#endpoints/${encodeURIComponent(id)}`);
   }
 
   function setSchemaHash(name: string) {
-    history.replaceState(null, "", `#schema:${encodeURIComponent(name)}`);
+    history.replaceState(null, "", `#schemas/${encodeURIComponent(name)}`);
   }
 
   function restoreFromHash() {
     const hash = decodeURIComponent(window.location.hash.slice(1));
     if (!hash) return;
 
-    if (hash.startsWith("schema:")) {
-      const schemaName = hash.slice("schema:".length);
+    if (hash.startsWith("schemas/")) {
+      const schemaName = hash.slice("schemas/".length);
       const schemas = state.spec?.components?.schemas ?? {};
       if (!(schemaName in schemas)) return;
       state.activeSchema = schemaName;
@@ -569,26 +574,29 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       return;
     }
 
-    const all = state.groups.flatMap((g) => g.endpoints);
-    const found = all.find((ep) => {
-      if (ep.operation.operationId) return ep.operation.operationId === hash;
-      return `${ep.method}:${ep.path}` === hash;
-    });
-    if (!found || found === state.activeEndpoint) return;
+    if (hash.startsWith("endpoints/")) {
+      const id = hash.slice("endpoints/".length);
+      const all = state.groups.flatMap((g) => g.endpoints);
+      const found = all.find((ep) => {
+        if (ep.operation.operationId) return ep.operation.operationId === id;
+        return `${ep.method}:${ep.path}` === id;
+      });
+      if (!found || found === state.activeEndpoint) return;
 
-    state.activeEndpoint = found;
-    state.activeSchema = null;
-    state.tryIt = {
-      endpoint: found,
-      paramValues: {},
-      bodyValue: "",
-      response: null,
-      loading: false,
-    };
-    renderNavPane();
-    renderDetailPane();
-    renderTryItPane();
-    applyPageLayout();
+      state.activeEndpoint = found;
+      state.activeSchema = null;
+      state.tryIt = {
+        endpoint: found,
+        paramValues: {},
+        bodyValue: "",
+        response: null,
+        loading: false,
+      };
+      renderNavPane();
+      renderDetailPane();
+      renderTryItPane();
+      applyPageLayout();
+    }
   }
 
   // ─── Keyboard shortcuts ───────────────────────────────────────────────────
@@ -673,6 +681,24 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   // ─── Bootstrap ────────────────────────────────────────────────────────────
 
+  // ─── Dark mode ────────────────────────────────────────────────────────────
+
+  const DARK_KEY = "api-explorer-dark";
+  const systemDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+  let darkMode = localStorage.getItem(DARK_KEY) !== null
+    ? localStorage.getItem(DARK_KEY) === "true"
+    : systemDark;
+
+  function applyDark(on: boolean) {
+    darkMode = on;
+    root.classList.toggle("dark", on);
+    try { localStorage.setItem(DARK_KEY, String(on)); } catch { /* ignore */ }
+  }
+
+  applyDark(darkMode);
+
+  // ─── Bootstrap ────────────────────────────────────────────────────────────
+
   const onHashChange = () => restoreFromHash();
   window.addEventListener("hashchange", onHashChange);
   document.addEventListener("keydown", onKeyDown);
@@ -682,13 +708,17 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     state.modalVisible = true;
     renderModalPane();
   });
-  // Delegated click for the shortcuts button — works in both initial and loaded top bar
+  // Delegated clicks — work in both initial and loaded top bar
   root.addEventListener("click", (e) => {
-    if ((e.target as Element).closest("#shortcuts-btn")) {
+    const target = e.target as Element;
+    if (target.closest("#shortcuts-btn")) {
       state.shortcutsVisible = true;
       state.modalVisible = false;
       state.authModalVisible = false;
       renderModalPane();
+    }
+    if (target.closest("#dark-toggle-btn")) {
+      applyDark(!darkMode);
     }
   });
 

@@ -33,29 +33,11 @@ export function renderNav(
       ${renderTab("schemas", "Schemas", activeTab)}
     </div>`;
 
-  if (activeTab === "schemas") {
-    return tabs + renderSchemasPane(schemas, activeSchema);
-  }
+  const searchBar = renderSearchBar(searchQuery, activeTab);
 
-  const searchBar = `
-    <div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
-      <div class="relative">
-        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <input
-          id="search-input"
-          type="text"
-          value="${escapeAttr(searchQuery)}"
-          autocomplete="off"
-          placeholder="Filter endpoints…"
-          class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-        />
-        ${searchQuery
-          ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 leading-none text-sm">×</button>`
-          : `<kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 rounded px-1 font-mono pointer-events-none leading-none">/</kbd>`}
-      </div>
-    </div>`;
+  if (activeTab === "schemas") {
+    return tabs + searchBar + renderSchemasPane(schemas, activeSchema, searchQuery);
+  }
 
   const groupsHtml = groups.length
     ? groups.map((group) => {
@@ -75,10 +57,33 @@ export function renderNav(
         </div>`;
       }).join("")
     : `<div class="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center gap-2">
-        <p class="text-[11px] text-gray-400">No endpoints match</p>
+        <p class="text-[11px] text-gray-400 dark:text-gray-500">No endpoints match</p>
        </div>`;
 
   return tabs + searchBar + groupsHtml;
+}
+
+function renderSearchBar(searchQuery: string, activeTab: "endpoints" | "schemas"): string {
+  const placeholder = activeTab === "schemas" ? "Filter schemas…" : "Filter endpoints…";
+  return `
+    <div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
+      <div class="relative">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          id="search-input"
+          type="text"
+          value="${escapeAttr(searchQuery)}"
+          autocomplete="off"
+          placeholder="${escapeAttr(placeholder)}"
+          class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+        />
+        ${searchQuery
+          ? `<button id="search-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 leading-none text-sm">×</button>`
+          : `<kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 rounded px-1 font-mono pointer-events-none leading-none">/</kbd>`}
+      </div>
+    </div>`;
 }
 
 function renderTab(id: "endpoints" | "schemas", label: string, active: "endpoints" | "schemas"): string {
@@ -94,11 +99,23 @@ function renderTab(id: "endpoints" | "schemas", label: string, active: "endpoint
     >${label}</button>`;
 }
 
-function renderSchemasPane(schemas: Record<string, Schema>, activeSchema: string | null): string {
-  const names = Object.keys(schemas);
+function renderSchemasPane(schemas: Record<string, Schema>, activeSchema: string | null, searchQuery = ""): string {
+  const allNames = Object.keys(schemas);
+  if (!allNames.length) {
+    return `<div class="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center">
+      <p class="text-[11px] text-gray-400 dark:text-gray-500">No schemas defined</p>
+    </div>`;
+  }
+  const q = searchQuery.trim().toLowerCase();
+  const names = q
+    ? allNames.filter(name =>
+        name.toLowerCase().includes(q) ||
+        schemas[name].description?.toLowerCase().includes(q)
+      )
+    : allNames;
   if (!names.length) {
     return `<div class="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center">
-      <p class="text-[11px] text-gray-400">No schemas defined</p>
+      <p class="text-[11px] text-gray-400 dark:text-gray-500">No schemas match</p>
     </div>`;
   }
   const items = names.map((name) => {

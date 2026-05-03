@@ -1,5 +1,6 @@
 import type { Schema, Components } from "../types/openapi";
-import { resolveSchema, schemaToExample } from "../parser/spec-parser";
+import { resolveSchema } from "../parser/ref-resolver";
+import { schemaToExample } from "../parser/example-gen";
 import { escapeHtml } from "../utils/html";
 import { highlightJson } from "../utils/highlight";
 import { typeBadgeClass, schemaTypeLabel, renderSchemaNode, renderDetailEmpty } from "./endpoint-detail";

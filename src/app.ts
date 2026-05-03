@@ -5,7 +5,9 @@ import type {
   TryItState,
   AuthValues,
 } from "./types/openapi";
-import { parseSpec, resolveParameter, buildUrl } from "./parser/spec-parser";
+import { parseSpec } from "./parser/spec-parser";
+import { resolveParameter } from "./parser/ref-resolver";
+import { buildUrl } from "./parser/example-gen";
 import { renderNav } from "./components/nav";
 import { renderEndpointDetail, renderDetailEmpty } from "./pages/endpoint-detail";
 import { renderSchemaDetail } from "./pages/schema-detail";

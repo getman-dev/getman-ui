@@ -1,5 +1,6 @@
 import type { EndpointEntry, TryItResponse, Components, AuthValues, SecurityScheme } from "../types/openapi";
-import { resolveParameter, buildUrl } from "../parser/spec-parser";
+import { resolveParameter } from "../parser/ref-resolver";
+import { buildUrl } from "../parser/example-gen";
 
 // ─── Execute a real HTTP request ──────────────────────────────────────────────
 

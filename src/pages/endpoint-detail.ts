@@ -1,11 +1,6 @@
 import type { EndpointEntry, Parameter, Schema, Components, Response } from "../types/openapi";
-import {
-  resolveSchema,
-  resolveParameter,
-  getSuccessResponse,
-  getResponseExample,
-  schemaToExample,
-} from "../parser/spec-parser";
+import { resolveSchema, resolveParameter, resolveResponse } from "../parser/ref-resolver";
+import { schemaToExample, getSuccessResponse, getResponseExample } from "../parser/example-gen";
 import { escapeHtml } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";
@@ -254,7 +249,8 @@ function renderResponses(
     <div class="mb-6">
       <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Responses</h3>
       <div class="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden divide-y divide-gray-100 dark:divide-gray-700">
-        ${entries.map(([code, response]) => {
+        ${entries.map(([code, raw]) => {
+          const response = resolveResponse(raw, components);
           const example = getResponseExample(response, components);
           const hasContent = !!example;
           return `

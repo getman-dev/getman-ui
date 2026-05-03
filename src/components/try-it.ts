@@ -8,7 +8,8 @@ import type {
   Components,
   EndpointEntry,
 } from "../types/openapi";
-import { resolveParameter, resolveSchema, buildUrl, getRequestBodyExample } from "../parser/spec-parser";
+import { resolveParameter, resolveSchema } from "../parser/ref-resolver";
+import { buildUrl, getRequestBodyExample } from "../parser/example-gen";
 import { escapeHtml, escapeAttr } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";

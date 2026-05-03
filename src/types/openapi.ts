@@ -31,6 +31,7 @@ export interface Tag {
 export interface PathItem {
   summary?: string;
   description?: string;
+  parameters?: Parameter[];
   get?: Operation;
   post?: Operation;
   put?: Operation;

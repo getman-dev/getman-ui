@@ -217,7 +217,7 @@ src/
 │   └── SchemaDetailPage.ts     # Schema detail view
 ├── renderer/
 │   ├── nav.ts              # Navigation sidebar
-│   └── try-it.ts           # Try-it-out panel
+│   └── playground.ts           # Try-it-out panel
 ├── parser/
 │   └── spec-parser.ts      # OpenAPI spec parsing and resolution
 ├── types/

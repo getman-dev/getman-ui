@@ -2,7 +2,7 @@ import type {
   OpenAPISpec,
   EndpointEntry,
   TagGroup,
-  TryItState,
+  PlaygroundState,
   AuthValues,
 } from "./types/openapi";
 import { parseSpec } from "./parser/spec-parser";
@@ -11,7 +11,8 @@ import { buildUrl } from "./parser/example-gen";
 import { renderNav } from "./components/nav";
 import { renderEndpointDetail, renderDetailEmpty } from "./pages/endpoint-detail";
 import { renderSchemaDetail } from "./pages/schema-detail";
-import { renderTryIt } from "./components/try-it";
+import { SCHEMA_VIEWER_TAB_CLASSES } from "./components/schema-viewer";
+import { renderPlayground } from "./components/playground";
 import { renderTopBar } from "./components/top-bar";
 import { renderLoadModal } from "./components/load-modal";
 import { renderAuthModal } from "./components/auth-modal";
@@ -30,7 +31,7 @@ interface AppState {
   spec: OpenAPISpec | null;
   groups: TagGroup[];
   activeEndpoint: EndpointEntry | null;
-  tryIt: TryItState;
+  playground: PlaygroundState;
   searchQuery: string;
   selectedServer: string;
   modalVisible: boolean;
@@ -50,7 +51,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     spec: null,
     groups: [],
     activeEndpoint: null,
-    tryIt: { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false },
+    playground: { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false },
     searchQuery: "",
     selectedServer: "",
     modalVisible: false,
@@ -109,6 +110,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       const schema = state.spec.components?.schemas?.[state.activeSchema];
       if (schema) {
         $detail().innerHTML = renderSchemaDetail(state.activeSchema, schema, state.spec.components);
+        bindDetailEvents();
         return;
       }
     }
@@ -122,7 +124,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   function renderTryItPane() {
     if (!state.spec) return;
-    $tryIt().innerHTML = renderTryIt(state.tryIt, state.spec, state.authValues);
+    $tryIt().innerHTML = renderPlayground(state.playground, state.spec, state.authValues);
     bindTryItEvents();
   }
 
@@ -238,7 +240,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       btn.addEventListener("click", () => {
         state.activeSchema = btn.dataset.name!;
         state.activeEndpoint = null;
-        state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
+        state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
         setSchemaHash(state.activeSchema);
         renderNavPane();
         renderDetailPane();
@@ -257,7 +259,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         if (!found) return;
         state.activeEndpoint = found;
         state.activeSchema = null;
-        state.tryIt = {
+        state.playground = {
           endpoint: found,
           paramValues: {},
           bodyValue: "",
@@ -297,20 +299,34 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         chevron?.style.setProperty("transform", hidden ? "" : "rotate(180deg)");
       });
     });
+
+    $$<HTMLButtonElement>(".schema-viewer-tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const viewer = btn.closest(".schema-viewer");
+        if (!viewer) return;
+        const target = btn.dataset.tab;
+        viewer.querySelectorAll<HTMLButtonElement>(".schema-viewer-tab").forEach((t) => {
+          t.className = t === btn ? SCHEMA_VIEWER_TAB_CLASSES.active : SCHEMA_VIEWER_TAB_CLASSES.inactive;
+        });
+        viewer.querySelectorAll<HTMLElement>(".schema-viewer-panel").forEach((panel) => {
+          panel.classList.toggle("hidden", panel.dataset.panel !== target);
+        });
+      });
+    });
   }
 
   function bindTryItEvents() {
     $$<HTMLInputElement | HTMLSelectElement>(".try-input").forEach((input) => {
       input.addEventListener("input", () => {
         const name = (input as HTMLElement).dataset.name!;
-        state.tryIt.paramValues[name] = input.value;
+        state.playground.paramValues[name] = input.value;
         updateUrlPreview();
       });
     });
 
     const bodyTextarea = $<HTMLTextAreaElement>("#try-body");
     bodyTextarea?.addEventListener("input", () => {
-      state.tryIt.bodyValue = bodyTextarea.value;
+      state.playground.bodyValue = bodyTextarea.value;
     });
 
     $<HTMLElement>("#try-body-format")?.addEventListener("click", () => {
@@ -318,7 +334,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       try {
         const pretty = JSON.stringify(JSON.parse(bodyTextarea.value), null, 2);
         bodyTextarea.value = pretty;
-        state.tryIt.bodyValue = pretty;
+        state.playground.bodyValue = pretty;
       } catch { /* not valid JSON, ignore */ }
     });
 
@@ -326,7 +342,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     $$<HTMLInputElement | HTMLTextAreaElement>(".try-body-field").forEach((input) => {
       input.addEventListener("input", () => {
         const name = (input as HTMLElement).dataset.bodyField!;
-        state.tryIt.bodyParams[name] = input.value;
+        state.playground.bodyParams[name] = input.value;
       });
     });
 
@@ -335,7 +351,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       input.addEventListener("change", () => {
         const name = input.dataset.bodyFile!;
         if (!input.files?.length) return;
-        state.tryIt.fileValues[name] = input.multiple
+        state.playground.fileValues[name] = input.multiple
           ? Array.from(input.files)
           : input.files[0];
       });
@@ -344,7 +360,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     // Raw octet-stream file
     $<HTMLInputElement>("#try-body-raw-file")?.addEventListener("change", (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) state.tryIt.fileValues["__raw__"] = file;
+      if (file) state.playground.fileValues["__raw__"] = file;
     });
 
     $<HTMLElement>("#try-execute")?.addEventListener("click", handleExecute);
@@ -386,38 +402,38 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
   }
 
   function updateUrlPreview() {
-    if (!state.spec || !state.tryIt.endpoint) return;
-    const params = (state.tryIt.endpoint.operation.parameters ?? []).map((p) =>
+    if (!state.spec || !state.playground.endpoint) return;
+    const params = (state.playground.endpoint.operation.parameters ?? []).map((p) =>
       resolveParameter(p, state.spec!.components)
     );
     const baseUrl = state.selectedServer || state.spec.servers?.[0]?.url || "http://localhost";
-    const url = buildUrl(baseUrl, state.tryIt.endpoint.path, state.tryIt.paramValues, params);
+    const url = buildUrl(baseUrl, state.playground.endpoint.path, state.playground.paramValues, params);
     const preview = $<HTMLElement>("#try-url-preview");
     if (preview) preview.textContent = url;
   }
 
   async function handleExecute() {
-    if (!state.spec || !state.tryIt.endpoint) return;
+    if (!state.spec || !state.playground.endpoint) return;
 
-    state.tryIt.loading = true;
-    state.tryIt.response = null;
+    state.playground.loading = true;
+    state.playground.response = null;
     renderTryItPane();
 
     try {
       const baseUrl = state.selectedServer || state.spec.servers?.[0]?.url || "http://localhost";
       const response = await executeRequest(
-        state.tryIt.endpoint,
-        state.tryIt.paramValues,
-        state.tryIt.bodyValue,
+        state.playground.endpoint,
+        state.playground.paramValues,
+        state.playground.bodyValue,
         baseUrl,
         state.spec.components,
         state.authValues,
-        state.tryIt.bodyParams,
-        state.tryIt.fileValues
+        state.playground.bodyParams,
+        state.playground.fileValues
       );
-      state.tryIt.response = response;
+      state.playground.response = response;
     } catch (err) {
-      state.tryIt.response = {
+      state.playground.response = {
         status: 0,
         statusText: isCorsError(err)
           ? "CORS error — request blocked by browser"
@@ -430,7 +446,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       };
     }
 
-    state.tryIt.loading = false;
+    state.playground.loading = false;
     renderTryItPane();
   }
 
@@ -555,7 +571,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     state.groups = parseSpec(parsed);
     state.activeEndpoint = null;
     state.activeSchema = null;
-    state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
+    state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
     state.selectedServer = parsed.servers?.[0]?.url ?? "";
     state.searchQuery = "";
     state.modalVisible = false;
@@ -598,7 +614,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       state.activeSchema = schemaName;
       state.activeEndpoint = null;
       state.sidebarTab = "schemas";
-      state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
+      state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
       renderNavPane();
       renderDetailPane();
       applyPageLayout();
@@ -616,7 +632,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
       state.activeEndpoint = found;
       state.activeSchema = null;
-      state.tryIt = {
+      state.playground = {
         endpoint: found,
         paramValues: {},
         bodyValue: "",
@@ -654,7 +670,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
     // ⌘/Ctrl shortcuts — fire even inside inputs
     if (isMeta && e.key === "Enter") {
-      if (state.tryIt.endpoint && !state.tryIt.loading) {
+      if (state.playground.endpoint && !state.playground.loading) {
         e.preventDefault();
         handleExecute();
       }

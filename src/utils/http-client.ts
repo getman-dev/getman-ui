@@ -1,4 +1,4 @@
-import type { EndpointEntry, TryItResponse, Components, AuthValues, SecurityScheme } from "../types/openapi";
+import type { EndpointEntry, PlaygroundResponse, Components, AuthValues, SecurityScheme } from "../types/openapi";
 import { resolveParameter } from "../parser/ref-resolver";
 import { buildUrl } from "../parser/example-gen";
 
@@ -13,7 +13,7 @@ export async function executeRequest(
   authValues?: AuthValues,
   bodyParams?: Record<string, string>,
   fileValues?: Record<string, File | File[]>
-): Promise<TryItResponse> {
+): Promise<PlaygroundResponse> {
   const params = (endpoint.operation.parameters ?? []).map((p) =>
     resolveParameter(p, components)
   );

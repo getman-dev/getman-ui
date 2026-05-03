@@ -87,7 +87,7 @@ const TEMPLATE = /* html */ `
 
     <aside id="try-pane" class="shrink-0 bg-white dark:bg-gray-900 overflow-hidden">
       <div class="h-full flex flex-col items-center justify-center text-center px-5 gap-2">
-        <p class="text-xs text-gray-400 dark:text-gray-500">Try-it panel</p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">Playground</p>
       </div>
     </aside>
 

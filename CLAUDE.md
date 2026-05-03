@@ -26,7 +26,7 @@ src/
   components/
     nav.ts            # Sidebar: endpoint list, schema list, search, tabs
     top-bar.ts        # Header: title, server selector, dark mode, auth button
-    try-it.ts         # Try-it-out panel: params, body, auth, request/response
+    playground.ts         # Try-it-out panel: params, body, auth, request/response
     auth-modal.ts     # Auth configuration modal
     load-modal.ts     # Spec loader modal (URL or file upload)
   pages/

@@ -173,17 +173,17 @@ export interface TagGroup {
   endpoints: EndpointEntry[];
 }
 
-export interface TryItState {
+export interface PlaygroundState {
   endpoint: EndpointEntry | null;
   paramValues: Record<string, string>;
   bodyValue: string;
   bodyParams: Record<string, string>;
   fileValues: Record<string, File | File[]>;
-  response: TryItResponse | null;
+  response: PlaygroundResponse | null;
   loading: boolean;
 }
 
-export interface TryItResponse {
+export interface PlaygroundResponse {
   status: number;
   statusText: string;
   headers: Record<string, string>;

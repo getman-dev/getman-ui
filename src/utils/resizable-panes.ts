@@ -6,10 +6,10 @@ const MIN_DETAIL = 20; // % always reserved for center pane
 
 interface StoredWidths {
   nav: number;
-  tryIt: number;
+  playground: number;
 }
 
-const DEFAULTS: StoredWidths = { nav: 25, tryIt: 25 };
+const DEFAULTS: StoredWidths = { nav: 25, playground: 25 };
 
 function load(): StoredWidths {
   try {
@@ -18,7 +18,7 @@ function load(): StoredWidths {
       const p = JSON.parse(raw) as Partial<StoredWidths>;
       return {
         nav: typeof p.nav === "number" ? p.nav : DEFAULTS.nav,
-        tryIt: typeof p.tryIt === "number" ? p.tryIt : DEFAULTS.tryIt,
+        playground: typeof p.playground === "number" ? p.playground : DEFAULTS.playground,
       };
     }
   } catch { /* ignore corrupt storage */ }
@@ -51,7 +51,7 @@ export function initResizablePanes(root: HTMLElement = document.documentElement)
   function applyWidths(): void {
     const W = usableWidth();
     navEl.style.width = `${Math.round(W * state.nav / 100)}px`;
-    tryItEl.style.width = `${Math.round(W * state.tryIt / 100)}px`;
+    tryItEl.style.width = `${Math.round(W * state.playground / 100)}px`;
   }
 
   applyWidths();
@@ -75,13 +75,13 @@ export function initResizablePanes(root: HTMLElement = document.documentElement)
           // Left handle: drag right expands nav, shrinks detail
           state.nav = Math.max(
             MIN_NAV,
-            Math.min(startState.nav + deltaPct, 100 - MIN_DETAIL - state.tryIt)
+            Math.min(startState.nav + deltaPct, 100 - MIN_DETAIL - state.playground)
           );
         } else {
           // Right handle: drag right shrinks tryIt, expands detail
-          state.tryIt = Math.max(
+          state.playground = Math.max(
             MIN_TRYIT,
-            Math.min(startState.tryIt - deltaPct, 100 - MIN_DETAIL - state.nav)
+            Math.min(startState.playground - deltaPct, 100 - MIN_DETAIL - state.nav)
           );
         }
 

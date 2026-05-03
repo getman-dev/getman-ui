@@ -1,5 +1,5 @@
 import type {
-  TryItState,
+  PlaygroundState,
   OpenAPISpec,
   Parameter,
   AuthValues,
@@ -99,7 +99,7 @@ function renderParamField(param: Parameter, currentValue: string): string {
 
 // ─── Response panel ───────────────────────────────────────────────────────────
 
-function renderResponsePanel(state: TryItState): string {
+function renderResponsePanel(state: PlaygroundState): string {
   if (state.loading) {
     return `
       <div class="shrink-0 border-t border-gray-100 dark:border-gray-700 h-14 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/30">
@@ -250,7 +250,7 @@ function renderMultipartField(
 
 function renderBodySection(
   endpoint: EndpointEntry,
-  state: TryItState,
+  state: PlaygroundState,
   components: Components | undefined
 ): string {
   const rb = endpoint.operation.requestBody;
@@ -313,7 +313,7 @@ function renderBodySection(
 
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
-export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: AuthValues): string {
+export function renderPlayground(state: PlaygroundState, spec: OpenAPISpec, authValues: AuthValues): string {
   if (!state.endpoint) {
     return `
       <div class="h-full flex flex-col items-center justify-center text-center px-6 gap-3">
@@ -322,7 +322,7 @@ export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: Au
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
         </div>
-        <p class="text-sm text-gray-400 dark:text-gray-500">Select an endpoint to try it</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500">Select an endpoint to use the playground</p>
       </div>`;
   }
 
@@ -344,7 +344,7 @@ export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: Au
 
       <!-- Header -->
       <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
-        <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Try it out</span>
+        <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
         <div class="flex-1"></div>
         ${servers.length > 1
           ? `<select id="try-server" class="text-[10px] font-mono text-gray-500 dark:text-gray-400 bg-transparent border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:bg-gray-800">

@@ -33,20 +33,30 @@ function renderParameters(params: Parameter[], components: Components | undefine
       <div class="mb-4">
         <h4 class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">${location}</h4>
         <div class="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden">
-          ${items.map((rawParam) => {
-            const param = resolveParameter(rawParam, components);
-            const schema = resolveSchema(param.schema, components);
-            return `
-              <div class="flex items-start gap-3 px-3 py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 bg-white dark:bg-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
-                <div class="min-w-[120px]">
-                  <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">${escapeHtml(param.name)}</span>
-                  ${param.required ? '<span class="text-red-500 text-[9px] font-semibold">*</span>' : ""}
-                  ${param.deprecated ? '<span class="text-gray-400 dark:text-gray-500 text-[9px] ml-1">deprecated</span>' : ""}
-                </div>
-                <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded px-1.5 py-0.5 font-mono shrink-0">${schema?.type ?? "string"}</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 flex-1">${escapeHtml(param.description ?? schema?.description ?? "")}</span>
-              </div>`;
-          }).join("")}
+          <table class="w-full border-collapse">
+            <tbody>
+              ${items.map((rawParam) => {
+                const param = resolveParameter(rawParam, components);
+                const schema = resolveSchema(param.schema, components);
+                return `
+                  <tr class="border-b border-gray-100 dark:border-gray-700 last:border-0 bg-white dark:bg-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td class="px-3 py-2.5 whitespace-nowrap">
+                      <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">${escapeHtml(param.name)}</span>
+                      ${param.required ? '<span class="text-red-500 text-[9px] font-semibold ml-1">*</span>' : ""}
+                      ${param.deprecated ? '<span class="text-gray-400 dark:text-gray-500 text-[9px] ml-1">deprecated</span>' : ""}
+                    </td>
+                    <td class="px-3 py-2.5 whitespace-nowrap">
+                      <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded px-1.5 py-0.5 font-mono">${schema?.type ?? "string"}</span>
+                    </td>
+                    <td class="px-3 py-2.5 whitespace-nowrap">
+                      ${schema?.minimum !== undefined ? `<span class="text-[10px] font-mono text-gray-400 dark:text-gray-500">min:${schema.minimum}</span>` : ""}
+                      ${schema?.maximum !== undefined ? `<span class="text-[10px] font-mono text-gray-400 dark:text-gray-500 ml-1.5">max:${schema.maximum}</span>` : ""}
+                    </td>
+                    <td class="px-3 py-2.5 w-full text-xs text-gray-500 dark:text-gray-400">${escapeHtml(param.description ?? schema?.description ?? "")}</td>
+                  </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
         </div>
       </div>`)
     .join("");

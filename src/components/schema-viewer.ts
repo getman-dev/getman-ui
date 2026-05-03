@@ -129,6 +129,15 @@ export function renderSchemaNode(
       ? `<span class="text-[9px] text-gray-400 dark:text-gray-500 font-mono">${resolved.enum.slice(0, 4).map((v) => escapeHtml(String(v))).join(" | ")}</span>`
       : "";
 
+  const constraintsHtml = [
+    resolved.minimum   !== undefined ? `min:${resolved.minimum}`       : "",
+    resolved.maximum   !== undefined ? `max:${resolved.maximum}`       : "",
+    resolved.minLength !== undefined ? `minLen:${resolved.minLength}`  : "",
+    resolved.maxLength !== undefined ? `maxLen:${resolved.maxLength}`  : "",
+  ].filter(Boolean).map(c =>
+    `<span class="text-[9px] font-mono text-gray-400 dark:text-gray-500">${c}</span>`
+  ).join("");
+
   let childrenHtml = "";
   if (combined?.length) {
     const inner = combined.map((s, i) => renderSchemaNode(`[${i}]`, s, components, depth + 1, false)).join("");
@@ -150,6 +159,7 @@ export function renderSchemaNode(
         ${required ? '<span class="text-red-400 text-[9px] font-semibold">*</span>' : ""}
         <span class="text-[10px] rounded px-1.5 py-0.5 font-mono ${badgeClass}">${escapeHtml(typeLabel)}</span>
         ${resolved.nullable ? '<span class="text-[9px] bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded px-1 font-mono">nullable</span>' : ""}
+        ${constraintsHtml}
         ${resolved.description ? `<span class="text-[11px] text-gray-400 dark:text-gray-500">${escapeHtml(resolved.description)}</span>` : ""}
         ${enumHtml}
       </div>

@@ -15,7 +15,7 @@ import { SCHEMA_VIEWER_TAB_CLASSES } from "./components/schema-viewer";
 import { renderPlayground } from "./components/playground";
 import { renderTopBar } from "./components/top-bar";
 import { renderLoadModal } from "./components/load-modal";
-import { renderAuthModal } from "./components/auth-modal";
+import { renderAuthModal, AUTH_SCHEME_TAB_CLASSES } from "./components/auth-modal";
 import { executeRequest, isCorsError } from "./utils/http-client";
 
 // ─── Public interface ─────────────────────────────────────────────────────────
@@ -462,6 +462,18 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     $<HTMLElement>("#auth-modal-done")?.addEventListener("click", close);
     $<HTMLElement>("#auth-modal-backdrop")?.addEventListener("click", (e) => {
       if (e.target === e.currentTarget) close();
+    });
+
+    $$<HTMLButtonElement>(".auth-scheme-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const scheme = tab.dataset.scheme!;
+        $$<HTMLButtonElement>(".auth-scheme-tab").forEach((t) => {
+          t.className = t === tab ? AUTH_SCHEME_TAB_CLASSES.active : AUTH_SCHEME_TAB_CLASSES.inactive;
+        });
+        $$<HTMLElement>(".auth-scheme-panel").forEach((panel) => {
+          panel.classList.toggle("hidden", panel.dataset.panel !== scheme);
+        });
+      });
     });
 
     $$<HTMLButtonElement>(".auth-authorize-btn").forEach((btn) => {

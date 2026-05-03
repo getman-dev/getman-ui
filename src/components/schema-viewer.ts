@@ -10,7 +10,7 @@ import { schemaToExample } from "../parser/example-gen";
 import { highlightJson } from "../utils/highlight";
 import {escapeHtml} from "../utils/html";
 
-const TAB_ACTIVE   = "schema-viewer-tab px-3 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600";
+const TAB_ACTIVE   = "schema-viewer-tab px-3 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600";
 const TAB_INACTIVE = "schema-viewer-tab px-3 py-1 text-[11px] font-medium rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors";
 
 /** Exported so `app.ts` can restore tab appearance without duplicating the class strings. */

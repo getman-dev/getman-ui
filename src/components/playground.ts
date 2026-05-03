@@ -357,7 +357,7 @@ export function renderPlayground(state: PlaygroundState, spec: OpenAPISpec, auth
       <!-- URL bar + Send -->
       <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0 bg-gray-50/50 dark:bg-gray-800/30">
         <div class="flex items-stretch gap-2">
-          <div class="flex items-center gap-2 flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg px-2.5 py-2 shadow-sm">
+          <div class="flex items-center gap-2 flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg px-2.5 py-2">
             <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0 ${methodBadgeClasses(ep.method)}">${ep.method.toUpperCase()}</span>
             <code class="text-[10px] text-gray-600 dark:text-gray-400 leading-tight flex-1 min-w-0 break-all" id="try-url-preview">${escapeHtml(builtUrl)}</code>
           </div>

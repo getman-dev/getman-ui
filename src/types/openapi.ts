@@ -176,6 +176,8 @@ export interface TryItState {
   endpoint: EndpointEntry | null;
   paramValues: Record<string, string>;
   bodyValue: string;
+  bodyParams: Record<string, string>;
+  fileValues: Record<string, File | File[]>;
   response: TryItResponse | null;
   loading: boolean;
 }

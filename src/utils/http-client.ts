@@ -9,7 +9,9 @@ export async function executeRequest(
   bodyValue: string,
   baseUrl: string,
   components: Components | undefined,
-  authValues?: AuthValues
+  authValues?: AuthValues,
+  bodyParams?: Record<string, string>,
+  fileValues?: Record<string, File | File[]>
 ): Promise<TryItResponse> {
   const params = (endpoint.operation.parameters ?? []).map((p) =>
     resolveParameter(p, components)
@@ -52,9 +54,38 @@ export async function executeRequest(
     headers[p.name] = paramValues[p.name];
   }
 
-  const hasBody = ["post", "put", "patch"].includes(endpoint.method);
-  if (hasBody && bodyValue.trim()) {
-    headers["Content-Type"] = "application/json";
+  const canHaveBody = ["post", "put", "patch", "delete"].includes(endpoint.method);
+  const reqContent = endpoint.operation.requestBody?.content ?? {};
+  const isMultipart = "multipart/form-data" in reqContent;
+  const isOctetStream = "application/octet-stream" in reqContent;
+
+  let fetchBody: BodyInit | undefined;
+
+  if (canHaveBody) {
+    if (isMultipart) {
+      const formData = new FormData();
+      for (const [name, value] of Object.entries(bodyParams ?? {})) {
+        if (value !== "") formData.append(name, value);
+      }
+      for (const [name, fileOrFiles] of Object.entries(fileValues ?? {})) {
+        if (Array.isArray(fileOrFiles)) {
+          for (const f of fileOrFiles) formData.append(name, f);
+        } else {
+          formData.append(name, fileOrFiles);
+        }
+      }
+      fetchBody = formData;
+      // Don't set Content-Type — browser must set it with the multipart boundary
+    } else if (isOctetStream) {
+      const rawFile = fileValues?.["__raw__"] as File | undefined;
+      if (rawFile) {
+        headers["Content-Type"] = "application/octet-stream";
+        fetchBody = rawFile;
+      }
+    } else if (bodyValue.trim()) {
+      headers["Content-Type"] = "application/json";
+      fetchBody = bodyValue;
+    }
   }
 
   const start = performance.now();
@@ -62,7 +93,7 @@ export async function executeRequest(
   const res = await fetch(url, {
     method: endpoint.method.toUpperCase(),
     headers,
-    body: hasBody && bodyValue.trim() ? bodyValue : undefined,
+    body: fetchBody,
     credentials: "omit",
   });
 

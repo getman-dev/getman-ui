@@ -48,7 +48,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     spec: null,
     groups: [],
     activeEndpoint: null,
-    tryIt: { endpoint: null, paramValues: {}, bodyValue: "", response: null, loading: false },
+    tryIt: { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false },
     searchQuery: "",
     selectedServer: "",
     modalVisible: false,
@@ -236,7 +236,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       btn.addEventListener("click", () => {
         state.activeSchema = btn.dataset.name!;
         state.activeEndpoint = null;
-        state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", response: null, loading: false };
+        state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
         setSchemaHash(state.activeSchema);
         renderNavPane();
         renderDetailPane();
@@ -259,6 +259,8 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
           endpoint: found,
           paramValues: {},
           bodyValue: "",
+          bodyParams: {},
+          fileValues: {},
           response: null,
           loading: false,
         };
@@ -316,6 +318,31 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         bodyTextarea.value = pretty;
         state.tryIt.bodyValue = pretty;
       } catch { /* not valid JSON, ignore */ }
+    });
+
+    // Multipart text/object fields
+    $$<HTMLInputElement | HTMLTextAreaElement>(".try-body-field").forEach((input) => {
+      input.addEventListener("input", () => {
+        const name = (input as HTMLElement).dataset.bodyField!;
+        state.tryIt.bodyParams[name] = input.value;
+      });
+    });
+
+    // Multipart file inputs
+    $$<HTMLInputElement>(".try-file-input").forEach((input) => {
+      input.addEventListener("change", () => {
+        const name = input.dataset.bodyFile!;
+        if (!input.files?.length) return;
+        state.tryIt.fileValues[name] = input.multiple
+          ? Array.from(input.files)
+          : input.files[0];
+      });
+    });
+
+    // Raw octet-stream file
+    $<HTMLInputElement>("#try-body-raw-file")?.addEventListener("change", (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) state.tryIt.fileValues["__raw__"] = file;
     });
 
     $<HTMLElement>("#try-execute")?.addEventListener("click", handleExecute);
@@ -382,7 +409,9 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         state.tryIt.bodyValue,
         baseUrl,
         state.spec.components,
-        state.authValues
+        state.authValues,
+        state.tryIt.bodyParams,
+        state.tryIt.fileValues
       );
       state.tryIt.response = response;
     } catch (err) {
@@ -524,7 +553,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     state.groups = parseSpec(parsed);
     state.activeEndpoint = null;
     state.activeSchema = null;
-    state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", response: null, loading: false };
+    state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
     state.selectedServer = parsed.servers?.[0]?.url ?? "";
     state.searchQuery = "";
     state.modalVisible = false;
@@ -567,7 +596,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       state.activeSchema = schemaName;
       state.activeEndpoint = null;
       state.sidebarTab = "schemas";
-      state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", response: null, loading: false };
+      state.tryIt = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
       renderNavPane();
       renderDetailPane();
       applyPageLayout();
@@ -589,6 +618,8 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         endpoint: found,
         paramValues: {},
         bodyValue: "",
+        bodyParams: {},
+        fileValues: {},
         response: null,
         loading: false,
       };

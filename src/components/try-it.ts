@@ -4,8 +4,11 @@ import type {
   Parameter,
   AuthValues,
   SecurityScheme,
+  Schema,
+  Components,
+  EndpointEntry,
 } from "../types/openapi";
-import { resolveParameter, buildUrl, getRequestBodyExample } from "../parser/spec-parser";
+import { resolveParameter, resolveSchema, buildUrl, getRequestBodyExample } from "../parser/spec-parser";
 import { escapeHtml, escapeAttr, methodBadgeClasses } from "./nav";
 import { highlightJson } from "../utils/highlight";
 
@@ -176,6 +179,136 @@ function section(label: string, content: string): string {
     </div>`;
 }
 
+// ─── Request body rendering ───────────────────────────────────────────────────
+
+function getBodyContentType(endpoint: EndpointEntry): string {
+  const content = endpoint.operation.requestBody?.content ?? {};
+  if ("multipart/form-data" in content) return "multipart/form-data";
+  if ("application/octet-stream" in content) return "application/octet-stream";
+  if ("application/json" in content) return "application/json";
+  return Object.keys(content)[0] ?? "application/json";
+}
+
+const fileInputClass =
+  "try-file-input block w-full text-xs text-gray-600 dark:text-gray-400 cursor-pointer " +
+  "file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 " +
+  "file:text-xs file:font-medium file:bg-blue-50 dark:file:bg-blue-900/40 " +
+  "file:text-blue-600 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/60";
+
+const fieldInputClass =
+  "try-body-field w-full text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 " +
+  "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 " +
+  "placeholder-gray-300 dark:placeholder-gray-500 focus:outline-none focus:ring-1 " +
+  "focus:ring-blue-400 focus:border-blue-400 transition-colors font-mono";
+
+function renderMultipartField(
+  name: string,
+  prop: Schema,
+  required: boolean,
+  currentValue: string,
+  components: Components | undefined
+): string {
+  const resolved = resolveSchema(prop, components);
+  const isBinary = resolved?.format === "binary";
+  const isMultiBinary =
+    resolved?.type === "array" &&
+    resolveSchema(resolved.items, components)?.format === "binary";
+  const isObject = resolved?.type === "object" || (resolved?.properties != null && !isBinary);
+
+  const reqBadge = required
+    ? '<span class="text-red-500 text-[9px] font-semibold">required</span>'
+    : "";
+  const typeBadge =
+    isBinary || isMultiBinary
+      ? '<span class="text-[9px] text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded px-1">file</span>'
+      : "";
+  const desc = resolved?.description
+    ? `<p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">${escapeHtml(resolved.description)}</p>`
+    : "";
+
+  const label = `
+    <label class="flex items-center gap-1.5 mb-1.5">
+      <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">${escapeHtml(name)}</span>
+      ${reqBadge}${typeBadge}
+    </label>`;
+
+  if (isBinary) {
+    return `<div>${label}<input type="file" class="${fileInputClass}" data-body-file="${escapeAttr(name)}" />${desc}</div>`;
+  }
+  if (isMultiBinary) {
+    return `<div>${label}<input type="file" multiple class="${fileInputClass}" data-body-file="${escapeAttr(name)}" />${desc}</div>`;
+  }
+  if (isObject) {
+    return `<div>${label}<textarea rows="3" class="${fieldInputClass}" data-body-field="${escapeAttr(name)}" placeholder='{"key": "value"}'>${escapeHtml(currentValue)}</textarea>${desc}</div>`;
+  }
+
+  const inputType = resolved?.type === "integer" || resolved?.type === "number" ? "number" : "text";
+  return `<div>${label}<input type="${inputType}" class="${fieldInputClass}" data-body-field="${escapeAttr(name)}" value="${escapeAttr(currentValue)}" placeholder="${escapeAttr(resolved?.example != null ? String(resolved.example) : name)}" />${desc}</div>`;
+}
+
+function renderBodySection(
+  endpoint: EndpointEntry,
+  state: TryItState,
+  components: Components | undefined
+): string {
+  const rb = endpoint.operation.requestBody;
+  if (!rb) return "";
+
+  const content = rb.content ?? {};
+  const contentType = getBodyContentType(endpoint);
+  const requiredMark = rb.required
+    ? ' <span class="text-red-500 normal-case font-normal">required</span>'
+    : "";
+
+  if (contentType === "multipart/form-data") {
+    const schema = resolveSchema(content["multipart/form-data"]?.schema, components);
+    const props = schema?.properties ?? {};
+    const requiredSet = new Set(schema?.required ?? []);
+    const fields = Object.entries(props)
+      .map(([name, prop]) =>
+        renderMultipartField(name, prop, requiredSet.has(name), state.bodyParams[name] ?? "", components)
+      )
+      .join("");
+    return `
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Body${requiredMark}</p>
+          <span class="text-[9px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1.5 py-0.5">multipart/form-data</span>
+        </div>
+        <div class="flex flex-col gap-2.5">${fields || '<p class="text-[11px] text-gray-400 dark:text-gray-500">No schema defined.</p>'}</div>
+      </div>`;
+  }
+
+  if (contentType === "application/octet-stream") {
+    return `
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Body${requiredMark}</p>
+          <span class="text-[9px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1.5 py-0.5">application/octet-stream</span>
+        </div>
+        <input type="file" id="try-body-raw-file" class="${fileInputClass}" />
+      </div>`;
+  }
+
+  // JSON (default)
+  const bodyPlaceholder = getRequestBodyExample(endpoint, components);
+  return `
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Body${requiredMark}</p>
+        <button id="try-body-format" class="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
+          Format JSON
+        </button>
+      </div>
+      <textarea
+        id="try-body"
+        rows="8"
+        class="w-full text-[11px] border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 font-mono resize-y transition-colors leading-relaxed"
+        placeholder="${escapeAttr(bodyPlaceholder || "Enter JSON body…")}"
+      >${escapeHtml(state.bodyValue || bodyPlaceholder)}</textarea>
+    </div>`;
+}
+
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
 export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: AuthValues): string {
@@ -194,8 +327,6 @@ export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: Au
   const ep = state.endpoint;
   const components = spec.components;
   const params = (ep.operation.parameters ?? []).map((p) => resolveParameter(p, components));
-  const hasBody = !!ep.operation.requestBody;
-  const bodyPlaceholder = getRequestBodyExample(ep, components);
   const servers = spec.servers ?? [{ url: "http://localhost" }];
   const baseUrl = servers[0].url;
 
@@ -288,23 +419,7 @@ export function renderTryIt(state: TryItState, spec: OpenAPISpec, authValues: Au
         ${headerParams.length ? section("Headers", headerParams.map((p) => renderParamField(p, state.paramValues[p.name] ?? "")).join("")) : ""}
 
         <!-- Request body -->
-        ${hasBody ? `
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                Body${ep.operation.requestBody?.required ? ' <span class="text-red-500 normal-case font-normal">required</span>' : ""}
-              </p>
-              <button id="try-body-format" class="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
-                Format JSON
-              </button>
-            </div>
-            <textarea
-              id="try-body"
-              rows="8"
-              class="w-full text-[11px] border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 font-mono resize-y transition-colors leading-relaxed"
-              placeholder="${escapeAttr(bodyPlaceholder || "Enter JSON body…")}"
-            >${escapeHtml(state.bodyValue || bodyPlaceholder)}</textarea>
-          </div>` : ""}
+        ${renderBodySection(ep, state, components)}
 
       </div>
 

@@ -1,0 +1,647 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Response Codes & Headers API",
+    "description": "Exercises the full range of HTTP response status codes, response headers, Set-Cookie, wildcard status ranges (2XX, 4XX, 5XX), and OpenAPI `links` to describe relationships between operation responses.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://api.example.com/v1" }],
+  "tags": [
+    { "name": "2xx", "description": "Success responses" },
+    { "name": "3xx", "description": "Redirection responses" },
+    { "name": "4xx", "description": "Client error responses" },
+    { "name": "5xx", "description": "Server error responses" },
+    { "name": "headers", "description": "Rich response header examples" },
+    { "name": "links", "description": "Operation links — navigating related resources" }
+  ],
+  "paths": {
+    "/success/200": {
+      "get": {
+        "operationId": "get200",
+        "summary": "200 OK — standard success",
+        "tags": ["2xx"],
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Body contains the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResourceResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/success/201": {
+      "post": {
+        "operationId": "post201",
+        "summary": "201 Created — resource created",
+        "tags": ["2xx"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resource created. Location header points to the new resource.",
+            "headers": {
+              "Location": {
+                "description": "URL of the newly created resource",
+                "schema": { "type": "string", "format": "uri", "example": "https://api.example.com/v1/items/42" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResourceResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/success/202": {
+      "post": {
+        "operationId": "post202",
+        "summary": "202 Accepted — async processing started",
+        "description": "Request was accepted but processing is asynchronous. Poll the job status URL from the response.",
+        "tags": ["2xx"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Request accepted for async processing.",
+            "headers": {
+              "Location": {
+                "description": "URL to poll for job status",
+                "schema": { "type": "string", "format": "uri" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JobAccepted" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/success/204": {
+      "delete": {
+        "operationId": "delete204",
+        "summary": "204 No Content — deleted, no body",
+        "tags": ["2xx"],
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Resource deleted. No response body." }
+        }
+      }
+    },
+    "/success/206": {
+      "get": {
+        "operationId": "get206",
+        "summary": "206 Partial Content — range request",
+        "description": "Returns a byte range of a resource. Send a `Range: bytes=0-1023` request header.",
+        "tags": ["2xx"],
+        "parameters": [
+          {
+            "name": "Range",
+            "in": "header",
+            "description": "Byte range to retrieve (e.g. `bytes=0-1023`)",
+            "schema": { "type": "string", "example": "bytes=0-1023" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full content returned (no Range header sent)",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "206": {
+            "description": "Partial content returned for the requested byte range.",
+            "headers": {
+              "Content-Range": {
+                "description": "Range returned, e.g. `bytes 0-1023/10240`",
+                "schema": { "type": "string" }
+              },
+              "Content-Length": {
+                "description": "Number of bytes in this chunk",
+                "schema": { "type": "integer" }
+              }
+            },
+            "content": {
+              "application/octet-stream": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "416": {
+            "description": "Requested range not satisfiable",
+            "headers": {
+              "Content-Range": {
+                "schema": { "type": "string", "example": "bytes */10240" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/redirect/301": {
+      "get": {
+        "operationId": "get301",
+        "summary": "301 Moved Permanently",
+        "tags": ["3xx"],
+        "responses": {
+          "301": {
+            "description": "Resource permanently moved. Update bookmarks to the new URL.",
+            "headers": {
+              "Location": { "schema": { "type": "string", "format": "uri" } }
+            }
+          }
+        }
+      }
+    },
+    "/redirect/302": {
+      "get": {
+        "operationId": "get302",
+        "summary": "302 Found — temporary redirect",
+        "tags": ["3xx"],
+        "responses": {
+          "302": {
+            "description": "Temporarily redirected. Do not update bookmarks.",
+            "headers": {
+              "Location": { "schema": { "type": "string", "format": "uri" } }
+            }
+          }
+        }
+      }
+    },
+    "/redirect/304": {
+      "get": {
+        "operationId": "get304",
+        "summary": "304 Not Modified — cache hit",
+        "description": "Send `If-None-Match` or `If-Modified-Since` to trigger this response.",
+        "tags": ["3xx"],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "schema": { "type": "string", "example": "\"abc123\"" }
+          },
+          {
+            "name": "If-Modified-Since",
+            "in": "header",
+            "schema": { "type": "string", "format": "date-time" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content returned (cache miss or no validators sent)",
+            "headers": {
+              "ETag": { "schema": { "type": "string", "example": "\"abc123\"" } },
+              "Last-Modified": { "schema": { "type": "string", "format": "date-time" } }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } }
+            }
+          },
+          "304": {
+            "description": "Not modified — use cached version.",
+            "headers": {
+              "ETag": { "schema": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "/errors/400": {
+      "post": {
+        "operationId": "post400",
+        "summary": "400 Bad Request — validation errors",
+        "tags": ["4xx"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } } } },
+          "400": {
+            "description": "Validation failed. Body contains per-field error details.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+            }
+          }
+        }
+      }
+    },
+    "/errors/401": {
+      "get": {
+        "operationId": "get401",
+        "summary": "401 Unauthorized — missing/invalid credentials",
+        "tags": ["4xx"],
+        "responses": {
+          "200": { "description": "Authenticated response", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } } } },
+          "401": {
+            "description": "Authentication required.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Describes the authentication method expected",
+                "schema": { "type": "string", "example": "Bearer realm=\"api.example.com\"" }
+              }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/errors/429": {
+      "get": {
+        "operationId": "get429",
+        "summary": "429 Too Many Requests — rate limited",
+        "tags": ["4xx"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-RateLimit-Limit": { "schema": { "type": "integer" }, "description": "Requests allowed per window" },
+              "X-RateLimit-Remaining": { "schema": { "type": "integer" }, "description": "Requests remaining in window" },
+              "X-RateLimit-Reset": { "schema": { "type": "integer" }, "description": "Unix timestamp when window resets" }
+            },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": { "type": "integer", "example": 60 }
+              },
+              "X-RateLimit-Limit": { "schema": { "type": "integer" } },
+              "X-RateLimit-Remaining": { "schema": { "type": "integer" }, "example": 0 },
+              "X-RateLimit-Reset": { "schema": { "type": "integer" } }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/errors/wildcard": {
+      "get": {
+        "operationId": "wildcardResponses",
+        "summary": "Wildcard status ranges (2XX, 4XX, 5XX)",
+        "description": "Uses wildcard response codes — `2XX` covers all 2xx, `4XX` covers all 4xx client errors, `5XX` covers all 5xx server errors.",
+        "tags": ["4xx", "5xx"],
+        "responses": {
+          "2XX": {
+            "description": "Any 2xx success response",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } }
+            }
+          },
+          "4XX": {
+            "description": "Any 4xx client error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "5XX": {
+            "description": "Any 5xx server error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/errors/503": {
+      "get": {
+        "operationId": "get503",
+        "summary": "503 Service Unavailable — maintenance",
+        "tags": ["5xx"],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } } } },
+          "503": {
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "Retry-After": {
+                "description": "Time in seconds until service is expected to recover",
+                "schema": { "type": "integer", "example": 300 }
+              }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/headers/rich": {
+      "get": {
+        "operationId": "richHeaders",
+        "summary": "Response with rich headers",
+        "description": "Shows caching, CORS, rate-limiting, and pagination headers all together.",
+        "tags": ["headers"],
+        "responses": {
+          "200": {
+            "description": "Resource with full response headers",
+            "headers": {
+              "ETag": { "schema": { "type": "string" }, "description": "Content hash for cache validation" },
+              "Cache-Control": { "schema": { "type": "string", "example": "max-age=3600, must-revalidate" } },
+              "Last-Modified": { "schema": { "type": "string", "format": "date-time" } },
+              "X-Request-ID": { "schema": { "type": "string", "format": "uuid" } },
+              "X-RateLimit-Limit": { "schema": { "type": "integer", "example": 1000 } },
+              "X-RateLimit-Remaining": { "schema": { "type": "integer", "example": 987 } },
+              "X-RateLimit-Reset": { "schema": { "type": "integer" } },
+              "X-Total-Count": { "schema": { "type": "integer" }, "description": "Total items for pagination" },
+              "Link": {
+                "schema": { "type": "string" },
+                "description": "RFC 5988 pagination links",
+                "example": "<https://api.example.com/v1/items?page=2>; rel=\"next\", <https://api.example.com/v1/items?page=10>; rel=\"last\""
+              }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ResourceResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/headers/set-cookie": {
+      "post": {
+        "operationId": "setCookie",
+        "summary": "Response that sets cookies",
+        "description": "Sets a session cookie with `HttpOnly`, `Secure`, and `SameSite` attributes.",
+        "tags": ["headers"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string", "format": "password", "writeOnly": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated — session cookie set",
+            "headers": {
+              "Set-Cookie": {
+                "schema": { "type": "string" },
+                "description": "Session cookie. Example: `session_id=abc123; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=86400`"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": { "type": "string", "format": "uuid" },
+                    "expiresAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links/orders": {
+      "post": {
+        "operationId": "createOrder",
+        "summary": "Create an order (links example)",
+        "description": "The response includes OpenAPI `links` that describe how to navigate to related operations using values from this response.",
+        "tags": ["links"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateOrderRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Order" }
+              }
+            },
+            "links": {
+              "GetOrderById": {
+                "operationId": "getOrder",
+                "parameters": { "orderId": "$response.body#/id" },
+                "description": "Use `id` from the response to fetch the created order."
+              },
+              "GetOrderItems": {
+                "operationId": "listOrderItems",
+                "parameters": { "orderId": "$response.body#/id" },
+                "description": "Use `id` from the response to list the order's items."
+              },
+              "GetCustomer": {
+                "operationId": "getCustomer",
+                "parameters": { "customerId": "$response.body#/customerId" },
+                "description": "Use `customerId` to navigate to the customer who placed this order."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links/orders/{orderId}": {
+      "parameters": [
+        { "name": "orderId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+      ],
+      "get": {
+        "operationId": "getOrder",
+        "summary": "Get an order by ID",
+        "tags": ["links"],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Order" } }
+            },
+            "links": {
+              "GetOrderItems": {
+                "operationId": "listOrderItems",
+                "parameters": { "orderId": "$request.path.orderId" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/links/orders/{orderId}/items": {
+      "parameters": [
+        { "name": "orderId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+      ],
+      "get": {
+        "operationId": "listOrderItems",
+        "summary": "List items in an order",
+        "tags": ["links"],
+        "responses": {
+          "200": {
+            "description": "Order items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/OrderItem" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links/customers/{customerId}": {
+      "parameters": [
+        { "name": "customerId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+      ],
+      "get": {
+        "operationId": "getCustomer",
+        "summary": "Get a customer",
+        "tags": ["links"],
+        "responses": {
+          "200": {
+            "description": "Customer found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Customer" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResourceResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "data": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "CreateRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string" }
+        }
+      },
+      "JobAccepted": {
+        "type": "object",
+        "properties": {
+          "jobId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["queued", "processing"] },
+          "statusUrl": { "type": "string", "format": "uri" }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": ["code", "message", "errors"],
+        "properties": {
+          "code": { "type": "string", "const": "VALIDATION_ERROR" },
+          "message": { "type": "string" },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": { "type": "string", "example": "email" },
+                "message": { "type": "string", "example": "Must be a valid email address" },
+                "code": { "type": "string", "example": "invalid_format" }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "requestId": { "type": "string", "format": "uuid" }
+        }
+      },
+      "CreateOrderRequest": {
+        "type": "object",
+        "required": ["customerId", "items"],
+        "properties": {
+          "customerId": { "type": "string", "format": "uuid" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": { "type": "string", "format": "uuid" },
+                "quantity": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "customerId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"] },
+          "total": { "type": "number", "format": "double" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "productId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "quantity": { "type": "integer" },
+          "unitPrice": { "type": "number", "format": "double" }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      }
+    }
+  }
+}

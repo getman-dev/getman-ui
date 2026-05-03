@@ -1,5 +1,5 @@
 import type { OpenAPISpec, AuthValues } from "../types/openapi";
-import { escapeHtml, escapeAttr } from "./nav";
+import { escapeHtml, escapeAttr } from "../utils/html";
 
 export function renderTopBar(spec: OpenAPISpec, authValues: AuthValues): string {
   const info = spec.info;

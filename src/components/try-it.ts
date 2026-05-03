@@ -9,7 +9,8 @@ import type {
   EndpointEntry,
 } from "../types/openapi";
 import { resolveParameter, resolveSchema, buildUrl, getRequestBodyExample } from "../parser/spec-parser";
-import { escapeHtml, escapeAttr, methodBadgeClasses } from "./nav";
+import { escapeHtml, escapeAttr } from "../utils/html";
+import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

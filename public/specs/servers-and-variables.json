@@ -1,0 +1,323 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Servers & Variables API",
+    "description": "Demonstrates multiple server objects with descriptions, server URL templates with variables (environment, region, version), per-path server overrides, and per-operation server overrides. Shows how server variables affect URL construction.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{environment}.api.example.com/{version}",
+      "description": "Primary API — environment and version configurable",
+      "variables": {
+        "environment": {
+          "description": "Deployment environment",
+          "default": "api",
+          "enum": ["api", "staging", "sandbox"]
+        },
+        "version": {
+          "description": "API version",
+          "default": "v2",
+          "enum": ["v1", "v2", "v3"]
+        }
+      }
+    },
+    {
+      "url": "https://{region}.api.example.com/v2",
+      "description": "Regional endpoints — route to the nearest data center",
+      "variables": {
+        "region": {
+          "description": "Nearest geographic region",
+          "default": "us-east",
+          "enum": ["us-east", "us-west", "eu-west", "ap-southeast"]
+        }
+      }
+    },
+    {
+      "url": "http://localhost:{port}/v2",
+      "description": "Local development server",
+      "variables": {
+        "port": {
+          "description": "Local port",
+          "default": "3000"
+        }
+      }
+    }
+  ],
+  "tags": [
+    { "name": "global-servers", "description": "Use global server list" },
+    { "name": "path-server-override", "description": "Path-level server override" },
+    { "name": "operation-server-override", "description": "Operation-level server override" }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "operationId": "getStatus",
+        "summary": "API status — uses global server list",
+        "description": "Standard endpoint that inherits the global `servers` array. The URL is built from whichever server is selected.",
+        "tags": ["global-servers"],
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "listUsers",
+        "summary": "List users — uses global server list",
+        "description": "Another endpoint on the primary API. Inherits all three global servers.",
+        "tags": ["global-servers"],
+        "responses": {
+          "200": {
+            "description": "User list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cdn/assets/{assetId}": {
+      "servers": [
+        {
+          "url": "https://cdn.example.com",
+          "description": "CDN server — overrides global servers at path level"
+        },
+        {
+          "url": "https://cdn-backup.example.com",
+          "description": "CDN fallback"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "assetId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "example": "logo-v2.png" }
+        }
+      ],
+      "get": {
+        "operationId": "getAsset",
+        "summary": "Get a CDN asset",
+        "description": "This entire path is served from the CDN, not the API. The path-level `servers` override replaces the global server list for all operations on this path.",
+        "tags": ["path-server-override"],
+        "responses": {
+          "200": {
+            "description": "Asset content",
+            "headers": {
+              "Cache-Control": { "schema": { "type": "string", "example": "public, max-age=31536000, immutable" } },
+              "CDN-Cache-Status": { "schema": { "type": "string", "enum": ["HIT", "MISS", "REVALIDATED"] } }
+            },
+            "content": {
+              "image/png": { "schema": { "type": "string", "format": "binary" } },
+              "image/svg+xml": { "schema": { "type": "string" } },
+              "application/javascript": { "schema": { "type": "string" } },
+              "text/css": { "schema": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "/internal/metrics": {
+      "servers": [
+        {
+          "url": "https://internal.example.com",
+          "description": "Internal network only — not reachable from the public internet"
+        }
+      ],
+      "get": {
+        "operationId": "getMetrics",
+        "summary": "Get internal metrics (path-level override)",
+        "description": "Served from the internal network. Not reachable via the public API gateway.",
+        "tags": ["path-server-override"],
+        "responses": {
+          "200": {
+            "description": "Metrics data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MetricsResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/generate": {
+      "post": {
+        "operationId": "generateReport",
+        "summary": "Generate a report — operation-level server override",
+        "description": "Heavy report generation runs on a dedicated compute cluster. The operation-level `servers` points to that cluster, overriding both global and path-level servers.",
+        "tags": ["operation-server-override"],
+        "servers": [
+          {
+            "url": "https://compute.{region}.example.com",
+            "description": "Dedicated compute cluster for long-running jobs",
+            "variables": {
+              "region": {
+                "default": "us-east",
+                "enum": ["us-east", "eu-west"],
+                "description": "Compute region"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReportRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Report job queued",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReportJob" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listReports",
+        "summary": "List reports — uses global servers",
+        "description": "Listing is served from the regular API. Only `POST /reports/generate` uses the compute cluster.",
+        "tags": ["global-servers"],
+        "responses": {
+          "200": {
+            "description": "Report list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ReportJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uploads/large": {
+      "put": {
+        "operationId": "uploadLargeFile",
+        "summary": "Upload large file — operation-level override to upload server",
+        "description": "Large file uploads bypass the API gateway and go directly to the upload server to avoid timeouts.",
+        "tags": ["operation-server-override"],
+        "servers": [
+          {
+            "url": "https://upload.example.com",
+            "description": "Dedicated upload server — higher timeouts, direct S3 write"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": { "type": "string", "format": "binary" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Upload complete",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fileId": { "type": "string", "format": "uuid" },
+                    "url": { "type": "string", "format": "uri" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["ok", "degraded", "down"] },
+          "version": { "type": "string", "example": "v2" },
+          "environment": { "type": "string", "example": "production" },
+          "region": { "type": "string", "example": "us-east" },
+          "uptime": { "type": "integer", "description": "Seconds since last restart" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "displayName": { "type": "string" }
+        }
+      },
+      "MetricsResponse": {
+        "type": "object",
+        "properties": {
+          "requestsPerSecond": { "type": "number" },
+          "p50LatencyMs": { "type": "number" },
+          "p99LatencyMs": { "type": "number" },
+          "errorRate": { "type": "number", "description": "Error rate as a fraction (0–1)" },
+          "activeConnections": { "type": "integer" },
+          "collectedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ReportRequest": {
+        "type": "object",
+        "required": ["type", "dateRange"],
+        "properties": {
+          "type": { "type": "string", "enum": ["revenue", "usage", "audit", "custom"] },
+          "dateRange": {
+            "type": "object",
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "string", "format": "date" },
+              "to": { "type": "string", "format": "date" }
+            }
+          },
+          "format": { "type": "string", "enum": ["pdf", "csv", "xlsx"], "default": "pdf" },
+          "callbackUrl": { "type": "string", "format": "uri" }
+        }
+      },
+      "ReportJob": {
+        "type": "object",
+        "properties": {
+          "jobId": { "type": "string", "format": "uuid" },
+          "type": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "processing", "completed", "failed"] },
+          "downloadUrl": { "type": ["string", "null"], "format": "uri" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

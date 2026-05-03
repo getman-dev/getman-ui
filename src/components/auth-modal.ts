@@ -1,5 +1,5 @@
 import type { SecurityScheme, AuthValues } from "../types/openapi";
-import { escapeHtml, escapeAttr } from "./nav";
+import { escapeHtml, escapeAttr } from "../utils/html";
 
 function schemeTypeLabel(scheme: SecurityScheme): string {
   switch (scheme.type) {

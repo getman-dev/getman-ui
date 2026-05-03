@@ -1,0 +1,598 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Schema Types Showcase API",
+    "description": "Exercises the full JSON Schema / OpenAPI schema feature set: allOf, anyOf, oneOf, not, discriminator + polymorphism, recursive $ref, all primitive formats (date, uuid, email, uri, byte, binary, …), enums, const, nullable (OpenAPI 3.1 style), readOnly/writeOnly, and additionalProperties.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://api.example.com/v1" }],
+  "tags": [
+    { "name": "composition", "description": "Schema composition keywords: allOf, anyOf, oneOf, not" },
+    { "name": "polymorphism", "description": "Discriminator-based polymorphism" },
+    { "name": "formats", "description": "Primitive types and string formats" },
+    { "name": "structures", "description": "Nested objects, arrays, recursive schemas" }
+  ],
+  "paths": {
+    "/composition/all-of": {
+      "get": {
+        "operationId": "getAllOfExample",
+        "summary": "allOf — merged schema",
+        "description": "The response combines all listed schemas — every property from every schema is required.",
+        "tags": ["composition"],
+        "responses": {
+          "200": {
+            "description": "Combined object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminUser" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/composition/any-of": {
+      "post": {
+        "operationId": "postAnyOfExample",
+        "summary": "anyOf — one or more schemas must match",
+        "description": "The request body can be a `StringFilter`, `NumericFilter`, or both.",
+        "tags": ["composition"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyFilter" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filter results",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "count": { "type": "integer" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/composition/one-of": {
+      "post": {
+        "operationId": "postOneOfExample",
+        "summary": "oneOf — exactly one schema must match",
+        "description": "The request body is either a `CardPayment` or a `BankTransfer` — not both, not neither.",
+        "tags": ["composition"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PaymentMethod" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment initiated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentReceipt" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/composition/not": {
+      "post": {
+        "operationId": "postNotExample",
+        "summary": "not — schema must NOT match",
+        "description": "Accepts any string that is NOT an email address.",
+        "tags": ["composition"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NonEmailString" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Accepted" }
+        }
+      }
+    },
+    "/polymorphism/shapes": {
+      "post": {
+        "operationId": "createShape",
+        "summary": "Discriminator — create a Shape",
+        "description": "Accepts a `Circle`, `Rectangle`, or `Triangle`. The `shapeType` discriminator property routes to the correct sub-schema.",
+        "tags": ["polymorphism"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Shape" },
+              "examples": {
+                "circle": {
+                  "summary": "Circle",
+                  "value": { "shapeType": "circle", "radius": 5.0 }
+                },
+                "rectangle": {
+                  "summary": "Rectangle",
+                  "value": { "shapeType": "rectangle", "width": 10.0, "height": 4.5 }
+                },
+                "triangle": {
+                  "summary": "Triangle",
+                  "value": { "shapeType": "triangle", "base": 6.0, "height": 3.0 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shape created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Shape" } }
+            }
+          }
+        }
+      }
+    },
+    "/polymorphism/notifications": {
+      "get": {
+        "operationId": "listNotifications",
+        "summary": "Discriminator — list Notifications (mixed types)",
+        "description": "Returns a list where each item is one of `EmailNotification`, `SmsNotification`, or `PushNotification`.",
+        "tags": ["polymorphism"],
+        "responses": {
+          "200": {
+            "description": "Notification list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Notification" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formats/primitives": {
+      "get": {
+        "operationId": "getAllFormats",
+        "summary": "All primitive types and string formats",
+        "description": "Returns an object that contains every standard OpenAPI/JSON Schema format.",
+        "tags": ["formats"],
+        "responses": {
+          "200": {
+            "description": "Format showcase",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AllFormats" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formats/nullable": {
+      "get": {
+        "operationId": "getNullableFields",
+        "summary": "Nullable fields (OpenAPI 3.1 style)",
+        "description": "OpenAPI 3.1 uses `type: [\"string\", \"null\"]` for nullable fields (no `nullable: true`).",
+        "tags": ["formats"],
+        "responses": {
+          "200": {
+            "description": "Object with nullable fields",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProfileWithNulls" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/structures/recursive": {
+      "get": {
+        "operationId": "getTree",
+        "summary": "Recursive schema — tree node",
+        "description": "A `TreeNode` can contain an array of child `TreeNode`s, forming an arbitrarily deep tree.",
+        "tags": ["structures"],
+        "responses": {
+          "200": {
+            "description": "Root tree node",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TreeNode" },
+                "example": {
+                  "id": 1,
+                  "label": "Root",
+                  "children": [
+                    { "id": 2, "label": "Child A", "children": [] },
+                    { "id": 3, "label": "Child B", "children": [
+                      { "id": 4, "label": "Grandchild", "children": [] }
+                    ]}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/structures/additional-properties": {
+      "get": {
+        "operationId": "getAdditionalProperties",
+        "summary": "additionalProperties variants",
+        "description": "Shows three forms: `additionalProperties: true`, `additionalProperties: false`, and `additionalProperties: { type: string }`.",
+        "tags": ["structures"],
+        "responses": {
+          "200": {
+            "description": "Additional properties showcase",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdditionalPropertiesShowcase" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/structures/readonly-writeonly": {
+      "post": {
+        "operationId": "createWithReadWriteOnly",
+        "summary": "readOnly and writeOnly fields",
+        "description": "`readOnly` fields are only in responses; `writeOnly` (e.g. passwords) are only in requests.",
+        "tags": ["structures"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccountCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AccountCreate" } }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Timestamps": {
+        "type": "object",
+        "description": "Common timestamp fields mixed into other schemas via allOf.",
+        "properties": {
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "BaseUser": {
+        "type": "object",
+        "required": ["id", "email"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "email": { "type": "string", "format": "email" }
+        }
+      },
+      "AdminUser": {
+        "description": "allOf example — combines BaseUser, Timestamps, and adds admin-specific fields.",
+        "allOf": [
+          { "$ref": "#/components/schemas/BaseUser" },
+          { "$ref": "#/components/schemas/Timestamps" },
+          {
+            "type": "object",
+            "required": ["role", "permissions"],
+            "properties": {
+              "role": { "type": "string", "const": "admin" },
+              "permissions": {
+                "type": "array",
+                "items": { "type": "string", "enum": ["read", "write", "delete", "manage"] }
+              },
+              "department": { "type": "string" }
+            }
+          }
+        ]
+      },
+      "StringFilter": {
+        "type": "object",
+        "description": "Filter by string field",
+        "properties": {
+          "field": { "type": "string" },
+          "contains": { "type": "string" },
+          "startsWith": { "type": "string" }
+        }
+      },
+      "NumericFilter": {
+        "type": "object",
+        "description": "Filter by numeric range",
+        "properties": {
+          "field": { "type": "string" },
+          "gte": { "type": "number" },
+          "lte": { "type": "number" }
+        }
+      },
+      "AnyFilter": {
+        "description": "anyOf — match one or more of these filter types simultaneously.",
+        "anyOf": [
+          { "$ref": "#/components/schemas/StringFilter" },
+          { "$ref": "#/components/schemas/NumericFilter" }
+        ]
+      },
+      "CardPayment": {
+        "type": "object",
+        "required": ["type", "cardNumber", "expiry", "cvv"],
+        "properties": {
+          "type": { "type": "string", "const": "card" },
+          "cardNumber": { "type": "string", "pattern": "^\\d{16}$" },
+          "expiry": { "type": "string", "pattern": "^\\d{2}/\\d{2}$" },
+          "cvv": { "type": "string", "pattern": "^\\d{3,4}$", "writeOnly": true }
+        }
+      },
+      "BankTransfer": {
+        "type": "object",
+        "required": ["type", "accountNumber", "routingNumber"],
+        "properties": {
+          "type": { "type": "string", "const": "bank" },
+          "accountNumber": { "type": "string" },
+          "routingNumber": { "type": "string" }
+        }
+      },
+      "PaymentMethod": {
+        "description": "oneOf — must be exactly one payment method type.",
+        "oneOf": [
+          { "$ref": "#/components/schemas/CardPayment" },
+          { "$ref": "#/components/schemas/BankTransfer" }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "card": "#/components/schemas/CardPayment",
+            "bank": "#/components/schemas/BankTransfer"
+          }
+        }
+      },
+      "PaymentReceipt": {
+        "type": "object",
+        "properties": {
+          "transactionId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["pending", "completed", "failed"] },
+          "amount": { "type": "number", "format": "double" },
+          "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+        }
+      },
+      "NonEmailString": {
+        "description": "not — any object that does NOT match an email format.",
+        "type": "object",
+        "properties": {
+          "value": {
+            "not": { "type": "string", "format": "email" },
+            "type": "string"
+          }
+        }
+      },
+      "Shape": {
+        "description": "Discriminator — one of Circle, Rectangle, or Triangle.",
+        "oneOf": [
+          { "$ref": "#/components/schemas/Circle" },
+          { "$ref": "#/components/schemas/Rectangle" },
+          { "$ref": "#/components/schemas/Triangle" }
+        ],
+        "discriminator": {
+          "propertyName": "shapeType",
+          "mapping": {
+            "circle": "#/components/schemas/Circle",
+            "rectangle": "#/components/schemas/Rectangle",
+            "triangle": "#/components/schemas/Triangle"
+          }
+        }
+      },
+      "Circle": {
+        "type": "object",
+        "required": ["shapeType", "radius"],
+        "properties": {
+          "shapeType": { "type": "string", "const": "circle" },
+          "radius": { "type": "number", "format": "double", "exclusiveMinimum": 0 }
+        }
+      },
+      "Rectangle": {
+        "type": "object",
+        "required": ["shapeType", "width", "height"],
+        "properties": {
+          "shapeType": { "type": "string", "const": "rectangle" },
+          "width": { "type": "number", "format": "double", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "format": "double", "exclusiveMinimum": 0 }
+        }
+      },
+      "Triangle": {
+        "type": "object",
+        "required": ["shapeType", "base", "height"],
+        "properties": {
+          "shapeType": { "type": "string", "const": "triangle" },
+          "base": { "type": "number", "format": "double", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "format": "double", "exclusiveMinimum": 0 }
+        }
+      },
+      "Notification": {
+        "description": "Polymorphic notification — discriminated by `channel`.",
+        "oneOf": [
+          { "$ref": "#/components/schemas/EmailNotification" },
+          { "$ref": "#/components/schemas/SmsNotification" },
+          { "$ref": "#/components/schemas/PushNotification" }
+        ],
+        "discriminator": {
+          "propertyName": "channel",
+          "mapping": {
+            "email": "#/components/schemas/EmailNotification",
+            "sms": "#/components/schemas/SmsNotification",
+            "push": "#/components/schemas/PushNotification"
+          }
+        }
+      },
+      "EmailNotification": {
+        "type": "object",
+        "required": ["channel", "to", "subject"],
+        "properties": {
+          "channel": { "type": "string", "const": "email" },
+          "to": { "type": "string", "format": "email" },
+          "subject": { "type": "string" },
+          "htmlBody": { "type": "string" }
+        }
+      },
+      "SmsNotification": {
+        "type": "object",
+        "required": ["channel", "to", "text"],
+        "properties": {
+          "channel": { "type": "string", "const": "sms" },
+          "to": { "type": "string", "description": "E.164 phone number", "pattern": "^\\+[1-9]\\d{1,14}$" },
+          "text": { "type": "string", "maxLength": 160 }
+        }
+      },
+      "PushNotification": {
+        "type": "object",
+        "required": ["channel", "deviceToken", "title"],
+        "properties": {
+          "channel": { "type": "string", "const": "push" },
+          "deviceToken": { "type": "string" },
+          "title": { "type": "string" },
+          "body": { "type": "string" },
+          "badge": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "AllFormats": {
+        "type": "object",
+        "description": "One property per standard OpenAPI format.",
+        "properties": {
+          "anInteger": { "type": "integer", "example": 42 },
+          "anInt32": { "type": "integer", "format": "int32", "example": 2147483647 },
+          "anInt64": { "type": "integer", "format": "int64", "example": 9007199254740991 },
+          "aNumber": { "type": "number", "example": 3.14 },
+          "aFloat": { "type": "number", "format": "float", "example": 3.14 },
+          "aDouble": { "type": "number", "format": "double", "example": 3.141592653589793 },
+          "aBoolean": { "type": "boolean", "example": true },
+          "aString": { "type": "string", "example": "hello" },
+          "aDate": { "type": "string", "format": "date", "example": "2024-01-15" },
+          "aDateTime": { "type": "string", "format": "date-time", "example": "2024-01-15T10:30:00Z" },
+          "aDuration": { "type": "string", "format": "duration", "example": "P3DT4H" },
+          "anEmail": { "type": "string", "format": "email", "example": "alice@example.com" },
+          "aUri": { "type": "string", "format": "uri", "example": "https://example.com" },
+          "aUriRef": { "type": "string", "format": "uri-reference", "example": "/path/to/resource" },
+          "aUuid": { "type": "string", "format": "uuid", "example": "550e8400-e29b-41d4-a716-446655440000" },
+          "aHostname": { "type": "string", "format": "hostname", "example": "api.example.com" },
+          "anIpv4": { "type": "string", "format": "ipv4", "example": "192.168.1.1" },
+          "anIpv6": { "type": "string", "format": "ipv6", "example": "2001:db8::1" },
+          "aByteString": { "type": "string", "format": "byte", "example": "SGVsbG8gV29ybGQ=", "description": "Base64-encoded binary data" },
+          "aBinaryField": { "type": "string", "format": "binary", "description": "Raw binary (used in multipart forms)" },
+          "aPassword": { "type": "string", "format": "password", "writeOnly": true },
+          "anEnum": { "type": "string", "enum": ["alpha", "beta", "gamma"], "example": "beta" },
+          "aConst": { "type": "string", "const": "fixed-value", "description": "Always exactly this value" },
+          "aMultipleOf": { "type": "integer", "multipleOf": 5, "example": 25 }
+        }
+      },
+      "ProfileWithNulls": {
+        "type": "object",
+        "description": "OpenAPI 3.1 nullable fields use `type: [\"string\", \"null\"]`.",
+        "required": ["id", "username"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "username": { "type": "string" },
+          "bio": {
+            "type": ["string", "null"],
+            "description": "Nullable — user may not have set a bio",
+            "example": null
+          },
+          "avatarUrl": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "description": "Nullable — user may not have uploaded an avatar"
+          },
+          "deletedAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "Null while active; set when the account is soft-deleted",
+            "readOnly": true
+          }
+        }
+      },
+      "TreeNode": {
+        "type": "object",
+        "description": "Recursive schema — each node can have child nodes of the same type.",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "integer" },
+          "label": { "type": "string" },
+          "value": {},
+          "children": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TreeNode" }
+          }
+        }
+      },
+      "AdditionalPropertiesShowcase": {
+        "type": "object",
+        "properties": {
+          "openMap": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Any additional keys are allowed with any value type",
+            "example": { "foo": "bar", "count": 42 }
+          },
+          "closedObject": {
+            "type": "object",
+            "properties": { "name": { "type": "string" } },
+            "additionalProperties": false,
+            "description": "No additional keys allowed beyond `name`"
+          },
+          "stringMap": {
+            "type": "object",
+            "additionalProperties": { "type": "string" },
+            "description": "Arbitrary keys, all values must be strings",
+            "example": { "en": "Hello", "es": "Hola", "fr": "Bonjour" }
+          }
+        }
+      },
+      "AccountCreate": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Auto-generated — only present in responses"
+          },
+          "email": { "type": "string", "format": "email" },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 8,
+            "description": "Only accepted in requests — never returned"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Server-set — only present in responses"
+          }
+        }
+      }
+    }
+  }
+}

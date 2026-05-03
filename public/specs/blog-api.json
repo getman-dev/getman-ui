@@ -1,0 +1,528 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Blog API",
+    "description": "Demonstrates full CRUD operations, pagination, multiple tags, shared component schemas, parameters, and reusable responses.",
+    "version": "1.0.0",
+    "contact": { "name": "API Support", "email": "support@example.com" },
+    "license": { "name": "MIT" }
+  },
+  "servers": [
+    { "url": "https://api.example.com/v1", "description": "Production" },
+    { "url": "http://localhost:3000/v1", "description": "Local development" }
+  ],
+  "tags": [
+    { "name": "posts", "description": "Blog post operations" },
+    { "name": "comments", "description": "Comment operations" },
+    { "name": "users", "description": "User management" }
+  ],
+  "paths": {
+    "/posts": {
+      "get": {
+        "operationId": "listPosts",
+        "summary": "List posts",
+        "description": "Returns a paginated list of posts, optionally filtered by status or author.",
+        "tags": ["posts"],
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by publication status",
+            "schema": { "type": "string", "enum": ["draft", "published", "archived"] }
+          },
+          {
+            "name": "authorId",
+            "in": "query",
+            "description": "Filter by author ID",
+            "schema": { "type": "integer", "example": 42 }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Full-text search query",
+            "schema": { "type": "string", "example": "openapi" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of posts",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedPosts" },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "title": "Getting started with OpenAPI",
+                      "excerpt": "A beginner's guide…",
+                      "status": "published",
+                      "authorId": 42,
+                      "tags": ["openapi", "rest"],
+                      "createdAt": "2024-01-15T10:00:00Z",
+                      "updatedAt": "2024-01-16T08:30:00Z"
+                    }
+                  ],
+                  "pagination": { "page": 1, "limit": 20, "total": 1, "pages": 1 }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPost",
+        "summary": "Create a post",
+        "tags": ["posts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePostRequest" },
+              "example": {
+                "title": "My new post",
+                "content": "Full post content here…",
+                "status": "draft",
+                "tags": ["openapi"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/posts/{postId}": {
+      "parameters": [{ "$ref": "#/components/parameters/PostId" }],
+      "get": {
+        "operationId": "getPost",
+        "summary": "Get a post",
+        "tags": ["posts"],
+        "responses": {
+          "200": {
+            "description": "Post found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "operationId": "replacePost",
+        "summary": "Replace a post",
+        "description": "Full replacement — all fields required.",
+        "tags": ["posts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePostRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post replaced",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Post" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "operationId": "updatePost",
+        "summary": "Update a post",
+        "description": "Partial update — only provided fields are changed.",
+        "tags": ["posts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Post" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "operationId": "deletePost",
+        "summary": "Delete a post",
+        "tags": ["posts"],
+        "responses": {
+          "204": { "description": "Post deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/posts/{postId}/comments": {
+      "parameters": [{ "$ref": "#/components/parameters/PostId" }],
+      "get": {
+        "operationId": "listComments",
+        "summary": "List comments on a post",
+        "tags": ["comments"],
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated comments",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedComments" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "post": {
+        "operationId": "createComment",
+        "summary": "Add a comment",
+        "tags": ["comments"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCommentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Comment" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/PostId" },
+        { "$ref": "#/components/parameters/CommentId" }
+      ],
+      "delete": {
+        "operationId": "deleteComment",
+        "summary": "Delete a comment",
+        "tags": ["comments"],
+        "responses": {
+          "204": { "description": "Comment deleted" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "listUsers",
+        "summary": "List users",
+        "tags": ["users"],
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated users",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedUsers" } }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createUser",
+        "summary": "Register a user",
+        "tags": ["users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": {
+            "description": "Email already in use",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "parameters": [{ "$ref": "#/components/parameters/UserId" }],
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get a user",
+        "tags": ["users"],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "operationId": "updateUser",
+        "summary": "Update a user",
+        "tags": ["users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUser",
+        "summary": "Delete a user",
+        "tags": ["users"],
+        "responses": {
+          "204": { "description": "User deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number (1-based)",
+        "schema": { "type": "integer", "minimum": 1, "default": 1 }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Items per page",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+      },
+      "PostId": {
+        "name": "postId",
+        "in": "path",
+        "required": true,
+        "description": "Post ID",
+        "schema": { "type": "integer", "example": 1 }
+      },
+      "CommentId": {
+        "name": "commentId",
+        "in": "path",
+        "required": true,
+        "description": "Comment ID",
+        "schema": { "type": "integer", "example": 10 }
+      },
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "User ID",
+        "schema": { "type": "integer", "example": 42 }
+      }
+    },
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "required": ["id", "title", "content", "status", "authorId", "createdAt"],
+        "properties": {
+          "id": { "type": "integer", "readOnly": true, "example": 1 },
+          "title": { "type": "string", "example": "Getting started with OpenAPI" },
+          "content": { "type": "string" },
+          "excerpt": { "type": "string", "example": "A brief summary…" },
+          "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+          "authorId": { "type": "integer", "example": 42 },
+          "tags": { "type": "array", "items": { "type": "string" }, "example": ["openapi", "rest"] },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreatePostRequest": {
+        "type": "object",
+        "required": ["title", "content"],
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "content": { "type": "string", "minLength": 1 },
+          "excerpt": { "type": "string", "maxLength": 500 },
+          "status": { "type": "string", "enum": ["draft", "published"], "default": "draft" },
+          "tags": { "type": "array", "items": { "type": "string" }, "maxItems": 10 }
+        }
+      },
+      "UpdatePostRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "content": { "type": "string", "minLength": 1 },
+          "excerpt": { "type": "string", "maxLength": 500 },
+          "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+          "tags": { "type": "array", "items": { "type": "string" }, "maxItems": 10 }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "required": ["id", "postId", "authorId", "body", "createdAt"],
+        "properties": {
+          "id": { "type": "integer", "readOnly": true },
+          "postId": { "type": "integer" },
+          "authorId": { "type": "integer" },
+          "body": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateCommentRequest": {
+        "type": "object",
+        "required": ["body"],
+        "properties": {
+          "body": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "email", "displayName", "createdAt"],
+        "properties": {
+          "id": { "type": "integer", "readOnly": true, "example": 42 },
+          "email": { "type": "string", "format": "email", "example": "alice@example.com" },
+          "displayName": { "type": "string", "example": "Alice" },
+          "bio": { "type": "string" },
+          "avatarUrl": { "type": "string", "format": "uri" },
+          "role": { "type": "string", "enum": ["reader", "author", "admin"], "default": "reader" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "required": ["email", "displayName", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "password": { "type": "string", "format": "password", "minLength": 8, "writeOnly": true }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "bio": { "type": "string", "maxLength": 500 },
+          "avatarUrl": { "type": "string", "format": "uri" }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": ["page", "limit", "total", "pages"],
+        "properties": {
+          "page": { "type": "integer", "example": 1 },
+          "limit": { "type": "integer", "example": 20 },
+          "total": { "type": "integer", "example": 142 },
+          "pages": { "type": "integer", "example": 8 }
+        }
+      },
+      "PaginatedPosts": {
+        "type": "object",
+        "required": ["data", "pagination"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "PaginatedComments": {
+        "type": "object",
+        "required": ["data", "pagination"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Comment" } },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "PaginatedUsers": {
+        "type": "object",
+        "required": ["data", "pagination"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/User" } },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string", "example": "NOT_FOUND" },
+          "message": { "type": "string", "example": "The requested resource was not found." },
+          "details": { "type": "object", "additionalProperties": true }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request body or parameters",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid authentication",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      }
+    }
+  }
+}

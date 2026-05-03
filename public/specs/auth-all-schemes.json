@@ -1,0 +1,355 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Auth Showcase API",
+    "description": "Demonstrates every OpenAPI security scheme type: API Key (header, query, cookie), HTTP Basic, HTTP Bearer, OAuth 2.0 (all four flows), and OpenID Connect.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://api.example.com/v1", "description": "Production" }
+  ],
+  "tags": [
+    { "name": "api-key", "description": "Endpoints secured with API keys" },
+    { "name": "http-auth", "description": "Endpoints using HTTP Basic or Bearer authentication" },
+    { "name": "oauth2", "description": "Endpoints using OAuth 2.0" },
+    { "name": "oidc", "description": "Endpoints using OpenID Connect" },
+    { "name": "multi-auth", "description": "Endpoints that accept multiple security schemes" }
+  ],
+  "paths": {
+    "/api-key/header": {
+      "get": {
+        "operationId": "getWithHeaderApiKey",
+        "summary": "Secured by API key in header",
+        "description": "Requires `X-API-Key` header. Common for server-to-server communication.",
+        "tags": ["api-key"],
+        "security": [{ "ApiKeyHeader": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api-key/query": {
+      "get": {
+        "operationId": "getWithQueryApiKey",
+        "summary": "Secured by API key in query string",
+        "description": "Requires `api_key` query parameter. Less secure than header — avoid in production with sensitive tokens.",
+        "tags": ["api-key"],
+        "security": [{ "ApiKeyQuery": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api-key/cookie": {
+      "get": {
+        "operationId": "getWithCookieApiKey",
+        "summary": "Secured by API key in cookie",
+        "description": "Requires `session_token` cookie. Note: cookies are not settable via browser `fetch` to cross-origin servers.",
+        "tags": ["api-key"],
+        "security": [{ "ApiKeyCookie": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/http/basic": {
+      "get": {
+        "operationId": "getWithHttpBasic",
+        "summary": "Secured by HTTP Basic auth",
+        "description": "Requires `Authorization: Basic <base64(username:password)>` header.",
+        "tags": ["http-auth"],
+        "security": [{ "HttpBasic": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/http/bearer": {
+      "get": {
+        "operationId": "getWithHttpBearer",
+        "summary": "Secured by HTTP Bearer token",
+        "description": "Requires `Authorization: Bearer <jwt>` header. Token format is JWT.",
+        "tags": ["http-auth"],
+        "security": [{ "HttpBearer": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/oauth2/authorization-code": {
+      "get": {
+        "operationId": "getWithAuthorizationCode",
+        "summary": "Secured by OAuth 2.0 Authorization Code flow",
+        "description": "Best for user-facing apps. Redirects user to the authorization server to grant consent.",
+        "tags": ["oauth2"],
+        "security": [{ "OAuth2AuthorizationCode": ["read:data"] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/oauth2/client-credentials": {
+      "get": {
+        "operationId": "getWithClientCredentials",
+        "summary": "Secured by OAuth 2.0 Client Credentials flow",
+        "description": "Best for machine-to-machine. Client authenticates directly with client ID and secret — no user involved.",
+        "tags": ["oauth2"],
+        "security": [{ "OAuth2ClientCredentials": ["read:data", "write:data"] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/oauth2/implicit": {
+      "get": {
+        "operationId": "getWithImplicit",
+        "summary": "Secured by OAuth 2.0 Implicit flow",
+        "description": "Legacy flow — token returned directly from authorization endpoint. Deprecated in OAuth 2.1; prefer Authorization Code + PKCE.",
+        "tags": ["oauth2"],
+        "security": [{ "OAuth2Implicit": ["read:data"] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/oauth2/password": {
+      "post": {
+        "operationId": "postWithPasswordFlow",
+        "summary": "Secured by OAuth 2.0 Resource Owner Password flow",
+        "description": "User provides credentials directly to the client. Only use for highly trusted first-party apps.",
+        "tags": ["oauth2"],
+        "security": [{ "OAuth2Password": ["read:data"] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ActionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/oidc/protected": {
+      "get": {
+        "operationId": "getWithOidc",
+        "summary": "Secured by OpenID Connect",
+        "description": "Accepts an OIDC ID token or access token. The discovery document is fetched from the `openIdConnectUrl`.",
+        "tags": ["oidc"],
+        "security": [{ "OpenIdConnect": ["openid", "profile", "email"] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/multi/any-scheme": {
+      "get": {
+        "operationId": "getWithAnyScheme",
+        "summary": "Accepts API key OR Bearer token",
+        "description": "Security entries in an array are OR-ed — any one scheme is sufficient.",
+        "tags": ["multi-auth"],
+        "security": [
+          { "ApiKeyHeader": [] },
+          { "HttpBearer": [] }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/multi/combined-scopes": {
+      "post": {
+        "operationId": "postWithCombinedScopes",
+        "summary": "Requires both Bearer AND specific OAuth scope",
+        "description": "Security entries within a single object are AND-ed — all schemes must be satisfied simultaneously.",
+        "tags": ["multi-auth"],
+        "security": [
+          { "HttpBearer": [], "OAuth2ClientCredentials": ["write:data"] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ActionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "$ref": "#/components/responses/AuthenticatedResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/public": {
+      "get": {
+        "operationId": "getPublicEndpoint",
+        "summary": "Public endpoint — no auth required",
+        "description": "Explicitly overrides global security with an empty array, making this endpoint public.",
+        "tags": ["multi-auth"],
+        "security": [],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthenticatedResponse" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key passed in the `X-API-Key` request header."
+      },
+      "ApiKeyQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "api_key",
+        "description": "API key passed as the `api_key` query parameter."
+      },
+      "ApiKeyCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session_token",
+        "description": "API key stored in the `session_token` cookie."
+      },
+      "HttpBasic": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic authentication. Encode `username:password` in Base64."
+      },
+      "HttpBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT access token passed as a Bearer token in the Authorization header."
+      },
+      "OAuth2AuthorizationCode": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 Authorization Code flow for user-facing applications.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.example.com/oauth/authorize",
+            "tokenUrl": "https://auth.example.com/oauth/token",
+            "refreshUrl": "https://auth.example.com/oauth/token",
+            "scopes": {
+              "read:data": "Read access to data",
+              "write:data": "Write access to data",
+              "admin": "Full administrative access"
+            }
+          }
+        }
+      },
+      "OAuth2ClientCredentials": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 Client Credentials flow for machine-to-machine communication.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://auth.example.com/oauth/token",
+            "scopes": {
+              "read:data": "Read access to data",
+              "write:data": "Write access to data"
+            }
+          }
+        }
+      },
+      "OAuth2Implicit": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 Implicit flow (deprecated — prefer Authorization Code + PKCE).",
+        "flows": {
+          "implicit": {
+            "authorizationUrl": "https://auth.example.com/oauth/authorize",
+            "scopes": {
+              "read:data": "Read access to data"
+            }
+          }
+        }
+      },
+      "OAuth2Password": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 Resource Owner Password flow for trusted first-party clients.",
+        "flows": {
+          "password": {
+            "tokenUrl": "https://auth.example.com/oauth/token",
+            "scopes": {
+              "read:data": "Read access to data"
+            }
+          }
+        }
+      },
+      "OpenIdConnect": {
+        "type": "openIdConnect",
+        "openIdConnectUrl": "https://auth.example.com/.well-known/openid-configuration",
+        "description": "OpenID Connect — discovery document defines supported scopes and endpoints."
+      }
+    },
+    "schemas": {
+      "AuthInfo": {
+        "type": "object",
+        "properties": {
+          "subject": { "type": "string", "description": "Authenticated user or client ID", "example": "user:42" },
+          "scheme": { "type": "string", "description": "Scheme used to authenticate", "example": "bearer" },
+          "scopes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["read:data"]
+          }
+        }
+      },
+      "ActionRequest": {
+        "type": "object",
+        "required": ["action"],
+        "properties": {
+          "action": { "type": "string", "example": "process" },
+          "payload": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "responses": {
+      "AuthenticatedResponse": {
+        "description": "Successful authenticated response",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/AuthInfo" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid credentials",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions or missing scope",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      }
+    }
+  },
+  "security": [{ "HttpBearer": [] }]
+}

@@ -6,7 +6,8 @@ import {
   getResponseExample,
   schemaToExample,
 } from "../parser/spec-parser";
-import { methodBadgeClasses, escapeHtml } from "../components/nav";
+import { escapeHtml } from "../utils/html";
+import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";
 
 // ─── Status code colors ───────────────────────────────────────────────────────

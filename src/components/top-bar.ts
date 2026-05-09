@@ -37,8 +37,6 @@ export function renderTopBar(
   return `
     <header class="relative flex items-center gap-3 px-4 h-14 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 z-10">
 
-      ${isOpen ? `<div id="server-popover-backdrop" class="fixed inset-0 z-[55]"></div>` : ""}
-
       <!-- API identity -->
       <div class="flex items-center gap-2.5 shrink-0 min-w-0">
         <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
@@ -58,9 +56,9 @@ export function renderTopBar(
       <!-- Divider -->
       <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 shrink-0 mx-1"></div>
 
-      <!-- Server chip + popover -->
+      <!-- Server chip + modal -->
       ${servers.length > 0 ? `
-        <div class="relative">
+        <div>
           ${renderServerChip(resolvedUrl, isOpen, "topbar-server-chip")}
           ${isOpen ? renderServerPanel(servers, selectedServer, serverVariables) : ""}
         </div>` : ""}

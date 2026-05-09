@@ -356,8 +356,7 @@ export function renderPlayground(
       <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
         <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
         <div class="flex-1"></div>
-        ${isOpen ? `<div id="server-popover-backdrop" class="fixed inset-0 z-[55]"></div>` : ""}
-        <div class="relative">
+        <div>
           ${renderServerChip(resolvedBase, isOpen, "playground-server-chip")}
           ${isOpen ? renderServerPanel(servers, selectedServer, serverVariables) : ""}
         </div>

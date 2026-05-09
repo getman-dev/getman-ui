@@ -226,11 +226,17 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
   }
 
   function bindServerConfigEvents() {
-    $<HTMLElement>("#server-popover-backdrop")?.addEventListener("click", () => {
+    const closeServerModal = () => {
       state.serverPopoverSource = null;
       renderTopBarPane();
       renderTryItPane();
+    };
+
+    $<HTMLElement>("#server-popover-backdrop")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeServerModal();
     });
+
+    $<HTMLElement>("#server-modal-close")?.addEventListener("click", closeServerModal);
 
     $<HTMLSelectElement>("#server-select")?.addEventListener("change", (e) => {
       const url = (e.target as HTMLSelectElement).value;

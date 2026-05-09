@@ -9,10 +9,11 @@ import type {
   EndpointEntry,
 } from "../types/openapi";
 import { resolveParameter, resolveSchema } from "../parser/ref-resolver";
-import { buildUrl, getRequestBodyExample } from "../parser/example-gen";
+import { buildUrl, getRequestBodyExample, resolveServerUrl } from "../parser/example-gen";
 import { escapeHtml, escapeAttr } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";
+import { renderServerChip, renderServerPanel } from "./server-config";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -313,7 +314,14 @@ function renderBodySection(
 
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
-export function renderPlayground(state: PlaygroundState, spec: OpenAPISpec, authValues: AuthValues): string {
+export function renderPlayground(
+  state: PlaygroundState,
+  spec: OpenAPISpec,
+  authValues: AuthValues,
+  selectedServer: string,
+  serverVariables: Record<string, string>,
+  serverPopoverSource: "topbar" | "playground" | null
+): string {
   if (!state.endpoint) {
     return `
       <div class="h-full flex flex-col items-center justify-center text-center px-6 gap-3">
@@ -330,28 +338,29 @@ export function renderPlayground(state: PlaygroundState, spec: OpenAPISpec, auth
   const components = spec.components;
   const params = (ep.operation.parameters ?? []).map((p) => resolveParameter(p, components));
   const servers = spec.servers ?? [{ url: "http://localhost" }];
-  const baseUrl = servers[0].url;
+  const activeServer = servers.find(s => s.url === selectedServer) ?? servers[0];
+  const resolvedBase = activeServer ? resolveServerUrl(activeServer, serverVariables) : (servers[0]?.url ?? "http://localhost");
 
   const pathParams = params.filter((p) => p.in === "path");
   const queryParams = params.filter((p) => p.in === "query");
   const headerParams = params.filter((p) => p.in === "header");
 
-  const builtUrl = buildUrl(baseUrl, ep.path, state.paramValues, params);
+  const builtUrl = buildUrl(resolvedBase, ep.path, state.paramValues, params);
+  const isOpen = serverPopoverSource === "playground";
   const canExecute = pathParams.every((p) => !p.required || state.paramValues[p.name]);
 
   return `
     <div class="h-full flex flex-col bg-white dark:bg-gray-900">
 
       <!-- Header -->
-      <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
         <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
         <div class="flex-1"></div>
-        ${servers.length > 1
-          ? `<select id="try-server" class="text-[10px] font-mono text-gray-500 dark:text-gray-400 bg-transparent border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:bg-gray-800">
-               ${servers.map((s) => `<option value="${escapeAttr(s.url)}"${s.url === baseUrl ? " selected" : ""}>${escapeHtml(s.description ?? s.url)}</option>`).join("")}
-             </select>`
-          : `<span class="text-[10px] font-mono text-gray-400 truncate max-w-[200px]" title="${escapeAttr(baseUrl)}">${escapeHtml(servers[0].description ?? baseUrl)}</span>`
-        }
+        ${isOpen ? `<div id="server-popover-backdrop" class="fixed inset-0 z-[55]"></div>` : ""}
+        <div class="relative">
+          ${renderServerChip(resolvedBase, isOpen, "playground-server-chip")}
+          ${isOpen ? renderServerPanel(servers, selectedServer, serverVariables) : ""}
+        </div>
       </div>
 
       <!-- URL bar + Send -->

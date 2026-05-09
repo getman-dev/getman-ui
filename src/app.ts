@@ -7,7 +7,7 @@ import type {
 } from "./types/openapi";
 import { parseSpec } from "./parser/spec-parser";
 import { resolveParameter } from "./parser/ref-resolver";
-import { buildUrl } from "./parser/example-gen";
+import { buildUrl, resolveServerUrl } from "./parser/example-gen";
 import { renderNav } from "./components/nav";
 import { renderEndpointDetail, renderDetailEmpty } from "./pages/endpoint-detail";
 import { renderSchemaDetail } from "./pages/schema-detail";
@@ -39,6 +39,8 @@ interface AppState {
   modalUrlValue: string;
   authValues: AuthValues;
   authModalVisible: boolean;
+  serverVariables: Record<string, string>;
+  serverPopoverSource: "topbar" | "playground" | null;
   sidebarTab: "endpoints" | "schemas";
   activeSchema: string | null;
   shortcutsVisible: boolean;
@@ -59,6 +61,8 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     modalUrlValue: "",
     authValues: {},
     authModalVisible: false,
+    serverVariables: {},
+    serverPopoverSource: null,
     sidebarTab: "endpoints",
     activeSchema: null,
     shortcutsVisible: false,
@@ -90,7 +94,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   function renderTopBarPane() {
     if (!state.spec) return;
-    $topBar().innerHTML = renderTopBar(state.spec, state.authValues);
+    $topBar().innerHTML = renderTopBar(state.spec, state.authValues, state.selectedServer, state.serverVariables, state.serverPopoverSource);
     bindTopBarEvents();
   }
 
@@ -124,7 +128,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   function renderTryItPane() {
     if (!state.spec) return;
-    $tryIt().innerHTML = renderPlayground(state.playground, state.spec, state.authValues);
+    $tryIt().innerHTML = renderPlayground(state.playground, state.spec, state.authValues, state.selectedServer, state.serverVariables, state.serverPopoverSource);
     bindTryItEvents();
   }
 
@@ -212,8 +216,47 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       renderAuthModalPane();
     });
 
+    $<HTMLElement>("#topbar-server-chip")?.addEventListener("click", () => {
+      state.serverPopoverSource = "topbar";
+      renderTopBarPane();
+      renderTryItPane();
+    });
+
+    bindServerConfigEvents();
+  }
+
+  function bindServerConfigEvents() {
+    $<HTMLElement>("#server-popover-backdrop")?.addEventListener("click", () => {
+      state.serverPopoverSource = null;
+      renderTopBarPane();
+      renderTryItPane();
+    });
+
     $<HTMLSelectElement>("#server-select")?.addEventListener("change", (e) => {
-      state.selectedServer = (e.target as HTMLSelectElement).value;
+      const url = (e.target as HTMLSelectElement).value;
+      state.selectedServer = url;
+      state.serverVariables = initServerVariables((state.spec?.servers ?? []).find(s => s.url === url));
+      renderTopBarPane();
+      renderTryItPane();
+      updateUrlPreview();
+    });
+
+    $$<HTMLSelectElement>(".server-var-select").forEach(sel => {
+      sel.addEventListener("change", () => {
+        state.serverVariables[sel.dataset.variable!] = sel.value;
+        renderTopBarPane();
+        renderTryItPane();
+        updateUrlPreview();
+      });
+    });
+
+    $$<HTMLInputElement>(".server-var-input").forEach(input => {
+      input.addEventListener("change", () => {
+        state.serverVariables[input.dataset.variable!] = input.value;
+        renderTopBarPane();
+        renderTryItPane();
+        updateUrlPreview();
+      });
     });
   }
 
@@ -316,6 +359,14 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
   }
 
   function bindTryItEvents() {
+    $<HTMLElement>("#playground-server-chip")?.addEventListener("click", () => {
+      state.serverPopoverSource = "playground";
+      renderTopBarPane();
+      renderTryItPane();
+    });
+
+    bindServerConfigEvents();
+
     $$<HTMLInputElement | HTMLSelectElement>(".try-input").forEach((input) => {
       input.addEventListener("input", () => {
         const name = (input as HTMLElement).dataset.name!;
@@ -401,12 +452,24 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     });
   }
 
+  function initServerVariables(server: { variables?: Record<string, { default: string }> } | undefined): Record<string, string> {
+    if (!server?.variables) return {};
+    return Object.fromEntries(Object.entries(server.variables).map(([name, v]) => [name, v.default]));
+  }
+
+  function resolvedBaseUrl(): string {
+    const servers = state.spec?.servers ?? [];
+    const server = servers.find(s => s.url === state.selectedServer) ?? servers[0];
+    if (!server) return state.selectedServer || "http://localhost";
+    return resolveServerUrl(server, state.serverVariables);
+  }
+
   function updateUrlPreview() {
     if (!state.spec || !state.playground.endpoint) return;
     const params = (state.playground.endpoint.operation.parameters ?? []).map((p) =>
       resolveParameter(p, state.spec!.components)
     );
-    const baseUrl = state.selectedServer || state.spec.servers?.[0]?.url || "http://localhost";
+    const baseUrl = resolvedBaseUrl();
     const url = buildUrl(baseUrl, state.playground.endpoint.path, state.playground.paramValues, params);
     const preview = $<HTMLElement>("#try-url-preview");
     if (preview) preview.textContent = url;
@@ -420,7 +483,7 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     renderTryItPane();
 
     try {
-      const baseUrl = state.selectedServer || state.spec.servers?.[0]?.url || "http://localhost";
+      const baseUrl = resolvedBaseUrl();
       const response = await executeRequest(
         state.playground.endpoint,
         state.playground.paramValues,
@@ -585,6 +648,8 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
     state.activeSchema = null;
     state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
     state.selectedServer = parsed.servers?.[0]?.url ?? "";
+    state.serverVariables = initServerVariables(parsed.servers?.[0]);
+    state.serverPopoverSource = null;
     state.searchQuery = "";
     state.modalVisible = false;
     state.modalError = "";

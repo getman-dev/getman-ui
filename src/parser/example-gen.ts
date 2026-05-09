@@ -1,5 +1,15 @@
-import type { Schema, Components, EndpointEntry, Response, Parameter } from "../types/openapi";
+import type { Schema, Components, EndpointEntry, Response, Parameter, Server } from "../types/openapi";
 import { resolveSchema } from "./ref-resolver";
+
+/**
+ * Resolves a server URL template by substituting `{variable}` placeholders
+ * with values from `variables`, falling back to the variable's declared default.
+ */
+export function resolveServerUrl(server: Server, variables: Record<string, string>): string {
+  return server.url.replace(/\{([^}]+)\}/g, (_, name: string) =>
+    variables[name] ?? server.variables?.[name]?.default ?? name
+  );
+}
 
 export function schemaToExample(
   schema: Schema | undefined,

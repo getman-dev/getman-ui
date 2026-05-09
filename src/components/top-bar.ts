@@ -1,15 +1,43 @@
-import type { OpenAPISpec, AuthValues } from "../types/openapi";
-import { escapeHtml, escapeAttr } from "../utils/html";
+/**
+ * Top application bar: API identity, server chip with popover, auth, dark mode, shortcuts, and spec loader.
+ */
 
-export function renderTopBar(spec: OpenAPISpec, authValues: AuthValues): string {
+import type { OpenAPISpec, AuthValues, Server } from "../types/openapi";
+import { escapeHtml, escapeAttr } from "../utils/html";
+import { renderServerChip, renderServerPanel } from "./server-config";
+import { resolveServerUrl } from "../parser/example-gen";
+
+/**
+ * Renders the top application bar.
+ *
+ * @param spec - The loaded OpenAPI spec.
+ * @param authValues - Current auth credentials keyed by scheme name.
+ * @param selectedServer - Template URL of the currently selected server.
+ * @param serverVariables - Current values for the active server's URL variables.
+ * @param serverPopoverSource - Which chip currently has its popover open, or null.
+ * @returns HTML string.
+ */
+export function renderTopBar(
+  spec: OpenAPISpec,
+  authValues: AuthValues,
+  selectedServer: string,
+  serverVariables: Record<string, string>,
+  serverPopoverSource: "topbar" | "playground" | null
+): string {
   const info = spec.info;
   const servers = spec.servers ?? [];
   const hasAuth = !!spec.components?.securitySchemes;
   const isAuthorized = hasAuth && Object.values(authValues).some((v) => v.value || v.username);
   const monogram = info.title.trim().charAt(0).toUpperCase();
 
+  const activeServer: Server | undefined = servers.find(s => s.url === selectedServer) ?? servers[0];
+  const resolvedUrl = activeServer ? resolveServerUrl(activeServer, serverVariables) : selectedServer;
+  const isOpen = serverPopoverSource === "topbar";
+
   return `
-    <header class="flex items-center gap-3 px-4 h-14 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 z-10">
+    <header class="relative flex items-center gap-3 px-4 h-14 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 z-10">
+
+      ${isOpen ? `<div id="server-popover-backdrop" class="fixed inset-0 z-[55]"></div>` : ""}
 
       <!-- API identity -->
       <div class="flex items-center gap-2.5 shrink-0 min-w-0">
@@ -30,18 +58,11 @@ export function renderTopBar(spec: OpenAPISpec, authValues: AuthValues): string 
       <!-- Divider -->
       <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 shrink-0 mx-1"></div>
 
-      <!-- Server indicator -->
+      <!-- Server chip + popover -->
       ${servers.length > 0 ? `
-        <div class="flex items-center gap-1.5 min-w-0">
-          <svg class="w-3 h-3 text-gray-400 dark:text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-          </svg>
-          ${servers.length > 1
-            ? `<select id="server-select"
-                class="text-[11px] border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:bg-white dark:focus:bg-gray-700 font-mono max-w-[220px] cursor-pointer">
-                ${servers.map((s) => `<option value="${escapeAttr(s.url)}">${escapeHtml(s.description ? `${s.description} (${s.url})` : s.url)}</option>`).join("")}
-              </select>`
-            : `<code class="text-[11px] text-gray-500 dark:text-gray-400 font-mono truncate max-w-[220px]">${escapeHtml(servers[0].url)}</code>`}
+        <div class="relative">
+          ${renderServerChip(resolvedUrl, isOpen, "topbar-server-chip")}
+          ${isOpen ? renderServerPanel(servers, selectedServer, serverVariables) : ""}
         </div>` : ""}
 
       <div class="flex-1"></div>

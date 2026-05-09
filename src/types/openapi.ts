@@ -18,9 +18,16 @@ export interface Info {
   license?: { name: string; url?: string };
 }
 
+export interface ServerVariable {
+  default: string;
+  enum?: string[];
+  description?: string;
+}
+
 export interface Server {
   url: string;
   description?: string;
+  variables?: Record<string, ServerVariable>;
 }
 
 export interface Tag {

@@ -5,6 +5,7 @@
 
 import type { SecurityScheme, AuthValues } from "../types/openapi";
 import { escapeHtml, escapeAttr } from "../utils/html";
+import { authState } from "../state/auth-state";
 
 const TAB_ACTIVE   = "auth-scheme-tab px-3 py-1.5 text-[11px] font-medium rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 flex items-center gap-1.5 shrink-0";
 const TAB_INACTIVE = "auth-scheme-tab px-3 py-1.5 text-[11px] font-medium rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex items-center gap-1.5 shrink-0";
@@ -175,4 +176,47 @@ export function renderAuthModal(
         </div>
       </div>
     </div>`;
+}
+
+/**
+ * Binds auth modal events: close, scheme tabs, authorize, and logout.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ */
+export function bindAuthModalEvents(root: HTMLElement) {
+  const close = () => authState.closeModal();
+  root.querySelector<HTMLElement>("#auth-modal-close")?.addEventListener("click", close);
+  root.querySelector<HTMLElement>("#auth-modal-done")?.addEventListener("click", close);
+  root.querySelector<HTMLElement>("#auth-modal-backdrop")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) close();
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".auth-scheme-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const scheme = tab.dataset.scheme!;
+      root.querySelectorAll<HTMLButtonElement>(".auth-scheme-tab").forEach((t) => {
+        t.className = t === tab ? AUTH_SCHEME_TAB_CLASSES.active : AUTH_SCHEME_TAB_CLASSES.inactive;
+      });
+      root.querySelectorAll<HTMLElement>(".auth-scheme-panel").forEach((panel) => {
+        panel.classList.toggle("hidden", panel.dataset.panel !== scheme);
+      });
+    });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".auth-authorize-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const schemeName = btn.dataset.scheme!;
+      const inputs = root.querySelectorAll<HTMLInputElement>(`.auth-input[data-scheme="${CSS.escape(schemeName)}"]`);
+      const existing = authState.authValues[schemeName] ?? { value: "", username: "", password: "" };
+      const updated = { ...existing };
+      inputs.forEach((input) => {
+        updated[input.dataset.field as "value" | "username" | "password"] = input.value;
+      });
+      authState.setSchemeAuth(schemeName, updated);
+    });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".auth-logout-btn").forEach((btn) => {
+    btn.addEventListener("click", () => authState.clearSchemeAuth(btn.dataset.scheme!));
+  });
 }

@@ -7,6 +7,8 @@
 import type { Server, ServerVariable } from "../types/openapi";
 import { escapeHtml, escapeAttr } from "../utils/html";
 import { resolveServerUrl } from "../parser/example-gen";
+import { serverState, initServerVariables } from "../state/server-state";
+import { specState } from "../state/spec-state";
 
 function renderVariableRow(varName: string, varDef: ServerVariable, currentVal: string): string {
   const baseClass =
@@ -100,9 +102,34 @@ export function renderServerChip(resolvedUrl: string, isOpen: boolean, id: strin
       <svg class="w-3 h-3 shrink-0 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
       </svg>
-      <span class="truncate max-w-[240px]">${escapeHtml(resolvedUrl)}</span>
+      <span class="truncate max-w-[240px]">Go ${escapeHtml(resolvedUrl)}</span>
       <svg class="w-3 h-3 opacity-50 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
       </svg>
     </button>`;
+}
+
+/**
+ * Binds server selection and variable change events within the given root.
+ * Calling this after each render replaces the previous listeners (elements are recreated).
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ */
+export function bindServerConfigEvents(root: HTMLElement) {
+  root.querySelector<HTMLElement>("#server-popover-backdrop")?.addEventListener("click", () => serverState.setPopoverSource(null));
+  root.querySelector<HTMLElement>("#server-modal-close")?.addEventListener("click", () => serverState.setPopoverSource(null));
+
+  root.querySelector<HTMLSelectElement>("#server-select")?.addEventListener("change", (e) => {
+    const url = (e.target as HTMLSelectElement).value;
+    const server = (specState.spec?.servers ?? []).find(s => s.url === url);
+    serverState.setServer(url, initServerVariables(server));
+  });
+
+  root.querySelectorAll<HTMLSelectElement>(".server-var-select").forEach(sel => {
+    sel.addEventListener("change", () => serverState.setVariable(sel.dataset.variable!, sel.value));
+  });
+
+  root.querySelectorAll<HTMLInputElement>(".server-var-input").forEach(input => {
+    input.addEventListener("change", () => serverState.setVariable(input.dataset.variable!, input.value));
+  });
 }

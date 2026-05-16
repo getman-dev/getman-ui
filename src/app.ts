@@ -1,22 +1,25 @@
-import type {
-  OpenAPISpec,
-  EndpointEntry,
-  TagGroup,
-  PlaygroundState,
-  AuthValues,
-} from "./types/openapi";
-import { parseSpec } from "./parser/spec-parser";
+/**
+ * Application bootstrap: wires state store subscriptions, owns render orchestration,
+ * and handles event binding, spec loading, hash routing, and keyboard shortcuts.
+ */
+import type { OpenAPISpec, TagGroup } from "./types/openapi";
 import { resolveParameter } from "./parser/ref-resolver";
 import { buildUrl, resolveServerUrl } from "./parser/example-gen";
-import { renderNav } from "./components/nav";
-import { renderEndpointDetail, renderDetailEmpty } from "./pages/endpoint-detail";
+import { renderNav, bindNavEvents } from "./components/nav";
+import { renderEndpointDetail, renderDetailEmpty, bindDetailEvents } from "./pages/endpoint-detail";
 import { renderSchemaDetail } from "./pages/schema-detail";
-import { SCHEMA_VIEWER_TAB_CLASSES } from "./components/schema-viewer";
-import { renderPlayground } from "./components/playground";
-import { renderTopBar } from "./components/top-bar";
-import { renderLoadModal } from "./components/load-modal";
-import { renderAuthModal, AUTH_SCHEME_TAB_CLASSES } from "./components/auth-modal";
+import { renderPlayground, bindPlaygroundEvents } from "./components/playground";
+import { renderTopBar, bindTopBarEvents } from "./components/top-bar";
+import { renderLoadModal, bindModalEvents } from "./components/load-modal";
+import { renderAuthModal, bindAuthModalEvents } from "./components/auth-modal";
 import { executeRequest, isCorsError } from "./utils/http-client";
+import { specState } from "./state/spec-state";
+import { navState } from "./state/nav-state";
+import { serverState } from "./state/server-state";
+import { authState } from "./state/auth-state";
+import { playgroundState } from "./state/playground-state";
+import { modalState } from "./state/modal-state";
+import { applySpec } from "./state/actions";
 
 // ─── Public interface ─────────────────────────────────────────────────────────
 
@@ -25,65 +28,23 @@ export interface AppController {
   destroy(): void;
 }
 
-// ─── App state ────────────────────────────────────────────────────────────────
-
-interface AppState {
-  spec: OpenAPISpec | null;
-  groups: TagGroup[];
-  activeEndpoint: EndpointEntry | null;
-  playground: PlaygroundState;
-  searchQuery: string;
-  selectedServer: string;
-  modalVisible: boolean;
-  modalError: string;
-  modalUrlValue: string;
-  authValues: AuthValues;
-  authModalVisible: boolean;
-  serverVariables: Record<string, string>;
-  serverPopoverSource: "topbar" | "playground" | null;
-  sidebarTab: "endpoints" | "schemas";
-  activeSchema: string | null;
-  shortcutsVisible: boolean;
-}
-
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
 export function createApp(root: HTMLElement, initialUrl?: string): AppController {
-  const state: AppState = {
-    spec: null,
-    groups: [],
-    activeEndpoint: null,
-    playground: { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false },
-    searchQuery: "",
-    selectedServer: "",
-    modalVisible: false,
-    modalError: "",
-    modalUrlValue: "",
-    authValues: {},
-    authModalVisible: false,
-    serverVariables: {},
-    serverPopoverSource: null,
-    sidebarTab: "endpoints",
-    activeSchema: null,
-    shortcutsVisible: false,
-  };
-
-  // ─── Scoped DOM helpers ───────────────────────────────────────────────────
-
   const $  = <T extends HTMLElement>(sel: string): T => root.querySelector<T>(sel)!;
   const $$ = <T extends HTMLElement>(sel: string): NodeListOf<T> => root.querySelectorAll<T>(sel);
 
-  const $topBar   = () => $<HTMLElement>("#top-bar");
-  const $nav      = () => $<HTMLElement>("#nav-pane");
-  const $detail   = () => $<HTMLElement>("#detail-pane");
-  const $tryIt    = () => $<HTMLElement>("#try-pane");
-  const $modal    = () => $<HTMLElement>("#modal-container");
-  const $authModal = () => $<HTMLElement>("#auth-modal-container");
+  const $topBar    = () => root.querySelector<HTMLElement>("#top-bar");
+  const $nav       = () => root.querySelector<HTMLElement>("#nav-pane");
+  const $detail    = () => root.querySelector<HTMLElement>("#detail-pane");
+  const $tryIt     = () => root.querySelector<HTMLElement>("#try-pane");
+  const $modal     = () => root.querySelector<HTMLElement>("#modal-container");
+  const $authModal = () => root.querySelector<HTMLElement>("#auth-modal-container");
 
   // ─── Render passes ───────────────────────────────────────────────────────
 
   function renderAll() {
-    if (!state.spec) return;
+    if (!specState.spec) return;
     renderTopBarPane();
     renderNavPane();
     renderDetailPane();
@@ -93,94 +54,119 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
   }
 
   function renderTopBarPane() {
-    if (!state.spec) return;
-    $topBar().innerHTML = renderTopBar(state.spec, state.authValues, state.selectedServer, state.serverVariables, state.serverPopoverSource);
-    bindTopBarEvents();
+    const el = $topBar();
+    if (!el || !specState.spec) return;
+    el.innerHTML = renderTopBar(
+      specState.spec,
+      authState.authValues,
+      serverState.selectedServer,
+      serverState.serverVariables,
+      serverState.serverPopoverSource,
+    );
+    bindTopBarEvents(root);
   }
 
   function renderNavPane() {
-    const filtered = filterGroups(state.groups, state.searchQuery);
-    const schemas = state.spec?.components?.schemas ?? {};
-    $nav().innerHTML = renderNav(filtered, state.activeEndpoint, state.searchQuery, state.sidebarTab, schemas, state.activeSchema);
-    bindNavEvents();
+    const el = $nav();
+    if (!el) return;
+    const filtered = filterGroups(specState.groups, navState.searchQuery);
+    const schemas = specState.spec?.components?.schemas ?? {};
+    el.innerHTML = renderNav(
+      filtered,
+      navState.activeEndpoint,
+      navState.searchQuery,
+      navState.sidebarTab,
+      schemas,
+      navState.activeSchema,
+    );
+    bindNavEvents(root);
   }
 
   function renderDetailPane() {
-    if (!state.spec) {
-      $detail().innerHTML = renderDetailEmpty();
+    const el = $detail();
+    if (!el) return;
+    if (!specState.spec) {
+      el.innerHTML = renderDetailEmpty();
       return;
     }
-    if (state.activeSchema) {
-      const schema = state.spec.components?.schemas?.[state.activeSchema];
+    if (navState.activeSchema) {
+      const schema = specState.spec.components?.schemas?.[navState.activeSchema];
       if (schema) {
-        $detail().innerHTML = renderSchemaDetail(state.activeSchema, schema, state.spec.components);
-        bindDetailEvents();
+        el.innerHTML = renderSchemaDetail(navState.activeSchema, schema, specState.spec.components);
+        bindDetailEvents(root);
         return;
       }
     }
-    if (!state.activeEndpoint) {
-      $detail().innerHTML = renderDetailEmpty();
+    if (!navState.activeEndpoint) {
+      el.innerHTML = renderDetailEmpty();
     } else {
-      $detail().innerHTML = renderEndpointDetail(state.activeEndpoint, state.spec.components);
-      bindDetailEvents();
+      el.innerHTML = renderEndpointDetail(navState.activeEndpoint, specState.spec.components);
+      bindDetailEvents(root);
     }
   }
 
   function renderTryItPane() {
-    if (!state.spec) return;
-    $tryIt().innerHTML = renderPlayground(state.playground, state.spec, state.authValues, state.selectedServer, state.serverVariables, state.serverPopoverSource);
-    bindTryItEvents();
+    const el = $tryIt();
+    if (!el || !specState.spec) return;
+    el.innerHTML = renderPlayground(
+      playgroundState.snapshot(),
+      specState.spec,
+      authState.authValues,
+      serverState.selectedServer,
+      serverState.serverVariables,
+      serverState.serverPopoverSource,
+    );
+    bindPlaygroundEvents(root, handleExecute, updateUrlPreview);
   }
 
   function renderModalPane() {
-    if (state.shortcutsVisible) {
-      $modal().innerHTML = renderShortcutsOverlay();
+    const el = $modal();
+    if (!el) return;
+    if (modalState.shortcutsVisible) {
+      el.innerHTML = renderShortcutsOverlay();
       bindShortcutsOverlayEvents();
     } else {
-      $modal().innerHTML = renderLoadModal(state.modalVisible, state.modalUrlValue, state.modalError);
-      bindModalEvents();
+      el.innerHTML = renderLoadModal(modalState.modalVisible, modalState.modalUrlValue, modalState.modalError);
+      bindModalEvents(root, loadSpecFromUrl, loadSpecFromFile);
     }
   }
 
-  function renderShortcutsOverlay(): string {
-    const rows: [string, string][] = [
-      ["/",      "Focus search"],
-      ["↑ ↓",   "Navigate endpoints"],
-      ["Enter",  "Select endpoint"],
-      ["Esc",    "Close / dismiss"],
-      ["⌘ K",   "Load spec"],
-      ["⌘ ↵",   "Execute request"],
-      ["?",      "Toggle this panel"],
-    ];
-    const rowsHtml = rows.map(([key, desc]) => `
-      <div class="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
-        <span class="text-xs text-gray-600 dark:text-gray-300">${desc}</span>
-        <kbd class="text-[10px] font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded border border-gray-200 dark:border-gray-600 shrink-0">${key}</kbd>
-      </div>`).join("");
-    return `
-      <div id="shortcuts-backdrop" class="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
-          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-700">
-            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Keyboard shortcuts</span>
-            <button id="shortcuts-close" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none transition-colors">×</button>
-          </div>
-          <div class="px-5 py-2">${rowsHtml}</div>
-        </div>
-      </div>`;
-  }
-
-  function bindShortcutsOverlayEvents() {
-    const close = () => { state.shortcutsVisible = false; renderModalPane(); };
-    $<HTMLElement>("#shortcuts-close")?.addEventListener("click", close);
-    $<HTMLElement>("#shortcuts-backdrop")?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) close();
-    });
-  }
-
   function renderAuthModalPane() {
-    const schemes = state.spec?.components?.securitySchemes ?? {};
-    $authModal().innerHTML = renderAuthModal(state.authModalVisible, schemes, state.authValues);
-    bindAuthModalEvents();
+    const el = $authModal();
+    if (!el) return;
+    const schemes = specState.spec?.components?.securitySchemes ?? {};
+    el.innerHTML = renderAuthModal(authState.authModalVisible, schemes, authState.authValues);
+    bindAuthModalEvents(root);
+  }
+
+  function applyPageLayout() {
+    const tryPane = $tryIt();
+    const handleRight = root.querySelector<HTMLElement>("#handle-right");
+    const show = !!navState.activeEndpoint;
+    if (tryPane) tryPane.style.display = show ? "" : "none";
+    if (handleRight) handleRight.style.display = show ? "" : "none";
+  }
+
+  // ─── Subscriptions ───────────────────────────────────────────────────────
+
+  function wireSubscriptions() {
+    specState.sub(renderAll);
+
+    navState.sub(renderNavPane);
+    navState.sub(renderDetailPane);
+    navState.sub(applyPageLayout);
+
+    serverState.sub(renderTopBarPane);
+    serverState.sub(renderTryItPane);
+    serverState.sub(updateUrlPreview);
+
+    authState.sub(renderAuthModalPane);
+    authState.sub(renderTopBarPane);
+    authState.sub(renderTryItPane);
+
+    playgroundState.sub(renderTryItPane);
+
+    modalState.sub(renderModalPane);
   }
 
   // ─── Filtering ───────────────────────────────────────────────────────────
@@ -202,403 +188,62 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       .filter((g) => g.endpoints.length > 0);
   }
 
-  // ─── Event binding ───────────────────────────────────────────────────────
+  // ─── Shortcuts overlay events (no dedicated component file) ─────────────────
 
-  function bindTopBarEvents() {
-    $<HTMLElement>("#load-spec-btn")?.addEventListener("click", () => {
-      state.modalVisible = true;
-      state.modalError = "";
-      renderModalPane();
-    });
-
-    $<HTMLElement>("#auth-btn")?.addEventListener("click", () => {
-      state.authModalVisible = true;
-      renderAuthModalPane();
-    });
-
-    $<HTMLElement>("#topbar-server-chip")?.addEventListener("click", () => {
-      state.serverPopoverSource = "topbar";
-      renderTopBarPane();
-      renderTryItPane();
-    });
-
-    bindServerConfigEvents();
-  }
-
-  function bindServerConfigEvents() {
-    const closeServerModal = () => {
-      state.serverPopoverSource = null;
-      renderTopBarPane();
-      renderTryItPane();
-    };
-
-    $<HTMLElement>("#server-popover-backdrop")?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) closeServerModal();
-    });
-
-    $<HTMLElement>("#server-modal-close")?.addEventListener("click", closeServerModal);
-
-    $<HTMLSelectElement>("#server-select")?.addEventListener("change", (e) => {
-      const url = (e.target as HTMLSelectElement).value;
-      state.selectedServer = url;
-      state.serverVariables = initServerVariables((state.spec?.servers ?? []).find(s => s.url === url));
-      renderTopBarPane();
-      renderTryItPane();
-      updateUrlPreview();
-    });
-
-    $$<HTMLSelectElement>(".server-var-select").forEach(sel => {
-      sel.addEventListener("change", () => {
-        state.serverVariables[sel.dataset.variable!] = sel.value;
-        renderTopBarPane();
-        renderTryItPane();
-        updateUrlPreview();
-      });
-    });
-
-    $$<HTMLInputElement>(".server-var-input").forEach(input => {
-      input.addEventListener("change", () => {
-        state.serverVariables[input.dataset.variable!] = input.value;
-        renderTopBarPane();
-        renderTryItPane();
-        updateUrlPreview();
-      });
+  function bindShortcutsOverlayEvents() {
+    $<HTMLElement>("#shortcuts-close")?.addEventListener("click", () => modalState.closeShortcuts());
+    $<HTMLElement>("#shortcuts-backdrop")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) modalState.closeShortcuts();
     });
   }
 
-  function bindNavEvents() {
-    $$<HTMLButtonElement>(".sidebar-tab").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        state.sidebarTab = btn.dataset.tab as "endpoints" | "schemas";
-        renderNavPane();
-      });
-    });
-
-    $<HTMLInputElement>("#search-input")?.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        state.searchQuery = (e.target as HTMLInputElement).value;
-        renderNavPane();
-      }
-    });
-    $<HTMLElement>("#search-clear")?.addEventListener("click", () => {
-      state.searchQuery = "";
-      renderNavPane();
-    });
-
-    $$<HTMLButtonElement>(".nav-schema").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        state.activeSchema = btn.dataset.name!;
-        state.activeEndpoint = null;
-        state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
-        setSchemaHash(state.activeSchema);
-        renderNavPane();
-        renderDetailPane();
-        applyPageLayout();
-      });
-    });
-
-    $$<HTMLButtonElement>(".nav-endpoint").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const path = btn.dataset.path!;
-        const method = btn.dataset.method!;
-        const found = state.groups
-          .flatMap((g) => g.endpoints)
-          .find((ep) => ep.path === path && ep.method === method);
-
-        if (!found) return;
-        state.activeEndpoint = found;
-        state.activeSchema = null;
-        state.playground = {
-          endpoint: found,
-          paramValues: {},
-          bodyValue: "",
-          bodyParams: {},
-          fileValues: {},
-          response: null,
-          loading: false,
-        };
-        setEndpointHash(found);
-        renderNavPane();
-        renderDetailPane();
-        renderTryItPane();
-        applyPageLayout();
-      });
-    });
-
-    $$<HTMLButtonElement>(".nav-tag-toggle").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const list = btn.nextElementSibling as HTMLElement;
-        const chevron = btn.querySelector<SVGElement>(".nav-tag-chevron");
-        const isOpen = btn.getAttribute("aria-expanded") === "true";
-        btn.setAttribute("aria-expanded", String(!isOpen));
-        list.style.display = isOpen ? "none" : "";
-        chevron?.style.setProperty("transform", isOpen ? "rotate(-90deg)" : "");
-      });
-    });
-  }
-
-  function bindDetailEvents() {
-    $$<HTMLButtonElement>(".response-toggle").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const item = btn.closest(".response-item");
-        const body = item?.querySelector<HTMLElement>(".response-body");
-        const chevron = btn.querySelector<SVGElement>(".response-chevron");
-        if (!body) return;
-        const hidden = body.classList.toggle("hidden");
-        chevron?.style.setProperty("transform", hidden ? "" : "rotate(180deg)");
-      });
-    });
-
-    $$<HTMLButtonElement>(".schema-viewer-tab").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const viewer = btn.closest(".schema-viewer");
-        if (!viewer) return;
-        const target = btn.dataset.tab;
-        viewer.querySelectorAll<HTMLButtonElement>(".schema-viewer-tab").forEach((t) => {
-          t.className = t === btn ? SCHEMA_VIEWER_TAB_CLASSES.active : SCHEMA_VIEWER_TAB_CLASSES.inactive;
-        });
-        viewer.querySelectorAll<HTMLElement>(".schema-viewer-panel").forEach((panel) => {
-          panel.classList.toggle("hidden", panel.dataset.panel !== target);
-        });
-      });
-    });
-  }
-
-  function bindTryItEvents() {
-    $<HTMLElement>("#playground-server-chip")?.addEventListener("click", () => {
-      state.serverPopoverSource = "playground";
-      renderTopBarPane();
-      renderTryItPane();
-    });
-
-    bindServerConfigEvents();
-
-    $$<HTMLInputElement | HTMLSelectElement>(".try-input").forEach((input) => {
-      input.addEventListener("input", () => {
-        const name = (input as HTMLElement).dataset.name!;
-        state.playground.paramValues[name] = input.value;
-        updateUrlPreview();
-      });
-    });
-
-    const bodyTextarea = $<HTMLTextAreaElement>("#try-body");
-    bodyTextarea?.addEventListener("input", () => {
-      state.playground.bodyValue = bodyTextarea.value;
-    });
-
-    $<HTMLElement>("#try-body-format")?.addEventListener("click", () => {
-      if (!bodyTextarea) return;
-      try {
-        const pretty = JSON.stringify(JSON.parse(bodyTextarea.value), null, 2);
-        bodyTextarea.value = pretty;
-        state.playground.bodyValue = pretty;
-      } catch { /* not valid JSON, ignore */ }
-    });
-
-    // Multipart text/object fields
-    $$<HTMLInputElement | HTMLTextAreaElement>(".try-body-field").forEach((input) => {
-      input.addEventListener("input", () => {
-        const name = (input as HTMLElement).dataset.bodyField!;
-        state.playground.bodyParams[name] = input.value;
-      });
-    });
-
-    // Multipart file inputs
-    $$<HTMLInputElement>(".try-file-input").forEach((input) => {
-      input.addEventListener("change", () => {
-        const name = input.dataset.bodyFile!;
-        if (!input.files?.length) return;
-        state.playground.fileValues[name] = input.multiple
-          ? Array.from(input.files)
-          : input.files[0];
-      });
-    });
-
-    // Raw octet-stream file
-    $<HTMLInputElement>("#try-body-raw-file")?.addEventListener("change", (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) state.playground.fileValues["__raw__"] = file;
-    });
-
-    $<HTMLElement>("#try-execute")?.addEventListener("click", handleExecute);
-
-    $<HTMLElement>("#try-copy-btn")?.addEventListener("click", async () => {
-      const text = $<HTMLElement>("#try-tab-body")?.querySelector("pre")?.textContent ?? "";
-      await navigator.clipboard.writeText(text);
-      const btn = $<HTMLElement>("#try-copy-btn");
-      if (!btn) return;
-      const original = btn.innerHTML;
-      btn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Copied`;
-      btn.classList.add("text-green-600");
-      setTimeout(() => {
-        btn.innerHTML = original;
-        btn.classList.remove("text-green-600");
-      }, 2000);
-    });
-
-    $$<HTMLButtonElement>(".try-tab").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
-        $$<HTMLButtonElement>(".try-tab").forEach((t) => {
-          const active = t === tab;
-          t.classList.toggle("bg-white", active);
-          t.classList.toggle("dark:bg-gray-700", active);
-          t.classList.toggle("shadow-sm", active);
-          t.classList.toggle("text-gray-700", active);
-          t.classList.toggle("dark:text-gray-200", active);
-          t.classList.toggle("border", active);
-          t.classList.toggle("border-gray-200", active);
-          t.classList.toggle("dark:border-gray-600", active);
-          t.classList.toggle("text-gray-400", !active);
-          t.classList.toggle("dark:text-gray-500", !active);
-        });
-        $<HTMLElement>("#try-tab-body")?.classList.toggle("hidden", target !== "body");
-        $<HTMLElement>("#try-tab-headers")?.classList.toggle("hidden", target !== "headers");
-      });
-    });
-  }
-
-  function initServerVariables(server: { variables?: Record<string, { default: string }> } | undefined): Record<string, string> {
-    if (!server?.variables) return {};
-    return Object.fromEntries(Object.entries(server.variables).map(([name, v]) => [name, v.default]));
-  }
+  // ─── URL preview ──────────────────────────────────────────────────────────
 
   function resolvedBaseUrl(): string {
-    const servers = state.spec?.servers ?? [];
-    const server = servers.find(s => s.url === state.selectedServer) ?? servers[0];
-    if (!server) return state.selectedServer || "http://localhost";
-    return resolveServerUrl(server, state.serverVariables);
+    const servers = specState.spec?.servers ?? [];
+    const server = servers.find(s => s.url === serverState.selectedServer) ?? servers[0];
+    if (!server) return serverState.selectedServer || "http://localhost";
+    return resolveServerUrl(server, serverState.serverVariables);
   }
 
   function updateUrlPreview() {
-    if (!state.spec || !state.playground.endpoint) return;
-    const params = (state.playground.endpoint.operation.parameters ?? []).map((p) =>
-      resolveParameter(p, state.spec!.components)
+    if (!specState.spec || !playgroundState.endpoint) return;
+    const params = (playgroundState.endpoint.operation.parameters ?? []).map((p) =>
+      resolveParameter(p, specState.spec!.components)
     );
-    const baseUrl = resolvedBaseUrl();
-    const url = buildUrl(baseUrl, state.playground.endpoint.path, state.playground.paramValues, params);
-    const preview = $<HTMLElement>("#try-url-preview");
+    const url = buildUrl(resolvedBaseUrl(), playgroundState.endpoint.path, playgroundState.paramValues, params);
+    const preview = root.querySelector<HTMLElement>("#try-url-preview");
     if (preview) preview.textContent = url;
   }
 
+  // ─── Request execution ────────────────────────────────────────────────────
+
   async function handleExecute() {
-    if (!state.spec || !state.playground.endpoint) return;
-
-    state.playground.loading = true;
-    state.playground.response = null;
-    renderTryItPane();
-
+    if (!specState.spec || !playgroundState.endpoint) return;
+    playgroundState.startLoading();
     try {
-      const baseUrl = resolvedBaseUrl();
       const response = await executeRequest(
-        state.playground.endpoint,
-        state.playground.paramValues,
-        state.playground.bodyValue,
-        baseUrl,
-        state.spec.components,
-        state.authValues,
-        state.playground.bodyParams,
-        state.playground.fileValues
+        playgroundState.endpoint,
+        playgroundState.paramValues,
+        playgroundState.bodyValue,
+        resolvedBaseUrl(),
+        specState.spec.components,
+        authState.authValues,
+        playgroundState.bodyParams,
+        playgroundState.fileValues,
       );
-      state.playground.response = response;
+      playgroundState.setResponse(response);
     } catch (err) {
-      state.playground.response = {
+      playgroundState.setResponse({
         status: 0,
         statusText: isCorsError(err)
           ? "CORS error — request blocked by browser"
           : String(err instanceof Error ? err.message : err),
         headers: {},
-        body: isCorsError(err)
-          ? "The request was blocked by CORS policy."
-          : "",
+        body: isCorsError(err) ? "The request was blocked by CORS policy." : "",
         duration: 0,
-      };
+      });
     }
-
-    state.playground.loading = false;
-    renderTryItPane();
-  }
-
-  function bindAuthModalEvents() {
-    const close = () => {
-      state.authModalVisible = false;
-      renderAuthModalPane();
-      renderTopBarPane();
-      renderTryItPane();
-    };
-
-    $<HTMLElement>("#auth-modal-close")?.addEventListener("click", close);
-    $<HTMLElement>("#auth-modal-done")?.addEventListener("click", close);
-    $<HTMLElement>("#auth-modal-backdrop")?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) close();
-    });
-
-    $$<HTMLButtonElement>(".auth-scheme-tab").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const scheme = tab.dataset.scheme!;
-        $$<HTMLButtonElement>(".auth-scheme-tab").forEach((t) => {
-          t.className = t === tab ? AUTH_SCHEME_TAB_CLASSES.active : AUTH_SCHEME_TAB_CLASSES.inactive;
-        });
-        $$<HTMLElement>(".auth-scheme-panel").forEach((panel) => {
-          panel.classList.toggle("hidden", panel.dataset.panel !== scheme);
-        });
-      });
-    });
-
-    $$<HTMLButtonElement>(".auth-authorize-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const schemeName = btn.dataset.scheme!;
-        const inputs = $$<HTMLInputElement>(`.auth-input[data-scheme="${CSS.escape(schemeName)}"]`);
-        const entry = state.authValues[schemeName] ?? { value: "", username: "", password: "" };
-        inputs.forEach((input) => {
-          const field = input.dataset.field as "value" | "username" | "password";
-          entry[field] = input.value;
-        });
-        state.authValues[schemeName] = entry;
-        renderAuthModalPane();
-        renderTopBarPane();
-        renderTryItPane();
-      });
-    });
-
-    $$<HTMLButtonElement>(".auth-logout-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        delete state.authValues[btn.dataset.scheme!];
-        renderAuthModalPane();
-        renderTopBarPane();
-        renderTryItPane();
-      });
-    });
-  }
-
-  function bindModalEvents() {
-    $<HTMLElement>("#modal-close")?.addEventListener("click", closeModal);
-    $<HTMLElement>("#load-modal-backdrop")?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) closeModal();
-    });
-
-    $<HTMLElement>("#spec-url-load")?.addEventListener("click", async () => {
-      const url = ($<HTMLInputElement>("#spec-url-input")).value.trim();
-      if (!url) return;
-      state.modalUrlValue = url;
-      await loadSpecFromUrl(url);
-    });
-
-    $<HTMLInputElement>("#spec-file-input")?.addEventListener("change", async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      await loadSpecFromFile(file);
-    });
-
-    $<HTMLElement>("#load-petstore")?.addEventListener("click", async () => {
-      await loadSpecFromUrl("https://petstore3.swagger.io/api/v3/openapi.json");
-    });
-  }
-
-  function closeModal() {
-    state.modalVisible = false;
-    state.modalError = "";
-    renderModalPane();
   }
 
   // ─── Spec loading ─────────────────────────────────────────────────────────
@@ -611,19 +256,16 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       const text = await res.text();
       await parseAndApplySpec(text, contentType.includes("yaml") || url.endsWith(".yaml") || url.endsWith(".yml"));
     } catch (err) {
-      state.modalError = `Failed to load: ${err instanceof Error ? err.message : String(err)}`;
-      renderModalPane();
+      modalState.setError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
   async function loadSpecFromFile(file: File) {
     try {
       const text = await file.text();
-      const isYaml = file.name.endsWith(".yaml") || file.name.endsWith(".yml");
-      await parseAndApplySpec(text, isYaml);
+      await parseAndApplySpec(text, file.name.endsWith(".yaml") || file.name.endsWith(".yml"));
     } catch (err) {
-      state.modalError = `Failed to read file: ${err instanceof Error ? err.message : String(err)}`;
-      renderModalPane();
+      modalState.setError(`Failed to read file: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -637,54 +279,21 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
         parsed = JSON.parse(text);
       }
     } catch (err) {
-      state.modalError = `Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`;
-      renderModalPane();
+      modalState.setError(`Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`);
       return;
     }
 
     if (!parsed.openapi || !parsed.paths) {
-      state.modalError = "Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.";
-      renderModalPane();
+      modalState.setError("Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.");
       return;
     }
 
-    state.spec = parsed;
-    state.groups = parseSpec(parsed);
-    state.activeEndpoint = null;
-    state.activeSchema = null;
-    state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
-    state.selectedServer = parsed.servers?.[0]?.url ?? "";
-    state.serverVariables = initServerVariables(parsed.servers?.[0]);
-    state.serverPopoverSource = null;
-    state.searchQuery = "";
-    state.modalVisible = false;
-    state.modalError = "";
-
-    renderAll();
+    applySpec(parsed, parsed.servers?.[0]);
     restoreFromHash();
     applyPageLayout();
   }
 
-  // ─── Page layout ──────────────────────────────────────────────────────────
-
-  function applyPageLayout() {
-    const tryPane = $<HTMLElement>("#try-pane");
-    const handleRight = $<HTMLElement>("#handle-right");
-    const show = !!state.activeEndpoint;
-    if (tryPane) tryPane.style.display = show ? "" : "none";
-    if (handleRight) handleRight.style.display = show ? "" : "none";
-  }
-
-  // ─── Hash-based routing ───────────────────────────────────────────────────
-
-  function setEndpointHash(endpoint: { method: string; path: string; operation: { operationId?: string } }) {
-    const id = endpoint.operation.operationId ?? `${endpoint.method}:${endpoint.path}`;
-    history.replaceState(null, "", `#endpoints/${encodeURIComponent(id)}`);
-  }
-
-  function setSchemaHash(name: string) {
-    history.replaceState(null, "", `#schemas/${encodeURIComponent(name)}`);
-  }
+  // ─── Hash routing ─────────────────────────────────────────────────────────
 
   function restoreFromHash() {
     const hash = decodeURIComponent(window.location.hash.slice(1));
@@ -692,46 +301,54 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
     if (hash.startsWith("schemas/")) {
       const schemaName = hash.slice("schemas/".length);
-      const schemas = state.spec?.components?.schemas ?? {};
-      if (!(schemaName in schemas)) return;
-      state.activeSchema = schemaName;
-      state.activeEndpoint = null;
-      state.sidebarTab = "schemas";
-      state.playground = { endpoint: null, paramValues: {}, bodyValue: "", bodyParams: {}, fileValues: {}, response: null, loading: false };
-      renderNavPane();
-      renderDetailPane();
-      applyPageLayout();
+      if (!(schemaName in (specState.spec?.components?.schemas ?? {}))) return;
+      navState.setSidebarTab("schemas");
+      navState.setActivePage(null, schemaName);
+      playgroundState.reset(null);
       return;
     }
 
     if (hash.startsWith("endpoints/")) {
       const id = hash.slice("endpoints/".length);
-      const all = state.groups.flatMap((g) => g.endpoints);
-      const found = all.find((ep) => {
-        if (ep.operation.operationId) return ep.operation.operationId === id;
-        return `${ep.method}:${ep.path}` === id;
-      });
-      if (!found || found === state.activeEndpoint) return;
-
-      state.activeEndpoint = found;
-      state.activeSchema = null;
-      state.playground = {
-        endpoint: found,
-        paramValues: {},
-        bodyValue: "",
-        bodyParams: {},
-        fileValues: {},
-        response: null,
-        loading: false,
-      };
-      renderNavPane();
-      renderDetailPane();
-      renderTryItPane();
-      applyPageLayout();
+      const found = specState.groups.flatMap((g) => g.endpoints).find((ep) =>
+        ep.operation.operationId ? ep.operation.operationId === id : `${ep.method}:${ep.path}` === id
+      );
+      if (!found || found === navState.activeEndpoint) return;
+      navState.setActivePage(found, null);
+      playgroundState.reset(found);
     }
   }
 
-  // ─── Keyboard shortcuts ───────────────────────────────────────────────────
+  // ─── Keyboard shortcuts overlay ───────────────────────────────────────────
+
+  function renderShortcutsOverlay(): string {
+    const rows: [string, string][] = [
+      ["/",     "Focus search"],
+      ["↑ ↓",  "Navigate endpoints"],
+      ["Enter", "Select endpoint"],
+      ["Esc",   "Close / dismiss"],
+      ["⌘ K",  "Load spec"],
+      ["⌘ ↵",  "Execute request"],
+      ["?",     "Toggle this panel"],
+    ];
+    const rowsHtml = rows.map(([key, desc]) => `
+      <div class="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
+        <span class="text-xs text-gray-600 dark:text-gray-300">${desc}</span>
+        <kbd class="text-[10px] font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded border border-gray-200 dark:border-gray-600 shrink-0">${key}</kbd>
+      </div>`).join("");
+    return `
+      <div id="shortcuts-backdrop" class="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Keyboard shortcuts</span>
+            <button id="shortcuts-close" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none transition-colors">×</button>
+          </div>
+          <div class="px-5 py-2">${rowsHtml}</div>
+        </div>
+      </div>`;
+  }
+
+  // ─── Keyboard navigation ──────────────────────────────────────────────────
 
   function navigateNav(dir: "up" | "down") {
     const buttons = Array.from($$<HTMLButtonElement>(".nav-endpoint"));
@@ -747,43 +364,27 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   function onKeyDown(e: KeyboardEvent) {
     const target = e.target as HTMLElement;
-    const tag = target.tagName;
-    const inInput = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+    const inInput = ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
     const isMeta = e.metaKey || e.ctrlKey;
 
-    // ⌘/Ctrl shortcuts — fire even inside inputs
     if (isMeta && e.key === "Enter") {
-      if (state.playground.endpoint && !state.playground.loading) {
-        e.preventDefault();
-        handleExecute();
-      }
+      if (playgroundState.endpoint && !playgroundState.loading) { e.preventDefault(); handleExecute(); }
       return;
     }
     if (isMeta && (e.key === "k" || e.key === "K")) {
       e.preventDefault();
-      state.shortcutsVisible = false;
-      state.modalVisible = true;
-      state.modalError = "";
-      renderModalPane();
+      modalState.open();
       return;
     }
 
-    // Escape — dismiss whatever is open
     if (e.key === "Escape") {
-      if (state.shortcutsVisible) { state.shortcutsVisible = false; renderModalPane(); return; }
-      if (state.modalVisible)     { closeModal(); return; }
-      if (state.authModalVisible) {
-        state.authModalVisible = false;
-        renderAuthModalPane(); renderTopBarPane(); renderTryItPane();
-        return;
-      }
-      if (root.contains(document.activeElement)) {
-        (document.activeElement as HTMLElement).blur();
-      }
+      if (modalState.shortcutsVisible) { modalState.closeShortcuts(); return; }
+      if (modalState.modalVisible)     { modalState.close(); return; }
+      if (authState.authModalVisible)  { authState.closeModal(); return; }
+      if (root.contains(document.activeElement)) (document.activeElement as HTMLElement).blur();
       return;
     }
 
-    // Arrow-key nav — works from anywhere (including search input)
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       if (inInput && target.id !== "search-input") return;
       e.preventDefault();
@@ -791,27 +392,17 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
       return;
     }
 
-    // Single-key shortcuts — skip when typing
     if (inInput) return;
 
     if (e.key === "/") {
       e.preventDefault();
       const search = $<HTMLInputElement>("#search-input");
-      search?.focus();
-      search?.select();
+      search?.focus(); search?.select();
       return;
     }
 
-    if (e.key === "?") {
-      e.preventDefault();
-      state.shortcutsVisible = !state.shortcutsVisible;
-      if (state.shortcutsVisible) { state.modalVisible = false; state.authModalVisible = false; }
-      renderModalPane();
-      return;
-    }
+    if (e.key === "?") { e.preventDefault(); modalState.toggleShortcuts(); }
   }
-
-  // ─── Bootstrap ────────────────────────────────────────────────────────────
 
   // ─── Dark mode ────────────────────────────────────────────────────────────
 
@@ -831,32 +422,21 @@ export function createApp(root: HTMLElement, initialUrl?: string): AppController
 
   // ─── Bootstrap ────────────────────────────────────────────────────────────
 
+  wireSubscriptions();
+
   const onHashChange = () => restoreFromHash();
   window.addEventListener("hashchange", onHashChange);
   document.addEventListener("keydown", onKeyDown);
 
   renderModalPane();
-  $<HTMLElement>("#load-spec-btn-initial")?.addEventListener("click", () => {
-    state.modalVisible = true;
-    renderModalPane();
-  });
-  // Delegated clicks — work in both initial and loaded top bar
+  $<HTMLElement>("#load-spec-btn-initial")?.addEventListener("click", () => modalState.open());
   root.addEventListener("click", (e) => {
     const target = e.target as Element;
-    if (target.closest("#shortcuts-btn")) {
-      state.shortcutsVisible = true;
-      state.modalVisible = false;
-      state.authModalVisible = false;
-      renderModalPane();
-    }
-    if (target.closest("#dark-toggle-btn")) {
-      applyDark(!darkMode);
-    }
+    if (target.closest("#shortcuts-btn")) modalState.openShortcuts();
+    if (target.closest("#dark-toggle-btn")) applyDark(!darkMode);
   });
 
-  if (initialUrl) {
-    loadSpecFromUrl(initialUrl);
-  }
+  if (initialUrl) loadSpecFromUrl(initialUrl);
 
   return {
     loadUrl: loadSpecFromUrl,

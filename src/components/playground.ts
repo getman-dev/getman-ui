@@ -13,7 +13,9 @@ import { buildUrl, getRequestBodyExample, resolveServerUrl } from "../parser/exa
 import { escapeHtml, escapeAttr } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
 import { highlightJson } from "../utils/highlight";
-import { renderServerChip, renderServerPanel } from "./server-config";
+import { renderServerChip, renderServerPanel, bindServerConfigEvents } from "./server-config";
+import { playgroundState } from "../state/playground-state";
+import { serverState } from "../state/server-state";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -437,4 +439,95 @@ export function renderPlayground(
       ${renderResponsePanel(state)}
 
     </div>`;
+}
+
+/**
+ * Binds try-it-out panel events: server chip, param inputs, body, files, execute, copy, and tabs.
+ * Execute and URL-preview update are passed as callbacks because they depend on app-level logic.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ * @param onExecute - Called when the user clicks Execute or uses the keyboard shortcut.
+ * @param onParamChange - Called after each parameter change to refresh the URL preview.
+ */
+export function bindPlaygroundEvents(
+  root: HTMLElement,
+  onExecute: () => Promise<void>,
+  onParamChange: () => void,
+) {
+  root.querySelector<HTMLElement>("#playground-server-chip")?.addEventListener("click", () => serverState.setPopoverSource("playground"));
+  bindServerConfigEvents(root);
+
+  root.querySelectorAll<HTMLInputElement | HTMLSelectElement>(".try-input").forEach((input) => {
+    input.addEventListener("input", () => {
+      playgroundState.setParam((input as HTMLElement).dataset.name!, input.value);
+      onParamChange();
+    });
+  });
+
+  const bodyTextarea = root.querySelector<HTMLTextAreaElement>("#try-body");
+  bodyTextarea?.addEventListener("input", () => playgroundState.setBody(bodyTextarea.value));
+
+  root.querySelector<HTMLElement>("#try-body-format")?.addEventListener("click", () => {
+    if (!bodyTextarea) return;
+    try {
+      const pretty = JSON.stringify(JSON.parse(bodyTextarea.value), null, 2);
+      bodyTextarea.value = pretty;
+      playgroundState.setBody(pretty);
+    } catch { /* not valid JSON */ }
+  });
+
+  root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(".try-body-field").forEach((input) => {
+    input.addEventListener("input", () => {
+      playgroundState.setBodyParam((input as HTMLElement).dataset.bodyField!, input.value);
+    });
+  });
+
+  root.querySelectorAll<HTMLInputElement>(".try-file-input").forEach((input) => {
+    input.addEventListener("change", () => {
+      if (!input.files?.length) return;
+      playgroundState.setFile(
+        input.dataset.bodyFile!,
+        input.multiple ? Array.from(input.files) : input.files[0],
+      );
+    });
+  });
+
+  root.querySelector<HTMLInputElement>("#try-body-raw-file")?.addEventListener("change", (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) playgroundState.setFile("__raw__", file);
+  });
+
+  root.querySelector<HTMLElement>("#try-execute")?.addEventListener("click", onExecute);
+
+  root.querySelector<HTMLElement>("#try-copy-btn")?.addEventListener("click", async () => {
+    const text = root.querySelector<HTMLElement>("#try-tab-body")?.querySelector("pre")?.textContent ?? "";
+    await navigator.clipboard.writeText(text);
+    const btn = root.querySelector<HTMLElement>("#try-copy-btn");
+    if (!btn) return;
+    const original = btn.innerHTML;
+    btn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Copied`;
+    btn.classList.add("text-green-600");
+    setTimeout(() => { btn.innerHTML = original; btn.classList.remove("text-green-600"); }, 2000);
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".try-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.tab;
+      root.querySelectorAll<HTMLButtonElement>(".try-tab").forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle("bg-white", active);
+        t.classList.toggle("dark:bg-gray-700", active);
+        t.classList.toggle("shadow-sm", active);
+        t.classList.toggle("text-gray-700", active);
+        t.classList.toggle("dark:text-gray-200", active);
+        t.classList.toggle("border", active);
+        t.classList.toggle("border-gray-200", active);
+        t.classList.toggle("dark:border-gray-600", active);
+        t.classList.toggle("text-gray-400", !active);
+        t.classList.toggle("dark:text-gray-500", !active);
+      });
+      root.querySelector<HTMLElement>("#try-tab-body")?.classList.toggle("hidden", target !== "body");
+      root.querySelector<HTMLElement>("#try-tab-headers")?.classList.toggle("hidden", target !== "headers");
+    });
+  });
 }

@@ -1,4 +1,5 @@
 import { escapeAttr } from "../utils/html";
+import { modalState } from "../state/modal-state";
 
 export function renderLoadModal(visible: boolean, urlValue = "", error = ""): string {
   if (!visible) return "";
@@ -58,4 +59,40 @@ export function renderLoadModal(visible: boolean, urlValue = "", error = ""): st
         </div>
       </div>
     </div>`;
+}
+
+/**
+ * Binds load-modal events: close, URL load, file upload, and petstore shortcut.
+ * Spec loading is delegated to callbacks so the modal stays decoupled from fetch logic.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ * @param loadFromUrl - Called with the URL string when the user submits a URL.
+ * @param loadFromFile - Called with the File when the user picks a file.
+ */
+export function bindModalEvents(
+  root: HTMLElement,
+  loadFromUrl: (url: string) => Promise<void>,
+  loadFromFile: (file: File) => Promise<void>,
+) {
+  root.querySelector<HTMLElement>("#modal-close")?.addEventListener("click", () => modalState.close());
+  root.querySelector<HTMLElement>("#load-modal-backdrop")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) modalState.close();
+  });
+
+  root.querySelector<HTMLElement>("#spec-url-load")?.addEventListener("click", async () => {
+    const url = root.querySelector<HTMLInputElement>("#spec-url-input")!.value.trim();
+    if (!url) return;
+    modalState.setUrlValue(url);
+    await loadFromUrl(url);
+  });
+
+  root.querySelector<HTMLInputElement>("#spec-file-input")?.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    await loadFromFile(file);
+  });
+
+  root.querySelector<HTMLElement>("#load-petstore")?.addEventListener("click", async () => {
+    await loadFromUrl("https://petstore3.swagger.io/api/v3/openapi.json");
+  });
 }

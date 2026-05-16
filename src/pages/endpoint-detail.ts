@@ -2,7 +2,7 @@ import type { EndpointEntry, Parameter, Components, Response } from "../types/op
 import { resolveSchema, resolveParameter, resolveResponse } from "../parser/ref-resolver";
 import { escapeHtml } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
-import { renderSchemaViewer } from "../components/schema-viewer";
+import { renderSchemaViewer, SCHEMA_VIEWER_TAB_CLASSES } from "../components/schema-viewer";
 
 // ─── Status code colors ───────────────────────────────────────────────────────
 
@@ -167,6 +167,37 @@ export function renderEndpointDetail(endpoint: EndpointEntry, components: Compon
         ${renderResponses(op.responses ?? {}, components)}
       </div>
     </div>`;
+}
+
+/**
+ * Binds interactive events in the detail pane: response accordion toggles and schema viewer tabs.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ */
+export function bindDetailEvents(root: HTMLElement) {
+  root.querySelectorAll<HTMLButtonElement>(".response-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const body = btn.closest(".response-item")?.querySelector<HTMLElement>(".response-body");
+      const chevron = btn.querySelector<SVGElement>(".response-chevron");
+      if (!body) return;
+      const hidden = body.classList.toggle("hidden");
+      chevron?.style.setProperty("transform", hidden ? "" : "rotate(180deg)");
+    });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".schema-viewer-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const viewer = btn.closest(".schema-viewer");
+      if (!viewer) return;
+      const target = btn.dataset.tab;
+      viewer.querySelectorAll<HTMLButtonElement>(".schema-viewer-tab").forEach((t) => {
+        t.className = t === btn ? SCHEMA_VIEWER_TAB_CLASSES.active : SCHEMA_VIEWER_TAB_CLASSES.inactive;
+      });
+      viewer.querySelectorAll<HTMLElement>(".schema-viewer-panel").forEach((panel) => {
+        panel.classList.toggle("hidden", panel.dataset.panel !== target);
+      });
+    });
+  });
 }
 
 export function renderDetailEmpty(): string {

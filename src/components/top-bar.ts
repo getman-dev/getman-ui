@@ -4,8 +4,11 @@
 
 import type { OpenAPISpec, AuthValues, Server } from "../types/openapi";
 import { escapeHtml, escapeAttr } from "../utils/html";
-import { renderServerChip, renderServerPanel } from "./server-config";
+import { renderServerChip, renderServerPanel, bindServerConfigEvents } from "./server-config";
 import { resolveServerUrl } from "../parser/example-gen";
+import { modalState } from "../state/modal-state";
+import { authState } from "../state/auth-state";
+import { serverState } from "../state/server-state";
 
 /**
  * Renders the top application bar.
@@ -120,4 +123,16 @@ export function renderTopBar(
         </button>
       </div>
     </header>`;
+}
+
+/**
+ * Binds top-bar button events and delegates server config events within the given root.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ */
+export function bindTopBarEvents(root: HTMLElement) {
+  root.querySelector<HTMLElement>("#load-spec-btn")?.addEventListener("click", () => modalState.open());
+  root.querySelector<HTMLElement>("#auth-btn")?.addEventListener("click", () => authState.openModal());
+  root.querySelector<HTMLElement>("#topbar-server-chip")?.addEventListener("click", () => serverState.setPopoverSource("topbar"));
+  bindServerConfigEvents(root);
 }

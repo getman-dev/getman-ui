@@ -1,6 +1,9 @@
 import type { TagGroup, EndpointEntry, Schema } from "../types/openapi";
 import { escapeHtml, escapeAttr } from "../utils/html";
 import { methodBadgeClasses } from "../utils/badges";
+import { navState } from "../state/nav-state";
+import { specState } from "../state/spec-state";
+import { selectEndpoint, selectSchema } from "../state/actions";
 
 // ─── Nav sidebar HTML ─────────────────────────────────────────────────────────
 
@@ -121,6 +124,46 @@ function renderSchemasPane(schemas: Record<string, Schema>, activeSchema: string
   }).join("");
 
   return `<div class="overflow-y-auto flex-1">${items}</div>`;
+}
+
+/**
+ * Binds nav sidebar events: tab switching, search, endpoint and schema selection, and tag toggling.
+ *
+ * @param root - The component root element used for scoped DOM queries.
+ */
+export function bindNavEvents(root: HTMLElement) {
+  root.querySelectorAll<HTMLButtonElement>(".sidebar-tab").forEach((btn) => {
+    btn.addEventListener("click", () => navState.setSidebarTab(btn.dataset.tab as "endpoints" | "schemas"));
+  });
+
+  root.querySelector<HTMLInputElement>("#search-input")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") navState.setSearch((e.target as HTMLInputElement).value);
+  });
+  root.querySelector<HTMLElement>("#search-clear")?.addEventListener("click", () => navState.setSearch(""));
+
+  root.querySelectorAll<HTMLButtonElement>(".nav-schema").forEach((btn) => {
+    btn.addEventListener("click", () => selectSchema(btn.dataset.name!));
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".nav-endpoint").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const found = specState.groups
+        .flatMap((g) => g.endpoints)
+        .find((ep) => ep.path === btn.dataset.path && ep.method === btn.dataset.method);
+      if (found) selectEndpoint(found);
+    });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>(".nav-tag-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const list = btn.nextElementSibling as HTMLElement;
+      const chevron = btn.querySelector<SVGElement>(".nav-tag-chevron");
+      const isOpen = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!isOpen));
+      list.style.display = isOpen ? "none" : "";
+      chevron?.style.setProperty("transform", isOpen ? "rotate(-90deg)" : "");
+    });
+  });
 }
 
 function renderNavItem(ep: EndpointEntry, active: EndpointEntry | null): string {

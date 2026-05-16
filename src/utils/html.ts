@@ -5,7 +5,3 @@ export function escapeHtml(str: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-
-export function escapeAttr(str: string): string {
-  return str.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}

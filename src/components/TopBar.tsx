@@ -27,30 +27,24 @@ export default function TopBar({ onToggleDark }: Props) {
     <header className="relative flex items-center gap-4 px-6 h-16 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 z-10">
 
       {info ? (
-        <>
-          <div className="flex items-center gap-2.5 shrink-0 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[11px] font-bold text-white leading-none">{monogram}</span>
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[180px]">{info.title}</span>
-                <span className="text-[10px] text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-600 rounded-full px-1.5 py-px font-mono shrink-0 leading-tight">{info.version}</span>
-              </div>
-              {info.description && (
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate max-w-[220px] leading-tight mt-px" title={info.description}>
-                  {info.description}
-                </p>
-              )}
-            </div>
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
+            <span className="text-[11px] font-bold text-white leading-none">{monogram}</span>
           </div>
-
-          <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 shrink-0 mx-1" />
-
-          {servers.length > 0 && <ServerConfig source="topbar" />}
-        </>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{info.title}</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-600 rounded-full px-1.5 py-px font-mono shrink-0 leading-tight">{info.version}</span>
+            </div>
+            {info.description && (
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight mt-px" title={info.description}>
+                {info.description}
+              </p>
+            )}
+          </div>
+        </div>
       ) : (
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shrink-0">
             <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -60,9 +54,14 @@ export default function TopBar({ onToggleDark }: Props) {
         </div>
       )}
 
-      <div className="flex-1" />
-
       <div className="flex items-center gap-2 shrink-0">
+
+        {servers.length > 0 && (
+          <>
+            <ServerConfig source="topbar" />
+            <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1 shrink-0" />
+          </>
+        )}
 
         {hasAuth && (
           <button

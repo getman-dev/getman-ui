@@ -1,5 +1,7 @@
 import styles from "./style.css?inline";
-export { mountApiExplorer } from "./mount";
+import { mountApiExplorer } from "./mount";
+
+export { mountApiExplorer };
 
 function ensureFonts() {
   if (document.querySelector("link[data-api-explorer-fonts]")) return;
@@ -23,3 +25,18 @@ function ensureStyles() {
 
 ensureFonts();
 ensureStyles();
+
+// Auto-mount every [data-api-explorer] element found in the document.
+// The attribute value is used as the spec URL (omit or leave empty for no initial spec).
+function autoMount() {
+  document.querySelectorAll<HTMLElement>("[data-api-explorer]").forEach(el => {
+    const url = el.getAttribute("data-api-explorer") || undefined;
+    mountApiExplorer(el, { url });
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", autoMount);
+} else {
+  autoMount();
+}

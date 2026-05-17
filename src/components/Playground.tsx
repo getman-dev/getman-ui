@@ -32,6 +32,59 @@ function schemeShortLabel(type: string, schemeOrIn?: string): string {
   return type;
 }
 
+const LOCATION_BADGE_CLASS: Record<string, string> = {
+  path:   "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30",
+  query:  "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30",
+  header: "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30",
+  form:   "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30",
+};
+
+interface ParamLabelProps {
+  name: string;
+  /** "path" | "query" | "header" | "form" — shown as a color-coded location badge. */
+  location: string;
+  /** Resolved type string shown as a badge, e.g. "string", "integer", "string·date-time". */
+  typeBadge?: string;
+  required: boolean;
+  description?: string;
+}
+
+/** Label row for a parameter or body field: name on the left, badges + help icon on the right. */
+function ParamLabel({ name, location, typeBadge, required, description }: ParamLabelProps) {
+  const locClass = LOCATION_BADGE_CLASS[location] ?? "text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700";
+  return (
+    <div className="flex items-center gap-2 mb-2">
+      <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200">{name}</span>
+      <div className="flex-1" />
+      <div className="flex items-center gap-1">
+        <span className={`text-[9px] font-mono rounded px-1.5 py-0.5 leading-none ${locClass}`}>
+          {location}
+        </span>
+        {typeBadge && (
+          <span className="text-[9px] font-mono text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 rounded px-1.5 py-0.5 leading-none">
+            {typeBadge}
+          </span>
+        )}
+        {required && (
+          <span className="text-[9px] font-semibold text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded px-1.5 py-0.5 leading-none">
+            required
+          </span>
+        )}
+        {description && (
+          <span className="relative group/tip">
+            <svg className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help hover:text-gray-600 dark:hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span className="pointer-events-none absolute bottom-full right-0 mb-2 w-56 rounded-lg bg-gray-900 dark:bg-gray-950 px-2.5 py-2 text-[10px] text-gray-100 leading-snug shadow-lg opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">
+              {description}
+            </span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** Renders the try-it-out panel: URL bar, params, body, and response. */
 export default function Playground() {
   const { endpoint, paramValues, bodyValue, bodyParams, fileValues, response, loading,
@@ -134,13 +187,11 @@ export default function Playground() {
     const required = isPath || !!param.required;
     const hasEnum  = !!param.schema?.enum?.length;
     const inputType = (param.schema?.type === "integer" || param.schema?.type === "number") ? "number" : "text";
+    const schema    = param.schema;
+    const typeBadge = hasEnum ? "enum" : schema?.format ? `${schema.type ?? "string"}·${schema.format}` : schema?.type;
     return (
       <div key={param.name}>
-        <label className="flex items-center gap-1.5 mb-2">
-          <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200">{param.name}</span>
-          {required && <span className="text-red-500 text-[9px] font-semibold">required</span>}
-          <span className="text-[9px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1 font-mono">{param.in}</span>
-        </label>
+        <ParamLabel name={param.name} location={param.in} typeBadge={typeBadge} required={required} description={param.description} />
         {hasEnum ? (
           <select className={inputClass} value={value} onChange={(e) => setParam(param.name, e.target.value)}>
             {!required && <option value="">—</option>}
@@ -157,7 +208,6 @@ export default function Playground() {
             onInput={(e) => setParam(param.name, (e.target as HTMLInputElement).value)}
           />
         )}
-        {param.description && <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{param.description}</p>}
       </div>
     );
   }
@@ -168,15 +218,10 @@ export default function Playground() {
     const isMultiBinary = resolved?.type === "array" && resolveSchema(resolved.items, components)?.format === "binary";
     const isObject      = resolved?.type === "object" || (resolved?.properties != null && !isBinary);
     const inputType     = (resolved?.type === "integer" || resolved?.type === "number") ? "number" : "text";
+    const typeBadge     = isBinary ? "file" : isMultiBinary ? "file[]" : resolved?.format ? `${resolved.type ?? "string"}·${resolved.format}` : resolved?.type;
     return (
       <div key={name}>
-        <label className="flex items-center gap-1.5 mb-2">
-          <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200">{name}</span>
-          {required && <span className="text-red-500 text-[9px] font-semibold">required</span>}
-          {(isBinary || isMultiBinary) && (
-            <span className="text-[9px] text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded px-1">file</span>
-          )}
-        </label>
+        <ParamLabel name={name} location="form" typeBadge={typeBadge} required={required} description={resolved?.description} />
         {isBinary ? (
           <input type="file" className={fileInputClass}
             onChange={(e) => { const f = e.target.files; if (f?.length) setFileField(name, f, false); }} />
@@ -193,7 +238,6 @@ export default function Playground() {
             value={bodyParams[name] ?? ""}
             onInput={(e) => setBodyParam(name, (e.target as HTMLInputElement).value)} />
         )}
-        {resolved?.description && <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{resolved.description}</p>}
       </div>
     );
   }
@@ -283,37 +327,29 @@ export default function Playground() {
           </div>
         )}
 
-        {pathParams.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Path</p>
-            <div className="flex flex-col gap-4">
-              {pathParams.map(p => renderParamField(p, paramValues[p.name] ?? ""))}
+        {(() => {
+          const regularParams = [...pathParams, ...queryParams, ...headerParams];
+          const multipartFields = bodyContentType === "multipart/form-data" && multipartSchema?.properties
+            ? Object.entries(multipartSchema.properties)
+            : [];
+          const hasParams = regularParams.length > 0 || multipartFields.length > 0;
+          if (!hasParams) return null;
+          const requiredSet = new Set(multipartSchema?.required ?? []);
+          return (
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Parameters</p>
+              <div className="flex flex-col gap-4">
+                {regularParams.map(p => renderParamField(p, paramValues[p.name] ?? ""))}
+                {multipartFields.map(([name, prop]) => renderMultipartField(name, prop, requiredSet.has(name), components))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
-        {queryParams.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Query</p>
-            <div className="flex flex-col gap-4">
-              {queryParams.map(p => renderParamField(p, paramValues[p.name] ?? ""))}
-            </div>
-          </div>
-        )}
-
-        {headerParams.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Headers</p>
-            <div className="flex flex-col gap-4">
-              {headerParams.map(p => renderParamField(p, paramValues[p.name] ?? ""))}
-            </div>
-          </div>
-        )}
-
-        {rb && (
+        {rb && bodyContentType !== "multipart/form-data" && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                 Body{rb.required && <span className="text-red-500 normal-case font-normal"> required</span>}
               </p>
               <span className="text-[9px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1.5 py-0.5">
@@ -321,26 +357,12 @@ export default function Playground() {
               </span>
             </div>
 
-            {bodyContentType === "multipart/form-data" ? (
-              <div className="flex flex-col gap-2.5">
-                {multipartSchema?.properties ? (() => {
-                  const requiredSet = new Set(multipartSchema.required ?? []);
-                  return Object.entries(multipartSchema.properties).map(([name, prop]) =>
-                    renderMultipartField(name, prop, requiredSet.has(name), components)
-                  );
-                })() : (
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500">No schema defined.</p>
-                )}
-              </div>
-
-            ) : bodyContentType === "application/octet-stream" ? (
+            {bodyContentType === "application/octet-stream" ? (
               <input type="file" className={fileInputClass}
                 onChange={(e) => { const f = e.target.files; if (f?.length) setFileValues({ ...fileValues, __raw__: f[0] }); }} />
-
             ) : (
               <>
-                <div className="flex items-center justify-between mb-2">
-                  <span />
+                <div className="flex justify-end mb-2">
                   <button
                     onClick={formatJson}
                     className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30"

@@ -9,24 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
   <body class="h-full">
-    <!--
-      Production embed (consumers copy this pattern):
-
-        <div data-api-explorer="https://example.com/openapi.json" style="height:600px"></div>
-        <script src="https://cdn.example.com/loader.js"></script>
-
-      The attribute value is the spec URL; omit it to start with an empty explorer.
-    -->
-    <div
-      data-api-explorer
-      style="height:100%"
-    ></div>
-    <script type="module">
-      import { mountApiExplorer } from "/src/main.tsx";
-      const el = document.querySelector("[data-api-explorer]");
-      const url = new URLSearchParams(location.search).get("url") ?? undefined;
-      if (url) el.setAttribute("data-api-explorer", url);
-      mountApiExplorer(el, { url });
-    </script>
+    <div data-api-explorer style="height:100%"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

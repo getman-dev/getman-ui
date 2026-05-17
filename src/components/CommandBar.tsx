@@ -1,10 +1,10 @@
 /** Command bar overlay (⌘K): search across endpoints, schemas, and actions. */
 import { useState, useEffect, useRef, useMemo } from "react";
 import clsx from "clsx";
-import { useModal } from "../contexts/modal-context";
-import { useSpec } from "../contexts/spec-context";
-import { modalActions } from "../contexts/modal-context";
-import { authActions } from "../contexts/auth-context";
+import { useModal } from "../contexts";
+import { useSpec } from "../contexts";
+import { modalActions } from "../contexts";
+import { authActions } from "../contexts";
 import { selectEndpoint, selectSchema } from "../state/actions";
 import { methodBadgeClasses } from "../utils/badges";
 import { escapeHtml } from "../utils/html";

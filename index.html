@@ -1,15 +1,22 @@
 <!doctype html>
 <html lang="en" class="h-full">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>API Explorer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  </head>
-  <body class="h-full">
-    <div data-api-explorer style="height:100%"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+          rel="stylesheet"/>
+</head>
+<body class="h-full">
+<div id="root" style="height:100%"></div>
+<script type="module">
+    import {mountApiExplorer} from "/src/main.js";
+    const url = new URLSearchParams(location.search).get("url") ?? undefined;
+    const unmount = mountApiExplorer(document.getElementById("root"), {
+        url: url
+    });
+</script>
+</body>
 </html>

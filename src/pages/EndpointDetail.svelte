@@ -80,7 +80,7 @@
   <div class="h-full flex flex-col">
 
     <!-- Header -->
-    <div class="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-700 shrink-0">
       <span class="method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded {methodBadgeClasses(endpoint.method)} uppercase w-[36px] text-center">
         {endpoint.method}
       </span>
@@ -91,26 +91,26 @@
     </div>
 
     <!-- Body -->
-    <div class="flex-1 overflow-y-auto px-5 py-4">
+    <div class="flex-1 overflow-y-auto px-6 py-6">
       {#if op.summary}
-        <p class="text-sm text-gray-700 dark:text-gray-200 mb-1 font-medium">{op.summary}</p>
+        <p class="text-sm text-gray-700 dark:text-gray-200 mb-2 font-medium">{op.summary}</p>
       {/if}
       {#if op.description}
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">{op.description}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">{op.description}</p>
       {:else}
-        <div class="mb-4"></div>
+        <div class="mb-6"></div>
       {/if}
 
       <!-- Parameters -->
-      <div class="mb-6">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Parameters</h3>
+      <div class="mb-8">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">Parameters</h3>
         {#if params.length === 0}
           <p class="text-xs text-gray-400 italic">No parameters</p>
         {:else}
           {#each paramLocations as loc}
             {#if grouped[loc].length > 0}
-              <div class="mb-4">
-                <h4 class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">{loc}</h4>
+              <div class="mb-5">
+                <h4 class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">{loc}</h4>
                 <div class="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden">
                   <table class="w-full border-collapse">
                     <tbody>
@@ -118,19 +118,19 @@
                         {@const param  = resolveParameter(rawParam as Parameter, components)}
                         {@const schema = resolveSchema(param.schema, components)}
                         <tr class="border-b border-gray-100 dark:border-gray-700 last:border-0 bg-white dark:bg-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
-                          <td class="px-3 py-2.5 whitespace-nowrap">
+                          <td class="px-4 py-3 whitespace-nowrap">
                             <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">{param.name}</span>
                             {#if param.required}<span class="text-red-500 text-[9px] font-semibold ml-1">*</span>{/if}
                             {#if param.deprecated}<span class="text-gray-400 dark:text-gray-500 text-[9px] ml-1">deprecated</span>{/if}
                           </td>
-                          <td class="px-3 py-2.5 whitespace-nowrap">
+                          <td class="px-4 py-3 whitespace-nowrap">
                             <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded px-1.5 py-0.5 font-mono">{schema?.type ?? "string"}</span>
                           </td>
-                          <td class="px-3 py-2.5 whitespace-nowrap">
+                          <td class="px-4 py-3 whitespace-nowrap">
                             {#if schema?.minimum !== undefined}<span class="text-[10px] font-mono text-gray-400 dark:text-gray-500">min:{schema.minimum}</span>{/if}
                             {#if schema?.maximum !== undefined}<span class="text-[10px] font-mono text-gray-400 dark:text-gray-500 ml-1.5">max:{schema.maximum}</span>{/if}
                           </td>
-                          <td class="px-3 py-2.5 w-full text-xs text-gray-500 dark:text-gray-400">
+                          <td class="px-4 py-3 w-full text-xs text-gray-500 dark:text-gray-400">
                             {param.description ?? schema?.description ?? ""}
                           </td>
                         </tr>
@@ -146,8 +146,8 @@
 
       <!-- Request body -->
       {#if op.requestBody && jsonContent?.schema}
-        <div class="mb-6">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Request body</h3>
+        <div class="mb-8">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">Request body</h3>
           {#if op.requestBody.description}
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{op.requestBody.description}</p>
           {/if}
@@ -169,15 +169,15 @@
 
       <!-- Responses accordion -->
       {#if responses.length > 0}
-        <div class="mb-6">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Responses</h3>
+        <div class="mb-8">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">Responses</h3>
           <div class="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden divide-y divide-gray-100 dark:divide-gray-700">
             {#each responses as { code, response, mediaKey, mediaType, example }}
               {@const isOpen = openResponses.has(code)}
               {@const hasContent = !!mediaType?.schema}
               <div>
                 <button
-                  class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
+                  class="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
                   onclick={() => hasContent && toggleResponse(code)}
                 >
                   <span class="text-xs {statusClass(code)}">{code}</span>

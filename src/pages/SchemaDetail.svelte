@@ -41,17 +41,17 @@
 {#if name && rawSchema && resolved}
   <div class="h-full flex flex-col">
 
-    <div class="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-700 shrink-0">
       <span class="text-[9px] font-bold font-mono px-[5px] py-[2px] rounded {badgeClass} uppercase">{typeLabel}</span>
       <code class="font-mono text-sm text-gray-800 dark:text-gray-200">{name}</code>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-5 py-4">
+    <div class="flex-1 overflow-y-auto px-6 py-6">
       {#if resolved.description}
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">{resolved.description}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">{resolved.description}</p>
       {/if}
-      <div class="mb-6">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Schema</h3>
+      <div class="mb-8">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">Schema</h3>
         <div class="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800/50">
           <SchemaViewer schema={rawSchema} {components} />
         </div>

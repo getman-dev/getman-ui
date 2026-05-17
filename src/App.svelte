@@ -11,6 +11,7 @@
   import Playground from "./components/Playground.svelte";
   import LoadModal from "./components/LoadModal.svelte";
   import AuthModal from "./components/AuthModal.svelte";
+  import CommandBar from "./components/CommandBar.svelte";
 
   let { initialUrl }: { initialUrl?: string } = $props();
 
@@ -52,10 +53,11 @@
     }
     if (isMeta && (e.key === "k" || e.key === "K")) {
       e.preventDefault();
-      modalState.modalVisible = true;
+      modalState.commandBarVisible = true;
       return;
     }
     if (e.key === "Escape") {
+      if (modalState.commandBarVisible)  { modalState.commandBarVisible = false; return; }
       if (modalState.shortcutsVisible) { modalState.shortcutsVisible = false; return; }
       if (modalState.modalVisible)     { modalState.modalVisible = false; modalState.modalError = ""; return; }
       if (authState.authModalVisible)  { authState.authModalVisible = false; return; }
@@ -100,7 +102,7 @@
     ["↑ ↓", "Navigate endpoints"],
     ["Enter","Select endpoint"],
     ["Esc",  "Close / dismiss"],
-    ["⌘ K", "Load spec"],
+    ["⌘ K", "Open command bar"],
     ["⌘ ↵", "Execute request"],
     ["?",    "Toggle this panel"],
   ];
@@ -115,6 +117,7 @@
   <!-- Modals -->
   <LoadModal onLoadUrl={loadSpecFromUrl} onLoadFile={loadSpecFromFile} />
   <AuthModal />
+  <CommandBar onToggleDark={toggleDark} />
 
   <!-- Keyboard shortcuts overlay -->
   {#if modalState.shortcutsVisible}

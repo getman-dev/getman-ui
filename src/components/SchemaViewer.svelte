@@ -65,13 +65,13 @@
   <pre class="text-[11px] bg-gray-50 dark:bg-gray-900 rounded-md p-3 overflow-x-auto text-gray-700 dark:text-gray-300 font-mono leading-relaxed">{@html highlightedExample}</pre>
 {:else if resolved && !exampleJson}
   <!-- Schema only — no tabs -->
-  <div class="px-3 py-2">
+  <div class="px-4 py-3">
     {@render schemaTree()}
   </div>
 {:else if resolved && exampleJson}
   <!-- Both sides — tabbed view -->
   <div>
-    <div class="flex gap-1 px-2 py-1.5 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-100 dark:border-gray-700">
+    <div class="flex gap-1 px-3 py-2 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-100 dark:border-gray-700">
       <button class={activeTab === "schema" ? TAB_ACTIVE : TAB_INACTIVE} onclick={() => activeTab = "schema"}>
         Schema
       </button>
@@ -80,11 +80,11 @@
       </button>
     </div>
     {#if activeTab === "schema"}
-      <div class="px-3 py-2">
+      <div class="px-4 py-3">
         {@render schemaTree()}
       </div>
     {:else}
-      <div class="px-3 py-2">
+      <div class="px-4 py-3">
         <pre class="text-[11px] bg-gray-50 dark:bg-gray-900 rounded-md p-3 overflow-x-auto text-gray-700 dark:text-gray-300 font-mono leading-relaxed">{@html highlightedExample}</pre>
       </div>
     {/if}

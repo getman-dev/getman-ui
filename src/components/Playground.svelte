@@ -162,7 +162,7 @@
   {@const hasEnum  = !!param.schema?.enum?.length}
   {@const inputType = (param.schema?.type === "integer" || param.schema?.type === "number") ? "number" : "text"}
   <div>
-    <label class="flex items-center gap-1.5 mb-1.5">
+    <label class="flex items-center gap-1.5 mb-2">
       <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">{param.name}</span>
       {#if required}<span class="text-red-500 text-[9px] font-semibold">required</span>{/if}
       <span class="text-[9px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1 font-mono">{param.in}</span>
@@ -196,7 +196,7 @@
   {@const isObject      = resolved?.type === "object" || (resolved?.properties != null && !isBinary)}
   {@const inputType     = (resolved?.type === "integer" || resolved?.type === "number") ? "number" : "text"}
   <div>
-    <label class="flex items-center gap-1.5 mb-1.5">
+    <label class="flex items-center gap-1.5 mb-2">
       <span class="font-mono text-[11px] text-gray-800 dark:text-gray-200">{name}</span>
       {#if required}<span class="text-red-500 text-[9px] font-semibold">required</span>{/if}
       {#if isBinary || isMultiBinary}
@@ -243,14 +243,14 @@
   <div class="h-full flex flex-col bg-white dark:bg-gray-900">
 
     <!-- Header -->
-    <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
+    <div class="flex items-center gap-2 px-5 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
       <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
       <div class="flex-1"></div>
       <ServerConfig source="playground" />
     </div>
 
     <!-- URL bar + Send -->
-    <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0 bg-gray-50/50 dark:bg-gray-800/30">
+    <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0 bg-gray-50/50 dark:bg-gray-800/30">
       <div class="flex items-stretch gap-2">
         <div class="flex items-center gap-2 flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg px-2.5 py-2">
           <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0 {methodBadgeClasses(endpoint.method)}">
@@ -272,21 +272,21 @@
     </div>
 
     <!-- Scrollable form -->
-    <div class="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-5">
+    <div class="flex-1 min-h-0 overflow-y-auto px-5 py-6 flex flex-col gap-7">
 
       <!-- Auth status -->
       {#if schemeNames !== null && Object.keys(allSchemes).length > 0}
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Authorization</p>
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Authorization</p>
           {#if schemeNames.length === 0}
             <p class="text-[10px] text-gray-400 dark:text-gray-500">No authentication required for this endpoint.</p>
           {:else}
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-2">
               {#each schemeNames.filter(n => allSchemes[n]) as n}
                 {@const scheme = allSchemes[n]}
                 {@const val = authState.authValues[n]}
                 {@const authorized = !!(val?.value || val?.username)}
-                <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-700/30">
+                <div class="flex items-center justify-between py-2.5 px-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-700/30">
                   <div>
                     <span class="text-[11px] font-mono text-gray-700 dark:text-gray-300">{n}</span>
                     <span class="ml-1.5 text-[10px] text-gray-400 dark:text-gray-500">
@@ -308,8 +308,8 @@
       <!-- Path params -->
       {#if pathParams.length}
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Path</p>
-          <div class="flex flex-col gap-2.5">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Path</p>
+          <div class="flex flex-col gap-4">
             {#each pathParams as p}{@render paramField(p, playgroundState.paramValues[p.name] ?? "")}{/each}
           </div>
         </div>
@@ -318,8 +318,8 @@
       <!-- Query params -->
       {#if queryParams.length}
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Query</p>
-          <div class="flex flex-col gap-2.5">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Query</p>
+          <div class="flex flex-col gap-4">
             {#each queryParams as p}{@render paramField(p, playgroundState.paramValues[p.name] ?? "")}{/each}
           </div>
         </div>
@@ -328,8 +328,8 @@
       <!-- Header params -->
       {#if headerParams.length}
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Headers</p>
-          <div class="flex flex-col gap-2.5">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Headers</p>
+          <div class="flex flex-col gap-4">
             {#each headerParams as p}{@render paramField(p, playgroundState.paramValues[p.name] ?? "")}{/each}
           </div>
         </div>
@@ -339,7 +339,7 @@
       {#if rb}
         <div>
           <div class="flex items-center justify-between mb-2">
-            <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">
               Body{#if rb.required} <span class="text-red-500 normal-case font-normal">required</span>{/if}
             </p>
             <span class="text-[9px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1.5 py-0.5">
@@ -386,7 +386,7 @@
 
     <!-- Response panel — always anchored at bottom -->
     {#if playgroundState.loading}
-      <div class="shrink-0 border-t border-gray-100 dark:border-gray-700 h-14 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/30">
+      <div class="shrink-0 border-t border-gray-100 dark:border-gray-700 h-16 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/30">
         <svg class="animate-spin w-3.5 h-3.5 text-blue-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
@@ -410,7 +410,7 @@
       <div class="shrink-0 border-t border-gray-100 dark:border-gray-700 flex flex-col" style="height:280px">
 
         <!-- Status bar -->
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-gray-100 dark:border-gray-700 shrink-0">
+        <div class="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
           <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Response</span>
           <span class="text-[10px] border rounded px-1.5 py-0.5 font-mono font-semibold {statusColor}">
             {r.status}{r.statusText ? " " + r.statusText : ""}
@@ -436,7 +436,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="flex gap-0.5 px-3 py-1.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
+        <div class="flex gap-0.5 px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
           <button
             onclick={() => responseTab = "body"}
             class="px-2.5 py-1 text-[10px] rounded font-medium transition-colors {responseTab === 'body' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}"

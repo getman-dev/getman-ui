@@ -49,8 +49,8 @@
 
   const tabClass = (id: "endpoints" | "schemas") =>
     id === navState.sidebarTab
-      ? "flex-1 py-2 text-[11px] font-medium transition-colors border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-      : "flex-1 py-2 text-[11px] font-medium transition-colors border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300";
+      ? "flex-1 py-3 text-[11px] font-medium transition-colors border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
+      : "flex-1 py-3 text-[11px] font-medium transition-colors border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300";
 </script>
 
 <aside class="shrink-0 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex flex-col h-full">
@@ -62,7 +62,7 @@
   </div>
 
   <!-- Search -->
-  <div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700 shrink-0">
+  <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
     <div class="relative">
       <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -73,7 +73,7 @@
         autocomplete="off"
         placeholder={searchPlaceholder}
         bind:value={navState.searchQuery}
-        class="w-full pl-7 pr-6 py-1.5 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+        class="w-full pl-7 pr-6 py-2 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
       />
       {#if navState.searchQuery}
         <button
@@ -97,7 +97,7 @@
         {@const collapsed = collapsedTags.has(group.name)}
         <div>
           <button
-            class="w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            class="w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-expanded={!collapsed}
             onclick={() => toggleTag(group.name)}
           >
@@ -115,7 +115,7 @@
               {#each group.endpoints as ep}
                 {@const isActive = navState.activeEndpoint?.path === ep.path && navState.activeEndpoint?.method === ep.method}
                 <button
-                  class="nav-endpoint w-full flex items-center gap-2 px-3 py-[6px] text-left transition-colors {isActive ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-800 dark:hover:text-gray-200'}"
+                  class="nav-endpoint w-full flex items-center gap-2.5 px-4 py-2 text-left transition-colors {isActive ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-800 dark:hover:text-gray-200'}"
                   title={ep.operation.summary ?? ep.path}
                   onclick={() => selectEndpoint(ep)}
                 >
@@ -149,7 +149,7 @@
           {@const typeLabel = schema.type ?? (schema.properties ? "object" : schema.items ? "array" : "")}
           {@const isActive = name === navState.activeSchema}
           <button
-            class="w-full text-left px-3 py-2 border-b border-gray-50 dark:border-gray-700/50 transition-colors {isActive ? 'bg-gray-100 dark:bg-gray-700' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}"
+            class="w-full text-left px-4 py-3 border-b border-gray-50 dark:border-gray-700/50 transition-colors {isActive ? 'bg-gray-100 dark:bg-gray-700' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}"
             onclick={() => selectSchema(name)}
           >
             <div class="flex items-center gap-2">

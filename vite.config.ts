@@ -1,11 +1,12 @@
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig(({ mode }) => ({
-  plugins: [tailwindcss(), svelte()],
-  ...(mode === "lib" && {
-    build: {
+  plugins: [tailwindcss(), react()],
+  build: {
+    sourcemap: true,
+    ...(mode === "lib" && {
       lib: {
         entry: "src/loader.ts",
         name: "ApiExplorer",
@@ -17,6 +18,6 @@ export default defineConfig(({ mode }) => ({
           entryFileNames: "[name].js",
         },
       },
-    },
-  }),
+    }),
+  },
 }));

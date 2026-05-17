@@ -1,34 +1,29 @@
-import { mount, unmount } from "svelte";
-import App from "./App.svelte";
+// Web component shell — mounts and unmounts the React App into the custom element.
+import { createRoot } from "react-dom/client";
+import { createElement } from "react";
+import type { Root } from "react-dom/client";
+import App from "./App";
 import { loadSpecFromUrl } from "./state/actions";
-import { initResizablePanes } from "./utils/resizable-panes";
 
 export class ApiExplorerElement extends HTMLElement {
   static observedAttributes = ["url"];
-  private _app: ReturnType<typeof mount> | null = null;
+  private _root: Root | null = null;
 
   connectedCallback() {
     if (!this.style.display) this.style.display = "block";
     if (!this.style.height) this.style.height = "100%";
-
-    const initialUrl =
-      this.getAttribute("url") ??
-      new URLSearchParams(location.search).get("url") ??
-      undefined;
-
-    this._app = mount(App, { target: this, props: { initialUrl } });
-    initResizablePanes(this);
+    const url = this.getAttribute("url") ?? undefined;
+    this._root = createRoot(this);
+    this._root.render(createElement(App, { initialUrl: url }));
   }
 
   disconnectedCallback() {
-    if (this._app) {
-      unmount(this._app);
-      this._app = null;
-    }
+    this._root?.unmount();
+    this._root = null;
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
-    if (name === "url" && newValue !== oldValue && this.isConnected && this._app) {
+    if (name === "url" && newValue !== oldValue && this.isConnected) {
       loadSpecFromUrl(newValue!);
     }
   }

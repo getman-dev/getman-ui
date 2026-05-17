@@ -1,11 +1,11 @@
 /** Cross-module state operations that mutate more than one store atomically. */
 import type { EndpointEntry, OpenAPISpec, Server } from "../types/openapi";
-import { specState } from "./spec-state.svelte.ts";
-import { navState } from "./nav-state.svelte.ts";
-import { serverState, initServerVariables } from "./server-state.svelte.ts";
-import { authState } from "./auth-state.svelte.ts";
-import { playgroundState } from "./playground-state.svelte.ts";
-import { modalState } from "./modal-state.svelte.ts";
+import { specSnapshot, specActions } from "../contexts/spec-context";
+import { navSnapshot, navActions } from "../contexts/nav-context";
+import { serverSnapshot, serverActions, initServerVariables } from "../contexts/server-context";
+import { authSnapshot } from "../contexts/auth-context";
+import { playgroundSnapshot, playgroundActions } from "../contexts/playground-context";
+import { modalActions } from "../contexts/modal-context";
 import { parseSpec } from "../parser/spec-parser";
 import { resolveServerUrl } from "../parser/example-gen";
 import { executeRequest, isCorsError } from "../utils/http-client";
@@ -14,7 +14,7 @@ import { executeRequest, isCorsError } from "../utils/http-client";
 
 /**
  * Fetches and applies an OpenAPI spec from a URL.
- * Sets modalState.modalError on failure.
+ * Sets modal error on failure.
  *
  * @param url - Absolute URL pointing to a JSON or YAML spec.
  */
@@ -26,13 +26,13 @@ export async function loadSpecFromUrl(url: string) {
     const text = await res.text();
     await parseAndApplySpec(text, contentType.includes("yaml") || url.endsWith(".yaml") || url.endsWith(".yml"));
   } catch (err) {
-    modalState.modalError = `Failed to load: ${err instanceof Error ? err.message : String(err)}`;
+    modalActions.setModalError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
 /**
  * Reads and applies an OpenAPI spec from a File object.
- * Sets modalState.modalError on failure.
+ * Sets modal error on failure.
  *
  * @param file - A .json or .yaml/.yml file chosen by the user.
  */
@@ -41,7 +41,7 @@ export async function loadSpecFromFile(file: File) {
     const text = await file.text();
     await parseAndApplySpec(text, file.name.endsWith(".yaml") || file.name.endsWith(".yml"));
   } catch (err) {
-    modalState.modalError = `Failed to read file: ${err instanceof Error ? err.message : String(err)}`;
+    modalActions.setModalError(`Failed to read file: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -55,12 +55,12 @@ async function parseAndApplySpec(text: string, isYaml: boolean) {
       parsed = JSON.parse(text) as OpenAPISpec;
     }
   } catch (err) {
-    modalState.modalError = `Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`;
+    modalActions.setModalError(`Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`);
     return;
   }
 
   if (!parsed.openapi || !parsed.paths) {
-    modalState.modalError = "Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.";
+    modalActions.setModalError("Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.");
     return;
   }
 
@@ -78,16 +78,16 @@ export function restoreFromHash() {
 
   if (hash.startsWith("schemas/")) {
     const name = hash.slice("schemas/".length);
-    if (name in (specState.spec?.components?.schemas ?? {})) selectSchema(name);
+    if (name in (specSnapshot.spec?.components?.schemas ?? {})) selectSchema(name);
     return;
   }
 
   if (hash.startsWith("endpoints/")) {
     const id = hash.slice("endpoints/".length);
-    const found = specState.groups.flatMap(g => g.endpoints).find(ep =>
+    const found = specSnapshot.groups.flatMap(g => g.endpoints).find(ep =>
       ep.operation.operationId ? ep.operation.operationId === id : `${ep.method}:${ep.path}` === id
     );
-    if (found && found !== navState.activeEndpoint) selectEndpoint(found);
+    if (found && found !== navSnapshot.activeEndpoint) selectEndpoint(found);
   }
 }
 
@@ -97,9 +97,9 @@ export function restoreFromHash() {
  * @param ep - The endpoint to activate.
  */
 export function selectEndpoint(ep: EndpointEntry) {
-  navState.activeEndpoint = ep;
-  navState.activeSchema = null;
-  resetPlayground(ep);
+  navActions.setActiveEndpoint(ep);
+  navActions.setActiveSchema(null);
+  playgroundActions.reset(ep);
   const id = ep.operation.operationId ?? `${ep.method}:${ep.path}`;
   history.replaceState(null, "", `#endpoints/${encodeURIComponent(id)}`);
 }
@@ -110,10 +110,10 @@ export function selectEndpoint(ep: EndpointEntry) {
  * @param name - Schema name as it appears in components.schemas.
  */
 export function selectSchema(name: string) {
-  navState.sidebarTab = "schemas";
-  navState.activeEndpoint = null;
-  navState.activeSchema = name;
-  resetPlayground(null);
+  navActions.setSidebarTab("schemas");
+  navActions.setActiveEndpoint(null);
+  navActions.setActiveSchema(name);
+  playgroundActions.reset(null);
   history.replaceState(null, "", `#schemas/${encodeURIComponent(name)}`);
 }
 
@@ -124,45 +124,45 @@ export function selectSchema(name: string) {
  * @param firstServer - First server entry from the spec, used to initialise server state.
  */
 export function applySpec(spec: OpenAPISpec, firstServer: Server | undefined) {
-  navState.searchQuery = "";
-  navState.sidebarTab = "endpoints";
-  navState.activeEndpoint = null;
-  navState.activeSchema = null;
-  resetPlayground(null);
-  serverState.selectedServer = firstServer?.url ?? "";
-  serverState.serverVariables = initServerVariables(firstServer);
-  serverState.serverPopoverSource = null;
-  modalState.modalVisible = false;
-  modalState.modalError = "";
-  specState.spec = spec;
-  specState.groups = parseSpec(spec);
+  navActions.setSearchQuery("");
+  navActions.setSidebarTab("endpoints");
+  navActions.setActiveEndpoint(null);
+  navActions.setActiveSchema(null);
+  playgroundActions.reset(null);
+  serverActions.setSelectedServer(firstServer?.url ?? "");
+  serverActions.setServerVariables(initServerVariables(firstServer));
+  serverActions.setServerPopoverSource(null);
+  modalActions.setModalVisible(false);
+  modalActions.setModalError("");
+  specActions.setSpec(spec);
+  specActions.setGroups(parseSpec(spec));
 }
 
 /**
- * Executes the current playground request and writes the response back to playgroundState.
- * Shared between the Send button in Playground.svelte and the ⌘Enter keyboard shortcut in App.svelte.
+ * Executes the current playground request and writes the response back to playground state.
+ * Shared between the Send button in Playground and the ⌘Enter keyboard shortcut in App.
  */
 export async function executePlayground() {
-  if (!playgroundState.endpoint || playgroundState.loading) return;
-  playgroundState.loading = true;
-  playgroundState.response = null;
-  const servers = specState.spec?.servers ?? [{ url: "http://localhost" }];
-  const active  = servers.find(s => s.url === serverState.selectedServer) ?? servers[0];
-  const baseUrl = active ? resolveServerUrl(active, serverState.serverVariables) : (servers[0]?.url ?? "http://localhost");
+  if (!playgroundSnapshot.endpoint || playgroundSnapshot.loading) return;
+  playgroundActions.setLoading(true);
+  playgroundActions.setResponse(null);
+  const servers = specSnapshot.spec?.servers ?? [{ url: "http://localhost" }];
+  const active  = servers.find(s => s.url === serverSnapshot.selectedServer) ?? servers[0];
+  const baseUrl = active ? resolveServerUrl(active, serverSnapshot.serverVariables) : (servers[0]?.url ?? "http://localhost");
   try {
     const response = await executeRequest(
-      playgroundState.endpoint,
-      playgroundState.paramValues,
-      playgroundState.bodyValue,
+      playgroundSnapshot.endpoint,
+      playgroundSnapshot.paramValues,
+      playgroundSnapshot.bodyValue,
       baseUrl,
-      specState.spec?.components,
-      authState.authValues,
-      playgroundState.bodyParams,
-      playgroundState.fileValues,
+      specSnapshot.spec?.components,
+      authSnapshot.authValues,
+      playgroundSnapshot.bodyParams,
+      playgroundSnapshot.fileValues,
     );
-    playgroundState.response = response;
+    playgroundActions.setResponse(response);
   } catch (err) {
-    playgroundState.response = {
+    playgroundActions.setResponse({
       status: 0,
       statusText: isCorsError(err)
         ? "CORS error — request blocked by browser"
@@ -170,18 +170,8 @@ export async function executePlayground() {
       headers: {},
       body: isCorsError(err) ? "The request was blocked by CORS policy." : "",
       duration: 0,
-    };
+    });
   } finally {
-    playgroundState.loading = false;
+    playgroundActions.setLoading(false);
   }
-}
-
-function resetPlayground(ep: EndpointEntry | null) {
-  playgroundState.endpoint = ep;
-  playgroundState.paramValues = {};
-  playgroundState.bodyValue = "";
-  playgroundState.bodyParams = {};
-  playgroundState.fileValues = {};
-  playgroundState.response = null;
-  playgroundState.loading = false;
 }

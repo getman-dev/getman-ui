@@ -1,5 +1,5 @@
 import styles from "./style.css?inline";
-import { ApiExplorerElement } from "./element";
+export { mountApiExplorer } from "./mount";
 
 function ensureFonts() {
   if (document.querySelector("link[data-api-explorer-fonts]")) return;
@@ -23,7 +23,3 @@ function ensureStyles() {
 
 ensureFonts();
 ensureStyles();
-
-if (!customElements.get("api-explorer")) {
-  customElements.define("api-explorer", ApiExplorerElement);
-}

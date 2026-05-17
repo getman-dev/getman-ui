@@ -2,7 +2,7 @@
 
 > **Maintenance rule**: keep this file up to date. Whenever the architecture, file structure, conventions, or key decisions change, update the relevant section before finishing the task.
 
-An OpenAPI 3.x UI delivered as a Web Component (`<api-explorer>`). Built with **React 19 + TypeScript**, Vite, and Tailwind. No Shadow DOM.
+An OpenAPI 3.x UI embedded via a `mountApiExplorer(target, options)` function. Built with **React 19 + TypeScript**, Vite, and Tailwind. No Shadow DOM.
 
 ## Commands
 
@@ -21,9 +21,9 @@ Place an `openapi.json` at the project root to load it automatically in dev.
 src/
   App.tsx             # Root component: AppProviders wrapper + AppInner (layout, dark mode,
                       # keyboard shortcuts, hash routing, initResizablePanes)
-  element.ts          # ApiExplorerElement web component — mounts/unmounts App via createRoot()
-  loader.ts           # Library entry — registers custom element, injects fonts + styles
-  main.tsx            # Dev entry — registers custom element (no font/style injection)
+  mount.ts            # mountApiExplorer(target, options) — creates a React root and renders App
+  loader.ts           # Library entry — injects fonts + styles, re-exports mountApiExplorer
+  main.tsx            # Dev entry — imports styles, re-exports mountApiExplorer
   contexts/
     index.tsx          # AppProviders composition + re-exports from all context modules
     spec-context.tsx   # spec + groups (parsed TagGroup[])
@@ -81,7 +81,7 @@ The eager snapshot pattern lets `actions.ts` read consistent state synchronously
 
 **Routing**: Hash-based (`#endpoints/<operationId>`, `#schemas/<Name>`). `restoreFromHash()` in `actions.ts` is called on spec load and on `hashchange`. Navigation actions (`selectEndpoint`, `selectSchema`) write to `history` directly.
 
-**Web Component**: `ApiExplorerElement` in `element.ts` calls `createRoot(this).render(createElement(App, { initialUrl }))` in `connectedCallback` and `_root.unmount()` in `disconnectedCallback`. Attribute changes call `loadSpecFromUrl` from `actions.ts` directly.
+**Mount function**: `mountApiExplorer(target, options?)` in `mount.ts` calls `createRoot(target).render(createElement(App, { initialUrl: options?.url }))` and returns an unmount cleanup function. Consumers call it from any JS context — query params, config objects, etc.
 
 **OpenAPI refs**: `$ref` strings are resolved at render time using `resolveRef` from `ref-resolver.ts`. `parseSpec` pre-merges path-level and operation-level parameters (operation wins on `name+in` conflict). Response `$ref`s are resolved via `resolveResponse` at point of use.
 

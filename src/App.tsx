@@ -1,20 +1,20 @@
   /** Root application component: layout, dark mode, keyboard shortcuts, hash routing. */
 import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-import { AppProviders } from "./contexts";
-import { useNav } from "./contexts/nav-context";
-import { useModal, modalActions, modalSnapshot } from "./contexts/modal-context";
-import { authActions, authSnapshot } from "./contexts/auth-context";
-import { playgroundSnapshot } from "./contexts/playground-context";
-import { loadSpecFromUrl, restoreFromHash, executePlayground } from "./state/actions";
-import { initResizablePanes } from "./utils/resizable-panes";
-import Nav from "./components/Nav";
-import TopBar from "./components/TopBar";
-import DetailPane from "./pages/DetailPane";
-import Playground from "./components/Playground";
-import LoadModal from "./components/LoadModal";
-import AuthModal from "./components/AuthModal";
-import CommandBar from "./components/CommandBar";
+import { AppProviders } from "./shared/contexts";
+import { useNav } from "./features/nav/nav-context";
+import { useModal, modalActions, modalSnapshot } from "./shared/contexts/modal-context";
+import { authActions, authSnapshot } from "./features/auth/auth-context";
+import { playgroundSnapshot } from "./features/playground/playground-context";
+import { loadSpecFromUrl, restoreFromHash, executePlayground } from "./shared/state/actions";
+import { initResizablePanes } from "./shared/utils/resizable-panes";
+import Nav from "./features/nav/Nav";
+import TopBar from "./shared/components/TopBar";
+import DetailPane from "./features/nav/DetailPane";
+import Playground from "./features/playground/Playground";
+import LoadModal from "./shared/components/LoadModal";
+import AuthModal from "./features/auth/AuthModal";
+import CommandBar from "./shared/components/CommandBar";
 
 const DARK_KEY = "api-explorer-dark";
 

@@ -4,14 +4,14 @@
 |---|---|
 | **Status** | Draft |
 | **Created** | 2026-05-17 |
-| **Area** | `src/components/Playground.tsx` → `src/components/playground/` |
+| **Area** | `src/features/playground/Playground.tsx` |
 | **Test spec** | `public/specs/parameters-all-types.json` |
 
 ---
 
 ## Summary
 
-Refactor the Playground's parameter rendering to correctly handle every OpenAPI 3.x parameter type — boolean, array, object, deprecated — while also surfacing schema constraints and default values in the UI. The work includes decomposing the monolithic `Playground.tsx` into focused sub-components under `src/components/playground/`.
+Refactor the Playground's parameter rendering to correctly handle every OpenAPI 3.x parameter type — boolean, array, object, deprecated — while also surfacing schema constraints and default values in the UI. The work includes decomposing the monolithic `Playground.tsx` into focused sub-components under `src/features/playground/`.
 
 ---
 
@@ -72,18 +72,18 @@ The `parameters-all-types.json` spec exercises all of these cases and serves as 
 
 > **Why comma-separated for free arrays?** Tag/chip inputs require significant implementation effort. Comma-separated is what most developers expect and type naturally; a label badge ("comma-separated") makes it explicit.
 
-### Schema constraints → tooltip
+### Schema constraints → badges
 
-Constraints are shown inside the help tooltip (alongside `description`). Where applicable, HTML attributes enforce them natively on the input.
+Constraints are shown as small badges in the `ParamLabel` row on the right, alongside location/type/required/deprecated. Always visible — no hover required. Where applicable, the matching HTML attribute is also set on the input so browsers enforce it natively.
 
-| Constraint | Tooltip label | HTML attribute |
+| Constraint | Badge label | HTML attribute |
 |---|---|---|
 | `minimum` | `min: N` | `min={N}` on number input |
 | `maximum` | `max: N` | `max={N}` on number input |
-| `minLength` | `min length: N` | `minLength={N}` |
-| `maxLength` | `max length: N` | `maxLength={N}` |
-| `pattern` | `pattern: …` | `pattern={…}` |
-| `default` | `default: …` | pre-fills input on load |
+| `minLength` | `min length: N` | `minLength={N}` on text input |
+| `maxLength` | `max length: N` | `maxLength={N}` on text input |
+| `pattern` | `pattern: …` | `pattern={…}` on text input |
+| `default` | `default: …` | pre-fills input on endpoint change |
 | `format` | already shown as type badge | — |
 
 ### Deprecated params
@@ -97,21 +97,74 @@ Constraints are shown inside the help tooltip (alongside `description`). Where a
 
 ### 1. `ParamField` architecture
 
-**Decision: thin router + typed sub-inputs**
+**Decision: single `ParamField` driven by a normalised `FieldSpec`**
 
-`ParamField` renders `ParamLabel` and delegates to a typed input component based on schema:
+`Playground` normalises both `operation.parameters` and `multipart/form-data` schema properties into a shared `FieldSpec` before rendering. `ParamField` never knows which source a field came from — it receives a spec and two optional callbacks.
+
+```ts
+interface FieldSpec {
+  // Identity
+  name: string;
+  location: "path" | "query" | "header" | "cookie" | "form";
+  required: boolean;
+  deprecated?: boolean;
+  description?: string;
+
+  // Widget routing
+  type?: "string" | "integer" | "number" | "boolean" | "array" | "object";
+  format?: string;          // "binary" → FileInput; "date", "date-time" etc. shown in type badge
+  enum?: unknown[];         // present → EnumSelect (single-value)
+  items?: {                 // array items descriptor
+    type?: string;
+    format?: string;        // "binary" → file[] in FileInput
+    enum?: unknown[];       // present → MultiSelect (checkboxes)
+  };
+
+  // Constraints — shown in tooltip; numeric/text inputs also get the matching HTML attribute
+  minimum?: number;         // min={} on number input
+  maximum?: number;         // max={} on number input
+  minLength?: number;       // minLength={} on text input
+  maxLength?: number;       // maxLength={} on text input
+  pattern?: string;         // pattern={} on text input
+  default?: unknown;        // pre-fills the input on endpoint change
+  example?: unknown;        // used as placeholder when no value is set
+}
+```
+
+`Playground` populates `FieldSpec` by reading both the top-level `Parameter` fields (`name`, `in`, `required`, `deprecated`, `description`) and the resolved schema fields (`type`, `format`, `enum`, `items`, `minimum`, …). `ParamField` and every input component import only `FieldSpec` — no `Schema` dependency.
+
+`ParamField` renders `ParamLabel` then routes to a typed input based on `FieldSpec`:
 
 ```
 ParamField
-  ├── ParamLabel          (location + type + required + deprecated + help tooltip)
+  ├── ParamLabel          (location + type + required + deprecated + tooltip)
   └── <input widget>
-        ├── ScalarInput   (string, integer, number — no enum)
-        ├── EnumSelect    (any type with enum, single-value)
-        ├── BooleanSelect (boolean — —/true/false)
-        ├── ArrayInput    (array with free items — comma-separated)
-        ├── MultiSelect   (array with enum items — checkboxes)
-        └── ObjectInput   (object — JSON textarea)
+        ├── FileInput     (format === "binary" or items.format === "binary")
+        ├── BooleanSelect (type === "boolean")
+        ├── MultiSelect   (type === "array" + items.enum)
+        ├── ArrayInput    (type === "array", free items)
+        ├── ObjectInput   (type === "object")
+        ├── EnumSelect    (enum at root — any scalar type)
+        └── ScalarInput   (everything else)
 ```
+
+The routing is evaluated top-to-bottom; the first matching condition wins:
+
+| Priority | Condition | Widget | Note |
+|---|---|---|---|
+| 1 | `format === "binary"` \| `items.format === "binary"` | `FileInput` | Multipart file upload; `items.format` triggers `multiple` |
+| 2 | `type === "boolean"` | `BooleanSelect` | `<select>` with `—` / `true` / `false` to distinguish absent from false |
+| 3 | `type === "array"` + `items.enum` | `MultiSelect` | Checkboxes; user picks many from a fixed set |
+| 4 | `type === "array"` | `ArrayInput` | Comma-separated text; hint badge shown |
+| 5 | `type === "object"` | `ObjectInput` | JSON textarea |
+| 6 | `enum` (root) | `EnumSelect` | Single `<select>`; user picks one from a fixed set |
+| 7 | _(default)_ | `ScalarInput` | Text or number input depending on `type` |
+
+`FileInput` is the only multipart-specific widget. Routing to it is a schema concern (`format`) — `ParamField` does not check `location`.
+
+State binding is done via callbacks passed by `Playground`:
+- `onChange(name, value: string)` — covers all scalar/enum/array/object inputs; writes to `paramValues` for parameters and `bodyParams` for form fields
+- `onFileChange(name, files: FileList, multiple: boolean)` — provided only for `location === "form"`; writes to `fileValues`
 
 ### 2. State shape for array values
 
@@ -129,45 +182,48 @@ A single `useEffect` in `Playground` walks all resolved params and writes `schem
 
 ### 4. Constraints display
 
-**Decision: tooltip + HTML attributes**
+**Decision: badges in `ParamLabel` + HTML attributes**
 
-Schema constraints are appended to the help tooltip content below the description. For number/text inputs, the equivalent HTML attributes (`min`, `max`, `minLength`, `maxLength`, `pattern`) are also set so browsers enforce them natively without extra code.
+Schema constraints are rendered as small badges in the `ParamLabel` row on the right, alongside the existing location/type/required/deprecated badges. Always visible — no interaction required. For number/text inputs, the equivalent HTML attributes (`min`, `max`, `minLength`, `maxLength`, `pattern`) are also set so browsers enforce them natively. The `(?)` tooltip retains only the `description` text.
 
 ---
 
 ## Proposed File Structure
 
+Files marked `(exists)` are already present. `ParamLabel` is implemented but still inline inside `Playground.tsx` — it needs to be extracted.
+
 ```
-src/components/
-  Playground.tsx                   ← layout shell + default pre-fill effect
-  playground/
-    shared.ts                      ← inputClass, fileInputClass constants
-    ParamLabel.tsx                 ← name + location/type/required/deprecated badges + tooltip
-    ParamField.tsx                 ← resolves schema type → delegates to typed input
-    inputs/
-      ScalarInput.tsx              ← text / number input
-      EnumSelect.tsx               ← <select> for enum params
-      BooleanSelect.tsx            ← <select> —/true/false
-      ArrayInput.tsx               ← comma-separated text + hint badge
-      MultiSelect.tsx              ← checkbox list for array + enum items
-      ObjectInput.tsx              ← JSON textarea
-    MultipartField.tsx             ← multipart form field (form location)
-    SendBar.tsx                    ← method badge + URL preview + Send button
-    AuthStatus.tsx                 ← security scheme status rows
-    BodyEditor.tsx                 ← JSON/binary/text body editor
-    ResponsePanel.tsx              ← response tabs, copy, status badge
+src/features/playground/
+  playground-context.tsx       ← (exists) params, body, files, response, loading, endpoint
+  Playground.tsx               ← (exists) orchestration only — normalises FieldSpec, wires callbacks
+  SendBar.tsx                  ← method badge + URL preview + Send button
+  AuthStatus.tsx               ← security scheme status rows
+  BodyEditor.tsx               ← JSON / binary body editor
+  ResponsePanel.tsx            ← response tabs, copy, status badge
+  ParamLabel.tsx               ← (extract from Playground.tsx) name + location/type/required/deprecated badges + tooltip
+  ParamField.tsx               ← FieldSpec → ParamLabel + typed input router
+  inputs/
+    ScalarInput.tsx            ← text / number input
+    EnumSelect.tsx             ← <select> for enum params
+    BooleanSelect.tsx          ← <select> —/true/false
+    ArrayInput.tsx             ← comma-separated text + hint badge
+    MultiSelect.tsx            ← checkboxes for array + enum items
+    ObjectInput.tsx            ← JSON textarea
+    FileInput.tsx              ← file / file[] upload (multipart binary fields)
 ```
 
 ---
 
-## Open Questions
+## Resolved
 
-| # | Question | Options | Impact |
-|---|---|---|---|
-| 1 | Should `MultiSelect` (array+enum) use a dropdown or inline checkboxes? | Dropdown (compact) vs inline list (always visible) | Layout |
-| 2 | Should constraints also be shown as text below the input (always visible)? | Tooltip only vs below-input text | Layout |
-| 3 | How should we handle `object` params beyond a JSON textarea? (deepObject style has known key structure) | JSON textarea vs structured key-value rows | Implementation effort |
-| 4 | Should `cookie` params show a warning that browsers block JS from reading HttpOnly cookies? | Yes (info badge/tooltip) vs no | UX |
+| # | Decision |
+|---|---|
+| R1 | **`MultipartField` is not a separate component.** `Playground` normalises both `operation.parameters` and multipart schema properties to `FieldSpec` before rendering. `ParamField` handles all field types. File upload behaviour lives in `FileInput` within `inputs/`, routed by schema format — not by a separate top-level component. |
+| R2 | **No `shared.ts` for CSS constants.** `inputClass` and `fileInputClass` are inlined into the components that use them. |
+| R3 | **`MultiSelect` uses a compact dropdown.** Collapsed by default; opens on click. Keeps the params list compact when enum sets are large. |
+| R4 | **Constraints are shown as badges in `ParamLabel`**, on the right side alongside the existing location/type/required/deprecated badges. Always visible, no hover required, no extra vertical space. |
+| R5 | **Object params use a JSON textarea.** No key-value row UI — the schema structure is available via the `(?)` tooltip for reference. |
+| R6 | **No cookie warning.** Cookie params are treated like any other location; the HttpOnly restriction is an edge case outside the playground's scope. |
 
 ---
 
@@ -175,8 +231,9 @@ src/components/
 
 | Phase | Scope | Files touched |
 |---|---|---|
-| 1 | Component scaffold — create `playground/` folder, move shared constants, extract `ResponsePanel`, `SendBar`, `AuthStatus`, `BodyEditor` | `Playground.tsx` + 5 new files |
-| 2 | `ParamLabel` enhancements — `cookie` badge, `deprecated` styling, constraints in tooltip | `playground/ParamLabel.tsx` |
-| 3 | Typed inputs — `ScalarInput`, `EnumSelect`, `BooleanSelect`, `ArrayInput`, `MultiSelect`, `ObjectInput` | 6 new files under `playground/inputs/` |
-| 4 | `ParamField` router — wires schema type → correct input component | `playground/ParamField.tsx` |
-| 5 | Default pre-fill — `useEffect` in `Playground.tsx` for `schema.default` | `Playground.tsx` |
+| 1 | Extract `ParamLabel` — move inline `ParamLabel` out of `Playground.tsx`; inline `inputClass`/`fileInputClass` constants into the components that use them | `Playground.tsx`, new `ParamLabel.tsx` |
+| 2 | `ParamLabel` enhancements — `cookie` badge (currently falls through to gray), `deprecated` strikethrough + badge, constraint badges (`min`, `max`, `pattern`, etc.) | `ParamLabel.tsx` |
+| 3 | Panel extraction — extract `ResponsePanel`, `SendBar`, `AuthStatus`, `BodyEditor` from `Playground.tsx` | `Playground.tsx` + 4 new files |
+| 4 | Typed inputs — `ScalarInput`, `EnumSelect`, `BooleanSelect`, `ArrayInput`, `MultiSelect`, `ObjectInput`, `FileInput` | 7 new files under `inputs/` |
+| 5 | `ParamField` + `FieldSpec` — define `FieldSpec`, add normalization in `Playground.tsx` for both `operation.parameters` and multipart properties, replace `renderParamField` / `renderMultipartField` with `<ParamField>` | new `ParamField.tsx`, `Playground.tsx` |
+| 6 | Default pre-fill — `useEffect` in `Playground.tsx` writes `schema.default` into `paramValues` when endpoint changes | `Playground.tsx` |

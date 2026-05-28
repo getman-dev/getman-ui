@@ -32,6 +32,8 @@ function toFieldSpec(param: ReturnType<typeof resolveParameter>): FieldSpec {
     format:     s?.format,
     enum:       s?.enum,
     items:      s?.items ? { type: s.items.type, format: s.items.format, enum: s.items.enum } : undefined,
+    style:      param.style,
+    explode:    param.explode,
     minimum:    s?.minimum,
     maximum:    s?.maximum,
     minLength:  s?.minLength,

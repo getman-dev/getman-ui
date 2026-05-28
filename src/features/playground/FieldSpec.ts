@@ -18,6 +18,10 @@ export interface FieldSpec {
     enum?: unknown[];    // present → MultiSelect (checkboxes)
   };
 
+  // Array serialization (query params only)
+  style?: string;    // "form" | "spaceDelimited" | "pipeDelimited" | "deepObject"
+  explode?: boolean; // true → repeated name=val pairs; false → joined with delimiter
+
   // Constraints — shown as badges in ParamLabel; matching HTML attributes set on the input
   minimum?: number;
   maximum?: number;

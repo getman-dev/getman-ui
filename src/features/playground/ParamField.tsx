@@ -60,7 +60,7 @@ export default function ParamField({ field, value, invalid, onChange, onFileChan
       return <MultiSelect value={value} options={items.enum} invalid={invalid} onChange={(v) => onChange(name, v)} />;
     }
     if (field.type === "array") {
-      return <ArrayInput value={value} invalid={invalid} onChange={(v) => onChange(name, v)} />;
+      return <ArrayInput value={value} style={field.style} explode={field.explode} invalid={invalid} onChange={(v) => onChange(name, v)} />;
     }
     if (field.type === "object") {
       return <ObjectInput value={value} invalid={invalid} onChange={(v) => onChange(name, v)} />;

@@ -66,6 +66,8 @@ export interface Parameter {
   description?: string;
   required?: boolean;
   deprecated?: boolean;
+  style?: string;
+  explode?: boolean;
   schema?: Schema;
   example?: unknown;
 }

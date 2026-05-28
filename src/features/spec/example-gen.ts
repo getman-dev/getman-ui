@@ -104,6 +104,55 @@ export function getResponseExample(
   return example !== null ? JSON.stringify(example, null, 2) : null;
 }
 
+/** Serializes a single query parameter's value(s) into `name=val` pair(s) per OpenAPI style/explode rules. */
+function serializeQueryParam(param: Parameter, raw: string): string {
+  const enc = encodeURIComponent;
+  const isArray = param.schema?.type === "array";
+  const isObject = param.schema?.type === "object";
+
+  if (isObject) {
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      return `${enc(param.name)}=${enc(raw)}`;
+    }
+    const style = param.style ?? "form";
+    const entries = Object.entries(parsed).filter(([, v]) => v !== null && v !== undefined && v !== "");
+    if (style === "deepObject") {
+      // deepObject: filter[color]=red&filter[size]=M
+      return entries.map(([k, v]) => `${enc(param.name)}[${enc(k)}]=${enc(String(v))}`).join("&");
+    }
+    // explode defaults to true for "form", false otherwise
+    const explode = param.explode ?? (style === "form");
+    if (explode) {
+      // form + explode: color=red&size=M (each key is its own param)
+      return entries.map(([k, v]) => `${enc(k)}=${enc(String(v))}`).join("&");
+    }
+    // form + no explode: filter=color,red,size,M
+    const flat = entries.flatMap(([k, v]) => [enc(k), enc(String(v))]);
+    return `${enc(param.name)}=${flat.join(",")}`;
+  }
+
+  if (!isArray) return `${enc(param.name)}=${enc(raw)}`;
+
+  const items = raw.split("\n").filter(Boolean);
+  if (!items.length) return "";
+
+  const style   = param.style ?? "form";
+  // explode defaults to true for "form", false for everything else
+  const explode = param.explode ?? (style === "form");
+
+  if (explode) {
+    return items.map(v => `${enc(param.name)}=${enc(v)}`).join("&");
+  }
+  const delimiter = style === "spaceDelimited" ? "%20"
+    : style === "pipeDelimited" ? "|"
+    : ",";
+  const joined = items.map(enc).join(delimiter);
+  return `${enc(param.name)}=${joined}`;
+}
+
 export function buildUrl(
   baseUrl: string,
   path: string,
@@ -118,10 +167,10 @@ export function buildUrl(
 
   const queryParams = parameters.filter((p) => p.in === "query" && paramValues[p.name]);
   if (queryParams.length) {
-    const qs = queryParams
-      .map((p) => `${encodeURIComponent(p.name)}=${encodeURIComponent(paramValues[p.name])}`)
-      .join("&");
-    url += `?${qs}`;
+    const parts = queryParams
+      .map(p => serializeQueryParam(p, paramValues[p.name]))
+      .filter(Boolean);
+    if (parts.length) url += `?${parts.join("&")}`;
   }
 
   return url;

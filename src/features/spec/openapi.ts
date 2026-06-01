@@ -120,6 +120,7 @@ export interface Schema {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  "x-enumDescriptions"?: Record<string, string>;
 }
 
 export interface Components {

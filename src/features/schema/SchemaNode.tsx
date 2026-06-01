@@ -61,15 +61,30 @@ export default function SchemaNode({ name, schema, components, depth = 0, requir
         {constraints.map(c => (
           <span key={c} className="text-[9px] font-mono text-gray-400 dark:text-gray-500">{c}</span>
         ))}
-        {resolved.description && (
-          <span className="text-[11px] text-gray-400 dark:text-gray-500">{resolved.description}</span>
-        )}
         {resolved.enum && (
           <span className="text-[9px] text-gray-400 dark:text-gray-500 font-mono">
             {resolved.enum.slice(0, 4).map(String).join(" | ")}
           </span>
         )}
       </div>
+      {resolved.description && (
+        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+          {resolved.description}
+        </p>
+      )}
+      {resolved.enum && resolved["x-enumDescriptions"] && (
+        <ul className="mt-1 space-y-0.5">
+          {resolved.enum.map((val) => {
+            const label = resolved["x-enumDescriptions"]![String(val)];
+            return label ? (
+              <li key={String(val)} className="flex gap-1.5 text-[10px]">
+                <span className="font-mono text-gray-700 dark:text-gray-300">{String(val)}</span>
+                <span className="text-gray-400 dark:text-gray-500">— {label}</span>
+              </li>
+            ) : null;
+          })}
+        </ul>
+      )}
 
       {combined?.length ? (
         <div className="border-l-2 border-gray-100 dark:border-gray-700 ml-3 pl-3 mt-0.5">

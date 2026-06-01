@@ -72,8 +72,19 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
     );
   }
 
+  const topLevelDescription = resolved?.description ? (
+    <p className="px-4 pt-3 pb-0 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+      {resolved.description}
+    </p>
+  ) : null;
+
   if (resolved && !exampleJson) {
-    return <div className="px-4 py-3">{renderSchemaTree()}</div>;
+    return (
+      <div>
+        {topLevelDescription}
+        <div className="px-4 py-3">{renderSchemaTree()}</div>
+      </div>
+    );
   }
 
   if (resolved && exampleJson) {
@@ -88,7 +99,10 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
           </button>
         </div>
         {activeTab === "schema" ? (
-          <div className="px-4 py-3">{renderSchemaTree()}</div>
+          <div>
+            {topLevelDescription}
+            <div className="px-4 py-3">{renderSchemaTree()}</div>
+          </div>
         ) : (
           <div className="px-4 py-3">
             <pre

@@ -41,7 +41,8 @@
 <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4" id="grid"></div>
 
 <script>
-  const SWAGGER_UI_URL = 'swagger.html'; // path to your swagger-ui.html
+  const SWAGGER_UI_URL = 'swagger.html';
+  const SCALAR_URL     = 'scalar.html';
 
   const specs = [
     {
@@ -115,6 +116,7 @@
   for (const spec of specs) {
     const explorerHref = `/?url=/specs/${spec.file}`;
     const swaggerHref  = `${SWAGGER_UI_URL}?url=/specs/${spec.file}`;
+    const scalarHref   = `${SCALAR_URL}?url=/specs/${spec.file}`;
 
     const card = document.createElement("div");
     card.className = [
@@ -169,6 +171,17 @@
                rel="noopener noreferrer"
                class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 hover:opacity-80 transition-opacity rounded-md px-2.5 py-1">
               Swagger UI
+              <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </a>
+
+            <!-- Open with Scalar -->
+            <a href="${scalarHref}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center gap-1 text-[11px] font-medium text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950 hover:opacity-80 transition-opacity rounded-md px-2.5 py-1">
+              Scalar
               <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
               </svg>

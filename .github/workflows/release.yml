@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build:lib
+
+      - name: Attach build to tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f dist/loader.js
+          git commit -m "chore: build ${GITHUB_REF_NAME}"
+          git tag -f ${GITHUB_REF_NAME}
+          git push origin ${GITHUB_REF_NAME} --force
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/loader.js
+          generate_release_notes: true
+          name: ${{ github.ref_name }}

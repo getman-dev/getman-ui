@@ -146,9 +146,9 @@ export async function executePlayground() {
   if (!playgroundSnapshot.endpoint || playgroundSnapshot.loading) return;
   playgroundActions.setLoading(true);
   playgroundActions.setResponse(null);
-  const servers = specSnapshot.spec?.servers ?? [{ url: "http://localhost" }];
+  const servers = specSnapshot.spec?.servers ?? [];
   const active  = servers.find(s => s.url === serverSnapshot.selectedServer) ?? servers[0];
-  const baseUrl = active ? resolveServerUrl(active, serverSnapshot.serverVariables) : (servers[0]?.url ?? "http://localhost");
+  const baseUrl = active ? resolveServerUrl(active, serverSnapshot.serverVariables) : window.location.origin;
   try {
     const response = await executeRequest(
       playgroundSnapshot.endpoint,

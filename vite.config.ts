@@ -20,4 +20,9 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   },
+  ...(mode === "lib" && {
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+  }),
 }));

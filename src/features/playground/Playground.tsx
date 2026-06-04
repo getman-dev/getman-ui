@@ -1,6 +1,6 @@
 /** Try-it-out panel: normalises parameters to FieldSpec and orchestrates sub-components. */
 import { useEffect, useMemo, useState } from "react";
-import type { Schema, Components } from "../spec/openapi";
+import type { Schema, Components, Operation, SecurityScheme, AuthValues } from "../spec/openapi";
 import { usePlayground } from "./playground-context";
 import { useSpec } from "../spec/spec-context";
 import { useAuth } from "../auth/auth-context";
@@ -15,6 +15,7 @@ import SendBar from "./SendBar";
 import AuthStatus from "./AuthStatus";
 import BodyEditor from "./BodyEditor";
 import ResponsePanel from "./ResponsePanel";
+import VerticalResizable from "../../shared/components/VerticalResizable";
 
 /**
  * Converts a resolved Parameter into a FieldSpec, lifting schema fields to the top level.
@@ -72,6 +73,82 @@ function toMultipartFieldSpec(
     default:     resolved?.default,
     example:     resolved?.example,
   };
+}
+
+interface PlaygroundFormProps {
+  schemeNames: string[] | null;
+  allSchemes: Record<string, SecurityScheme>;
+  authValues: AuthValues;
+  hasParams: boolean;
+  paramFields: FieldSpec[];
+  paramValues: Record<string, string>;
+  invalidFields: Set<string>;
+  onParamChange: (name: string, value: string) => void;
+  onFileChange: (name: string, files: FileList, multiple: boolean) => void;
+  multipartFields: FieldSpec[];
+  bodyParams: Record<string, string>;
+  onBodyParamChange: (name: string, value: string) => void;
+  op: Operation | undefined;
+  bodyContentType: string;
+  bodyValue: string;
+  onBodyChange: (value: string) => void;
+  onRawFile: (file: File) => void;
+}
+
+/** Form area of the playground: auth status, parameters, and request body editor. */
+function PlaygroundForm({
+  schemeNames, allSchemes, authValues,
+  hasParams, paramFields, paramValues, invalidFields, onParamChange, onFileChange,
+  multipartFields, bodyParams, onBodyParamChange,
+  op, bodyContentType, bodyValue, onBodyChange, onRawFile,
+}: PlaygroundFormProps) {
+  return (
+    <div className="px-5 py-6 flex flex-col gap-7">
+      <AuthStatus
+        schemeNames={schemeNames}
+        allSchemes={allSchemes}
+        authValues={authValues}
+      />
+
+      {hasParams && (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Parameters</p>
+          <div className="flex flex-col gap-4">
+            {paramFields.map(f => (
+              <ParamField
+                key={`${f.location}:${f.name}`}
+                field={f}
+                value={paramValues[f.name] ?? ""}
+                invalid={invalidFields.has(f.name)}
+                onChange={onParamChange}
+                onFileChange={onFileChange}
+              />
+            ))}
+            {multipartFields.map(f => (
+              <ParamField
+                key={f.name}
+                field={f}
+                value={bodyParams[f.name] ?? ""}
+                invalid={invalidFields.has(f.name)}
+                onChange={onBodyParamChange}
+                onFileChange={onFileChange}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {op?.requestBody && bodyContentType !== "multipart/form-data" && (
+        <BodyEditor
+          required={!!op.requestBody.required}
+          contentType={bodyContentType}
+          bodyValue={bodyValue}
+          onBodyChange={onBodyChange}
+          onRawFile={onRawFile}
+        />
+      )}
+    </div>
+  );
 }
 
 /** Renders the try-it-out panel. Delegates all rendering to focused sub-components. */
@@ -217,7 +294,7 @@ export default function Playground() {
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-900">
 
-      <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+      <div className="flex items-center gap-2 px-5 border-b border-gray-100 dark:border-gray-700 shrink-0 h-[50px]">
         <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
         <div className="flex-1" />
         <ServerConfig source="playground" />
@@ -231,55 +308,34 @@ export default function Playground() {
         onSend={handleSend}
       />
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-5 py-6 flex flex-col gap-7">
-
-        <AuthStatus
-          schemeNames={schemeNames}
-          allSchemes={spec?.components?.securitySchemes ?? {}}
-          authValues={authValues}
-        />
-
-        {hasParams && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Parameters</p>
-            <div className="flex flex-col gap-4">
-              {paramFields.map(f => (
-                <ParamField
-                  key={`${f.location}:${f.name}`}
-                  field={f}
-                  value={paramValues[f.name] ?? ""}
-                  invalid={invalidFields.has(f.name)}
-                  onChange={setParam}
-                  onFileChange={setFileField}
-                />
-              ))}
-              {multipartFields.map(f => (
-                <ParamField
-                  key={f.name}
-                  field={f}
-                  value={bodyParams[f.name] ?? ""}
-                  invalid={invalidFields.has(f.name)}
-                  onChange={setBodyParam}
-                  onFileChange={setFileField}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {op?.requestBody && bodyContentType !== "multipart/form-data" && (
-          <BodyEditor
-            required={!!op.requestBody.required}
-            contentType={bodyContentType}
+      <VerticalResizable
+        storageKey="try-pane-split"
+        defaultBottomHeight={280}
+        minTop={120}
+        minBottom={80}
+        top={
+          <PlaygroundForm
+            schemeNames={schemeNames}
+            allSchemes={spec?.components?.securitySchemes ?? {}}
+            authValues={authValues}
+            hasParams={hasParams}
+            paramFields={paramFields}
+            paramValues={paramValues}
+            invalidFields={invalidFields}
+            onParamChange={setParam}
+            onFileChange={setFileField}
+            multipartFields={multipartFields}
+            bodyParams={bodyParams}
+            onBodyParamChange={setBodyParam}
+            op={op}
+            bodyContentType={bodyContentType}
             bodyValue={bodyValue}
             onBodyChange={setBodyValue}
             onRawFile={(file) => setFileValues({ ...fileValues, __raw__: file })}
           />
-        )}
-
-      </div>
-
-      <ResponsePanel loading={loading} response={response} />
+        }
+        bottom={<ResponsePanel loading={loading} response={response} />}
+      />
 
     </div>
   );

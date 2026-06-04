@@ -1,4 +1,5 @@
 /** Request body editor: JSON textarea for application/json or a file input for application/octet-stream. */
+import ParamLabel from "./ParamLabel";
 
 const fileInputClass =
   "block w-full text-xs text-gray-600 dark:text-gray-400 cursor-pointer " +
@@ -22,14 +23,7 @@ export default function BodyEditor({ required, contentType, bodyValue, onBodyCha
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          Body{required && <span className="text-red-500 normal-case font-normal"> required</span>}
-        </p>
-        <span className="text-[9px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1.5 py-0.5">
-          {contentType}
-        </span>
-      </div>
+      <ParamLabel name="body" location="body" typeBadge={contentType} required={required} />
 
       {contentType === "application/octet-stream" ? (
         <input
@@ -38,15 +32,13 @@ export default function BodyEditor({ required, contentType, bodyValue, onBodyCha
           onChange={(e) => { const f = e.target.files; if (f?.length) onRawFile(f[0]); }}
         />
       ) : (
-        <>
-          <div className="flex justify-end mb-2">
-            <button
-              onClick={formatJson}
-              className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30"
-            >
-              Format JSON
-            </button>
-          </div>
+        <div className="relative">
+          <button
+            onClick={formatJson}
+            className="absolute top-1.5 right-1.5 z-10 text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30"
+          >
+            Format JSON
+          </button>
           <textarea
             rows={8}
             value={bodyValue}
@@ -54,7 +46,7 @@ export default function BodyEditor({ required, contentType, bodyValue, onBodyCha
             placeholder="Enter JSON body…"
             className="w-full text-[11px] border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 font-mono resize-y transition-colors leading-relaxed"
           />
-        </>
+        </div>
       )}
     </div>
   );

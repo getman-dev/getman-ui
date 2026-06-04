@@ -30,7 +30,7 @@ jobs:
           git add -f dist/loader.js
           git commit -m "chore: build ${GITHUB_REF_NAME}"
           git tag -f ${GITHUB_REF_NAME}
-          git push origin ${GITHUB_REF_NAME} --force
+          git push origin "refs/tags/${GITHUB_REF_NAME}" --force
 
       - uses: softprops/action-gh-release@v2
         with:

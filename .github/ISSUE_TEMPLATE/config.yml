@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: OpenAPI 3.x Specification
+    url: https://spec.openapis.org/oas/v3.1.0
+    about: Reference for OpenAPI 3.x — useful when filing spec-related issues

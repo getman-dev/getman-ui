@@ -1,0 +1,38 @@
+name: Chore / Refactor
+description: Maintenance, dependency update, refactor, CI, or test coverage — no new user-visible behavior
+title: "[Chore] "
+labels: ["chore"]
+body:
+  - type: textarea
+    id: what_and_why
+    attributes:
+      label: What and why
+      description: Describe the work and the motivation (e.g. dependency update, bundle size, test coverage, accessibility, cleanup).
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: List the files or areas of the codebase affected.
+      placeholder: |
+        - features/spec/
+        - shared/state/actions.ts
+        - build config / vite.config.ts
+    validations:
+      required: true
+
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of done
+      description: Bullet list of acceptance criteria — what does "complete" look like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Links to related issues, PRs, or upstream changelogs.

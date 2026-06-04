@@ -1,0 +1,16 @@
+<!doctype html>
+<html style="height:100%">
+<body style="height:100%;margin:0">
+
+<div id="api-docs" style="height:100%"></div>
+
+<script src="loader.js"></script>
+<script>
+    ApiExplorer.mountApiExplorer(
+        document.getElementById('api-docs'),
+        { url: 'https://petstore3.swagger.io/api/v3/openapi.json' }
+    );
+</script>
+
+</body>
+</html>

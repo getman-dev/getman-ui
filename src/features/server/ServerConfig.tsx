@@ -25,7 +25,7 @@ export default function ServerConfig({ source }: Props) {
   const servers      = spec?.servers ?? [];
   const activeServer = servers.find(s => s.url === selectedServer) ?? servers[0];
   const varEntries   = Object.entries(activeServer?.variables ?? {});
-  const resolvedUrl  = activeServer ? resolveServerUrl(activeServer, serverVariables) : selectedServer;
+  const resolvedUrl  = activeServer ? resolveServerUrl(activeServer, serverVariables) : window.location.origin;
   const isOpen       = serverPopoverSource === source;
 
   function openPanel() {

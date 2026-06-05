@@ -58,13 +58,31 @@ export default function ResponsePanel({ loading, response }: Props) {
       : "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700";
 
   return (
-    <div className="shrink-0 border-t border-gray-100 dark:border-gray-700 flex flex-col" style={{ height: 280 }}>
-      <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
-        <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Response</span>
+    <div className="h-full border-t border-gray-100 dark:border-gray-700 flex flex-col">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
         <span className={`text-[10px] border rounded px-1.5 py-0.5 font-mono font-semibold ${statusColor}`}>
           {response.status}{response.statusText ? ` ${response.statusText}` : ""}
         </span>
         <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{response.duration}ms</span>
+        <div className="w-px h-3 bg-gray-200 dark:bg-gray-700 mx-1" />
+        <div className="flex gap-0.5">
+          {(["body", "headers"] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={clsx(
+                "px-2.5 py-1 text-[10px] rounded font-medium transition-colors",
+                tab === t
+                  ? "bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
+                  : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300",
+              )}
+            >
+              {t === "headers"
+                ? <><span>Headers</span> <span className="ml-0.5 text-gray-300 dark:text-gray-600">{Object.keys(response.headers).length}</span></>
+                : "Body"}
+            </button>
+          ))}
+        </div>
         <div className="flex-1" />
         <button
           onClick={copyResponse}
@@ -89,25 +107,6 @@ export default function ResponsePanel({ loading, response }: Props) {
             </>
           )}
         </button>
-      </div>
-
-      <div className="flex gap-0.5 px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
-        {(["body", "headers"] as const).map(t => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={clsx(
-              "px-2.5 py-1 text-[10px] rounded font-medium transition-colors",
-              tab === t
-                ? "bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
-                : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300",
-            )}
-          >
-            {t === "headers"
-              ? <><span>Headers</span> <span className="ml-0.5 text-gray-300 dark:text-gray-600">{Object.keys(response.headers).length}</span></>
-              : "Body"}
-          </button>
-        ))}
       </div>
 
       <div className="flex-1 overflow-auto bg-white dark:bg-gray-900">

@@ -9,7 +9,7 @@ import { methodBadgeClasses } from "../../shared/utils/badges";
 /** Renders the sidebar with tabs, search, and a scrollable endpoint/schema list. */
 export default function Nav() {
   const { searchQuery, sidebarTab, activeEndpoint, activeSchema, setSearchQuery, setSidebarTab } = useNav();
-  const { spec, groups } = useSpec();
+  const { spec, groups, specLoading } = useSpec();
 
   const [collapsedTags, setCollapsedTags] = useState(new Set<string>());
 
@@ -88,7 +88,14 @@ export default function Nav() {
         </div>
       </div>
 
-      {sidebarTab === "endpoints" && (
+      {specLoading && !spec ? (
+        <div className="flex items-center justify-center flex-1 py-8">
+          <svg className="w-5 h-5 animate-spin text-blue-400 dark:text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      ) : sidebarTab === "endpoints" ? (
         filteredGroups.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center gap-2">
             <p className="text-[11px] text-gray-400 dark:text-gray-500">No endpoints match</p>
@@ -143,9 +150,7 @@ export default function Nav() {
             })}
           </div>
         )
-      )}
-
-      {sidebarTab === "schemas" && (
+      ) : (
         Object.keys(schemas).length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center">
             <p className="text-[11px] text-gray-400 dark:text-gray-500">No schemas defined</p>

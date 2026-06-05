@@ -19,6 +19,7 @@ import { executeRequest, isCorsError } from "../utils/http-client";
  * @param url - Absolute URL pointing to a JSON or YAML spec.
  */
 export async function loadSpecFromUrl(url: string) {
+  specActions.setSpecLoading(true);
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
@@ -27,6 +28,8 @@ export async function loadSpecFromUrl(url: string) {
     await parseAndApplySpec(text, contentType.includes("yaml") || url.endsWith(".yaml") || url.endsWith(".yml"));
   } catch (err) {
     modalActions.setModalError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
+  } finally {
+    specActions.setSpecLoading(false);
   }
 }
 

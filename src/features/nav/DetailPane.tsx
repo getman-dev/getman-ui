@@ -1,6 +1,7 @@
 /** Routes between EndpointDetail, SchemaDetail, and the empty state. */
 import { useNav } from "./nav-context";
 import { useSpec } from "../spec/spec-context";
+import { useModal, modalActions } from "../../shared/contexts/modal-context";
 import EndpointDetail from "../endpoint/EndpointDetail";
 import SchemaDetail from "../schema/SchemaDetail";
 
@@ -8,6 +9,7 @@ import SchemaDetail from "../schema/SchemaDetail";
 export default function DetailPane() {
   const { activeSchema, activeEndpoint } = useNav();
   const { spec, specLoading } = useSpec();
+  const { modalError, modalVisible } = useModal();
 
   if (specLoading && !spec) {
     return (
@@ -25,6 +27,28 @@ export default function DetailPane() {
   if (activeEndpoint) {
     return <EndpointDetail />;
   }
+
+  const embedError = !modalVisible ? modalError : "";
+
+  if (embedError) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-center px-8 gap-3">
+        <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+          <svg className="w-5 h-5 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <p className="text-sm text-red-600 dark:text-red-400">{embedError}</p>
+        <button
+          onClick={() => modalActions.setModalError("")}
+          className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 underline underline-offset-2"
+        >
+          Dismiss
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-8 gap-3">
       <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">

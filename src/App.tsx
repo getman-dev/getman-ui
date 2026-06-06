@@ -16,6 +16,7 @@ import Playground from "./features/playground/Playground";
 import LoadModal from "./shared/components/LoadModal";
 import AuthModal from "./features/auth/AuthModal";
 import CommandBar from "./shared/components/CommandBar";
+import { ErrorBoundary } from "./shared/components/ErrorBoundary";
 
 const DARK_KEY = "api-explorer-dark";
 
@@ -160,27 +161,29 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
 
       <TopBar onToggleDark={toggleDark} />
 
-      <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
-        <aside id="nav-pane" className="shrink-0 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex flex-col">
-          <Nav />
-        </aside>
+      <ErrorBoundary>
+        <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
+          <aside id="nav-pane" className="shrink-0 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex flex-col">
+            <Nav />
+          </aside>
 
-        <div id="handle-left" className="pane-handle" aria-hidden="true">
-          <div className="pane-handle-line" />
+          <div id="handle-left" className="pane-handle" aria-hidden="true">
+            <div className="pane-handle-line" />
+          </div>
+
+          <main id="detail-pane" className="flex-1 min-w-0 bg-white dark:bg-gray-900 overflow-hidden">
+            <DetailPane />
+          </main>
+
+          <div id="handle-right" className="pane-handle" aria-hidden="true" style={{ display: showPlayground ? "" : "none" }}>
+            <div className="pane-handle-line" />
+          </div>
+
+          <aside id="try-pane" className="shrink-0 bg-white dark:bg-gray-900 overflow-hidden" style={{ display: showPlayground ? "" : "none" }}>
+            <Playground />
+          </aside>
         </div>
-
-        <main id="detail-pane" className="flex-1 min-w-0 bg-white dark:bg-gray-900 overflow-hidden">
-          <DetailPane />
-        </main>
-
-        <div id="handle-right" className="pane-handle" aria-hidden="true" style={{ display: showPlayground ? "" : "none" }}>
-          <div className="pane-handle-line" />
-        </div>
-
-        <aside id="try-pane" className="shrink-0 bg-white dark:bg-gray-900 overflow-hidden" style={{ display: showPlayground ? "" : "none" }}>
-          <Playground />
-        </aside>
-      </div>
+      </ErrorBoundary>
     </div>
   );
 }

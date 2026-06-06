@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 
 interface ModalState {
   modalVisible: boolean;
-  modalError: string;
   modalUrlValue: string;
   shortcutsVisible: boolean;
   commandBarVisible: boolean;
@@ -12,7 +11,6 @@ interface ModalState {
 
 interface ModalContextActions {
   setModalVisible: (visible: boolean) => void;
-  setModalError: (error: string) => void;
   setModalUrlValue: (value: string) => void;
   setShortcutsVisible: (visible: boolean) => void;
   setCommandBarVisible: (visible: boolean) => void;
@@ -22,7 +20,6 @@ type ModalContextValue = ModalState & ModalContextActions;
 
 const defaultState: ModalState = {
   modalVisible: false,
-  modalError: "",
   modalUrlValue: "",
   shortcutsVisible: false,
   commandBarVisible: false,
@@ -31,7 +28,6 @@ const defaultState: ModalState = {
 export let modalSnapshot: ModalState = { ...defaultState };
 export const modalActions: ModalContextActions = {
   setModalVisible: () => {},
-  setModalError: () => {},
   setModalUrlValue: () => {},
   setShortcutsVisible: () => {},
   setCommandBarVisible: () => {},
@@ -46,10 +42,6 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const setModalVisible = useCallback((modalVisible: boolean) => {
     modalSnapshot = { ...modalSnapshot, modalVisible };
     setState(s => ({ ...s, modalVisible }));
-  }, []);
-  const setModalError = useCallback((modalError: string) => {
-    modalSnapshot = { ...modalSnapshot, modalError };
-    setState(s => ({ ...s, modalError }));
   }, []);
   const setModalUrlValue = useCallback((modalUrlValue: string) => {
     modalSnapshot = { ...modalSnapshot, modalUrlValue };
@@ -66,14 +58,13 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 
   modalSnapshot = state;
   modalActions.setModalVisible = setModalVisible;
-  modalActions.setModalError = setModalError;
   modalActions.setModalUrlValue = setModalUrlValue;
   modalActions.setShortcutsVisible = setShortcutsVisible;
   modalActions.setCommandBarVisible = setCommandBarVisible;
 
   const value = useMemo(
-    () => ({ ...state, setModalVisible, setModalError, setModalUrlValue, setShortcutsVisible, setCommandBarVisible }),
-    [state, setModalVisible, setModalError, setModalUrlValue, setShortcutsVisible, setCommandBarVisible]
+    () => ({ ...state, setModalVisible, setModalUrlValue, setShortcutsVisible, setCommandBarVisible }),
+    [state, setModalVisible, setModalUrlValue, setShortcutsVisible, setCommandBarVisible]
   );
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }

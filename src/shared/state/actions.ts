@@ -27,7 +27,7 @@ export async function loadSpecFromUrl(url: string) {
     const text = await res.text();
     await parseAndApplySpec(text, contentType.includes("yaml") || url.endsWith(".yaml") || url.endsWith(".yml"));
   } catch (err) {
-    modalActions.setModalError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
+    specActions.setLoadError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
   } finally {
     specActions.setSpecLoading(false);
   }
@@ -44,7 +44,7 @@ export async function loadSpecFromFile(file: File) {
     const text = await file.text();
     await parseAndApplySpec(text, file.name.endsWith(".yaml") || file.name.endsWith(".yml"));
   } catch (err) {
-    modalActions.setModalError(`Failed to read file: ${err instanceof Error ? err.message : String(err)}`);
+    specActions.setLoadError(`Failed to read file: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -58,12 +58,12 @@ async function parseAndApplySpec(text: string, isYaml: boolean) {
       parsed = JSON.parse(text) as OpenAPISpec;
     }
   } catch (err) {
-    modalActions.setModalError(`Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`);
+    specActions.setLoadError(`Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`);
     return;
   }
 
   if (!parsed.openapi || !parsed.paths) {
-    modalActions.setModalError("Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.");
+    specActions.setLoadError("Invalid OpenAPI spec: missing 'openapi' or 'paths' fields.");
     return;
   }
 
@@ -136,7 +136,7 @@ export function applySpec(spec: OpenAPISpec, firstServer: Server | undefined) {
   serverActions.setServerVariables(initServerVariables(firstServer));
   serverActions.setServerPopoverSource(null);
   modalActions.setModalVisible(false);
-  modalActions.setModalError("");
+  specActions.setLoadError("");
   specActions.setSpec(spec);
   specActions.setGroups(parseSpec(spec));
 }

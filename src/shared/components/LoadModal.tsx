@@ -1,18 +1,20 @@
 /** Load-spec modal: URL input, file upload, and Petstore shortcut. */
 import { useState } from "react";
 import { useModal } from "../contexts";
+import { useSpec, specActions } from "../../features/spec/spec-context";
 import { loadSpecFromUrl, loadSpecFromFile } from "../state/actions";
 import Modal from "./Modal";
 import * as React from "react";
 
 /** Renders the spec-loading modal. Visible when modalVisible is true. */
 export default function LoadModal() {
-  const { modalVisible, modalError, setModalVisible, setModalError, setModalUrlValue } = useModal();
+  const { modalVisible, setModalVisible, setModalUrlValue } = useModal();
+  const { loadError } = useSpec();
   const [urlValue, setUrlValue] = useState("");
 
   function close() {
     setModalVisible(false);
-    setModalError("");
+    specActions.setLoadError("");
   }
 
   async function loadUrl() {
@@ -85,9 +87,9 @@ export default function LoadModal() {
           </label>
         </div>
 
-        {modalError && (
+        {loadError && (
           <p className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-md px-3 py-2">
-            {modalError}
+            {loadError}
           </p>
         )}
 

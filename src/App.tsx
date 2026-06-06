@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { AppProviders } from "./shared/contexts";
 import { useNav } from "./features/nav/nav-context";
 import { useModal, modalActions, modalSnapshot } from "./shared/contexts/modal-context";
+import { specActions } from "./features/spec/spec-context";
 import { authActions, authSnapshot } from "./features/auth/auth-context";
 import { playgroundSnapshot } from "./features/playground/playground-context";
 import { loadSpecFromUrl, restoreFromHash, executePlayground } from "./shared/state/actions";
@@ -81,7 +82,7 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
       if (e.key === "Escape") {
         if (modalSnapshot.commandBarVisible) { modalActions.setCommandBarVisible(false); return; }
         if (modalSnapshot.shortcutsVisible)  { modalActions.setShortcutsVisible(false); return; }
-        if (modalSnapshot.modalVisible)      { modalActions.setModalVisible(false); modalActions.setModalError(""); return; }
+        if (modalSnapshot.modalVisible)      { modalActions.setModalVisible(false); specActions.setLoadError(""); return; }
         if (authSnapshot.authModalVisible)   { authActions.setAuthModalVisible(false); return; }
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         return;

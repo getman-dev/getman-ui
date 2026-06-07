@@ -1,4 +1,4 @@
-/** Sidebar navigation: endpoint list, schema list, search, and tab switching. */
+/** Sidebar navigation: unified endpoint + schema list with a single search input. */
 import { useState, useMemo } from "react";
 import clsx from "clsx";
 import { useNav } from "./nav-context";
@@ -6,12 +6,13 @@ import { useSpec } from "../spec/spec-context";
 import { selectEndpoint, selectSchema } from "../../shared/state/actions";
 import { methodBadgeClasses } from "../../shared/utils/badges";
 
-/** Renders the sidebar with tabs, search, and a scrollable endpoint/schema list. */
+/** Renders the sidebar with a single search input and a scrollable endpoint + schema list. */
 export default function Nav() {
-  const { searchQuery, sidebarTab, activeEndpoint, activeSchema, setSearchQuery, setSidebarTab } = useNav();
+  const { searchQuery, activeEndpoint, activeSchema, setSearchQuery } = useNav();
   const { spec, groups, specLoading } = useSpec();
 
   const [collapsedTags, setCollapsedTags] = useState(new Set<string>());
+  const [schemasCollapsed, setSchemasCollapsed] = useState(false);
 
   function toggleTag(name: string) {
     setCollapsedTags(prev => {
@@ -50,18 +51,10 @@ export default function Nav() {
     );
   }, [searchQuery, schemas]);
 
-  const tabClass = (id: "endpoints" | "schemas") =>
-    id === sidebarTab
-      ? "flex-1 py-3 text-[11px] font-medium transition-colors border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-      : "flex-1 py-3 text-[11px] font-medium transition-colors border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300";
+  const hasSchemas = Object.keys(schemas).length > 0;
 
   return (
     <aside className="shrink-0 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex flex-col h-full">
-
-      <div className="flex border-b border-gray-100 dark:border-gray-700 shrink-0">
-        <button className={tabClass("endpoints")} onClick={() => setSidebarTab("endpoints")}>Endpoints</button>
-        <button className={tabClass("schemas")}   onClick={() => setSidebarTab("schemas")}>Schemas</button>
-      </div>
 
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 shrink-0">
         <div className="relative">
@@ -72,7 +65,7 @@ export default function Nav() {
             id="search-input"
             type="text"
             autoComplete="off"
-            placeholder={sidebarTab === "schemas" ? "Filter schemas…" : "Filter endpoints…"}
+            placeholder="Filter…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-7 pr-6 py-2 text-[11px] border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors"
@@ -95,14 +88,12 @@ export default function Nav() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
         </div>
-      ) : sidebarTab === "endpoints" ? (
-        filteredGroups.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center gap-2">
-            <p className="text-[11px] text-gray-400 dark:text-gray-500">No endpoints match</p>
-          </div>
-        ) : (
-          <div>
-            {filteredGroups.map(group => {
+      ) : (
+        <div className="overflow-y-auto flex-1">
+
+          {/* Endpoints */}
+          {filteredGroups.length === 0 && searchQuery ? null : (
+            filteredGroups.map(group => {
               const collapsed = collapsedTags.has(group.name);
               return (
                 <div key={group.name}>
@@ -147,49 +138,63 @@ export default function Nav() {
                   )}
                 </div>
               );
-            })}
-          </div>
-        )
-      ) : (
-        Object.keys(schemas).length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center">
-            <p className="text-[11px] text-gray-400 dark:text-gray-500">No schemas defined</p>
-          </div>
-        ) : filteredSchemaNames.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center">
-            <p className="text-[11px] text-gray-400 dark:text-gray-500">No schemas match</p>
-          </div>
-        ) : (
-          <div className="overflow-y-auto flex-1">
-            {filteredSchemaNames.map(name => {
-              const schema    = schemas[name];
-              const typeLabel = schema.type ?? (schema.properties ? "object" : schema.items ? "array" : "");
-              const isActive  = name === activeSchema;
-              return (
-                <button
-                  key={name}
-                  className={clsx(
-                    "w-full text-left px-4 py-3 border-b border-gray-50 dark:border-gray-700/50 transition-colors",
-                    isActive ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  )}
-                  onClick={() => selectSchema(name)}
+            })
+          )}
+
+          {/* Schemas section */}
+          {hasSchemas && filteredSchemaNames.length > 0 && (
+            <>
+              <button
+                className="w-full flex items-center justify-between px-4 py-2.5 mt-1 border-t border-gray-100 dark:border-gray-700 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                aria-expanded={!schemasCollapsed}
+                onClick={() => setSchemasCollapsed(c => !c)}
+              >
+                <span>Schemas</span>
+                <svg
+                  className={clsx("w-3 h-3 transition-transform", schemasCollapsed && "-rotate-90")}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 uppercase">
-                      {typeLabel || "obj"}
-                    </span>
-                    <span className={clsx("truncate text-[11px] font-mono", isActive ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300")}>
-                      {name}
-                    </span>
-                  </div>
-                  {schema.description && (
-                    <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500 truncate pl-[38px]">{schema.description}</p>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              {!schemasCollapsed && filteredSchemaNames.map(name => {
+                const schema    = schemas[name];
+                const typeLabel = schema.type ?? (schema.properties ? "object" : schema.items ? "array" : "");
+                const isActive  = name === activeSchema;
+                return (
+                  <button
+                    key={name}
+                    className={clsx(
+                      "w-full text-left gap-2.5 px-4 py-2 transition-colors",
+                      isActive ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    )}
+                    onClick={() => selectSchema(name)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 uppercase">
+                        {typeLabel || "obj"}
+                      </span>
+                      <span className={clsx("truncate text-[11px] font-mono", isActive ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300")}>
+                        {name}
+                      </span>
+                    </div>
+                    {schema.description && (
+                      <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500 truncate pl-[38px]">{schema.description}</p>
+                    )}
+                  </button>
+                );
+              })}
+            </>
+          )}
+
+          {/* Empty state when search matches nothing at all */}
+          {filteredGroups.length === 0 && filteredSchemaNames.length === 0 && searchQuery && (
+            <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
+              <p className="text-[11px] text-gray-400 dark:text-gray-500">No results match</p>
+            </div>
+          )}
+
+        </div>
       )}
 
     </aside>

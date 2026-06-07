@@ -60,11 +60,6 @@ export default function ResponsePanel({ loading, response }: Props) {
   return (
     <div className="h-full border-t border-gray-100 dark:border-gray-700 flex flex-col">
       <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
-        <span className={`text-[10px] border rounded px-1.5 py-0.5 font-mono font-semibold ${statusColor}`}>
-          {response.status}{response.statusText ? ` ${response.statusText}` : ""}
-        </span>
-        <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{response.duration}ms</span>
-        <div className="w-px h-3 bg-gray-200 dark:bg-gray-700 mx-1" />
         <div className="flex gap-0.5">
           {(["body", "headers"] as const).map(t => (
             <button
@@ -83,6 +78,11 @@ export default function ResponsePanel({ loading, response }: Props) {
             </button>
           ))}
         </div>
+        <div className="w-px h-3 bg-gray-200 dark:bg-gray-700 mx-1" />
+        <span className={`text-[10px] border rounded px-1.5 py-0.5 font-mono font-semibold ${statusColor}`}>
+          {response.status}{response.statusText ? ` ${response.statusText}` : ""}
+        </span>
+        <span className={`text-[10px] text-gray-400 dark:text-gray-500 border rounded px-1.5 py-0.5 font-mono font-semibold ${statusColor}`}>{response.duration}ms</span>
         <div className="flex-1" />
         <button
           onClick={copyResponse}

@@ -1,18 +1,16 @@
-/** React Context for sidebar navigation: active endpoint/schema, search query, and tab. */
+/** React Context for sidebar navigation: active endpoint/schema and search query. */
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { EndpointEntry } from "../spec/openapi";
 
 interface NavState {
   searchQuery: string;
-  sidebarTab: "endpoints" | "schemas";
   activeEndpoint: EndpointEntry | null;
   activeSchema: string | null;
 }
 
 interface NavContextActions {
   setSearchQuery: (q: string) => void;
-  setSidebarTab: (tab: "endpoints" | "schemas") => void;
   setActiveEndpoint: (ep: EndpointEntry | null) => void;
   setActiveSchema: (name: string | null) => void;
 }
@@ -21,7 +19,6 @@ type NavContextValue = NavState & NavContextActions;
 
 const defaultState: NavState = {
   searchQuery: "",
-  sidebarTab: "endpoints",
   activeEndpoint: null,
   activeSchema: null,
 };
@@ -29,7 +26,6 @@ const defaultState: NavState = {
 export let navSnapshot: NavState = { ...defaultState };
 export const navActions: NavContextActions = {
   setSearchQuery: () => {},
-  setSidebarTab: () => {},
   setActiveEndpoint: () => {},
   setActiveSchema: () => {},
 };
@@ -44,10 +40,6 @@ export function NavProvider({ children }: { children: ReactNode }) {
     navSnapshot = { ...navSnapshot, searchQuery };
     setState(s => ({ ...s, searchQuery }));
   }, []);
-  const setSidebarTab = useCallback((sidebarTab: "endpoints" | "schemas") => {
-    navSnapshot = { ...navSnapshot, sidebarTab };
-    setState(s => ({ ...s, sidebarTab }));
-  }, []);
   const setActiveEndpoint = useCallback((activeEndpoint: EndpointEntry | null) => {
     navSnapshot = { ...navSnapshot, activeEndpoint };
     setState(s => ({ ...s, activeEndpoint }));
@@ -59,13 +51,12 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   navSnapshot = state;
   navActions.setSearchQuery = setSearchQuery;
-  navActions.setSidebarTab = setSidebarTab;
   navActions.setActiveEndpoint = setActiveEndpoint;
   navActions.setActiveSchema = setActiveSchema;
 
   const value = useMemo(
-    () => ({ ...state, setSearchQuery, setSidebarTab, setActiveEndpoint, setActiveSchema }),
-    [state, setSearchQuery, setSidebarTab, setActiveEndpoint, setActiveSchema]
+    () => ({ ...state, setSearchQuery, setActiveEndpoint, setActiveSchema }),
+    [state, setSearchQuery, setActiveEndpoint, setActiveSchema]
   );
   return <NavContext.Provider value={value}>{children}</NavContext.Provider>;
 }

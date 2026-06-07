@@ -108,12 +108,11 @@ export function selectEndpoint(ep: EndpointEntry) {
 }
 
 /**
- * Selects a schema: switches the sidebar tab, clears active endpoint, resets playground.
+ * Selects a schema: clears active endpoint, resets playground.
  *
  * @param name - Schema name as it appears in components.schemas.
  */
 export function selectSchema(name: string) {
-  navActions.setSidebarTab("schemas");
   navActions.setActiveEndpoint(null);
   navActions.setActiveSchema(name);
   playgroundActions.reset(null);
@@ -128,7 +127,6 @@ export function selectSchema(name: string) {
  */
 export function applySpec(spec: OpenAPISpec, firstServer: Server | undefined) {
   navActions.setSearchQuery("");
-  navActions.setSidebarTab("endpoints");
   navActions.setActiveEndpoint(null);
   navActions.setActiveSchema(null);
   playgroundActions.reset(null);

@@ -16,6 +16,29 @@ import AuthStatus from "./AuthStatus";
 import BodyEditor from "./BodyEditor";
 import ResponsePanel from "./ResponsePanel";
 import VerticalResizable from "../../shared/components/VerticalResizable";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface PlaygroundTheme {
+  container:           ThemeSlot;
+  header:              ThemeSlot;
+  inputLabel:          ThemeSlot;
+  textInput:           ThemeSlot; // variants: focused, error, disabled
+  selectInput:         ThemeSlot; // variants: focused, error
+  fileInput:           ThemeSlot;
+  fileInputButton:     ThemeSlot; // variants: hasFile
+  bodyEditor:          ThemeSlot; // variants: focused
+  contentTypeSelector: ThemeSlot;
+  sendButton:          ThemeSlot; // variants: loading, disabled
+  responsePanel:       ThemeSlot;
+  responseStatus:      ThemeSlot; // variants: success, redirect, clientError, serverError
+  responseTime:        ThemeSlot;
+  responseSize:        ThemeSlot;
+  responseTabs:        ThemeSlot;
+  responseTab:         ThemeSlot; // variants: active
+  responseBody:        ThemeSlot;
+  responseEmpty:       ThemeSlot;
+  errorBanner:         ThemeSlot;
+}
 
 /**
  * Converts a resolved Parameter into a FieldSpec, lifting schema fields to the top level.

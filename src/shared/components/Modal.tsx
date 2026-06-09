@@ -1,5 +1,16 @@
 /** Reusable modal shell: dimmed backdrop, container, header with close button, and footer slot. */
 import type { ReactNode } from "react";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface ModalTheme {
+  backdrop:    ThemeSlot;
+  container:   ThemeSlot;
+  header:      ThemeSlot;
+  title:       ThemeSlot;
+  closeButton: ThemeSlot;
+  body:        ThemeSlot;
+  footer:      ThemeSlot;
+}
 
 interface ModalProps {
   /** Whether the modal is rendered. */

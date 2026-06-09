@@ -7,6 +7,30 @@ import { resolveParameter, resolveSchema, resolveResponse } from "../spec/ref-re
 import { methodBadgeClasses } from "../../shared/utils/badges";
 import SchemaViewer from "../schema/SchemaViewer";
 import clsx from "clsx";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface EndpointTheme {
+  container:          ThemeSlot;
+  header:             ThemeSlot;
+  methodBadge:        ThemeSlot; // variants: get, post, put, patch, delete, head, options
+  path:               ThemeSlot;
+  summary:            ThemeSlot;
+  description:        ThemeSlot;
+  deprecated:         ThemeSlot;
+  paramSection:       ThemeSlot;
+  paramSectionTitle:  ThemeSlot;
+  paramRow:           ThemeSlot; // variants: required
+  paramName:          ThemeSlot;
+  paramType:          ThemeSlot;
+  paramRequired:      ThemeSlot;
+  paramDescription:   ThemeSlot;
+  responseAccordion:  ThemeSlot;
+  responseHeader:     ThemeSlot; // variants: open
+  responseStatusCode: ThemeSlot; // variants: success, redirect, clientError, serverError
+  responseDescription:ThemeSlot;
+  bodySection:        ThemeSlot;
+  bodyContentType:    ThemeSlot;
+}
 
 const paramLocations = ["path", "query", "header", "cookie"] as const;
 

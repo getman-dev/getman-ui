@@ -7,6 +7,16 @@ import clsx from "clsx";
 import { useServer, initServerVariables } from "./server-context";
 import { useSpec } from "../spec/spec-context";
 import { resolveServerUrl } from "../spec/example-gen";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface ServerConfigTheme {
+  chip:               ThemeSlot; // variants: open
+  popover:            ThemeSlot;
+  serverOption:       ThemeSlot; // variants: selected
+  variableLabel:      ThemeSlot;
+  variableInput:      ThemeSlot; // variants: focused
+  variableDescription:ThemeSlot;
+}
 
 interface Props {
   source: "topbar" | "playground";

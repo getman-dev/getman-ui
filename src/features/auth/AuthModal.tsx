@@ -7,6 +7,19 @@ import type { SecurityScheme, AuthSchemeValue } from "../spec/openapi";
 import { useAuth } from "../../shared/contexts";
 import { useSpec } from "../../shared/contexts";
 import Modal from "../../shared/components/Modal";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface AuthModalTheme {
+  schemeSection:    ThemeSlot;
+  schemeName:       ThemeSlot;
+  schemeType:       ThemeSlot;
+  schemeDescription:ThemeSlot;
+  tokenInput:       ThemeSlot; // variants: focused, filled
+  usernameInput:    ThemeSlot; // variants: focused
+  passwordInput:    ThemeSlot; // variants: focused
+  saveButton:       ThemeSlot;
+  clearButton:      ThemeSlot;
+}
 
 const inputClass =
   "w-full text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 " +

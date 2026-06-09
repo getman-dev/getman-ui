@@ -8,6 +8,18 @@ import { authActions } from "../contexts";
 import { selectEndpoint, selectSchema } from "../state/actions";
 import { methodBadgeClasses } from "../utils/badges";
 import { escapeHtml } from "../utils/html";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface CommandBarTheme {
+  backdrop:      ThemeSlot;
+  container:     ThemeSlot;
+  input:         ThemeSlot; // variants: focused
+  resultItem:    ThemeSlot; // variants: highlighted
+  resultLabel:   ThemeSlot;
+  resultCategory:ThemeSlot;
+  emptyState:    ThemeSlot;
+  shortcutBadge: ThemeSlot;
+}
 
 interface Props {
   onToggleDark: () => void;

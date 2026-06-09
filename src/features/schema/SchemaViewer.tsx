@@ -5,6 +5,21 @@ import { resolveSchema } from "../spec/ref-resolver";
 import { schemaToExample } from "../spec/example-gen";
 import { highlightJson } from "../../shared/utils/highlight";
 import SchemaNode from "./SchemaNode";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface SchemaTheme {
+  container:       ThemeSlot;
+  tabBar:          ThemeSlot;
+  tab:             ThemeSlot; // variants: active
+  nodeRow:         ThemeSlot; // variants: required, deprecated
+  nodeKey:         ThemeSlot;
+  nodeType:        ThemeSlot; // variants: string, integer, number, boolean, object, array
+  nodeDescription: ThemeSlot;
+  nodeRequired:    ThemeSlot;
+  nodeExpandButton:ThemeSlot; // variants: open
+  nodeNested:      ThemeSlot;
+  exampleBlock:    ThemeSlot;
+}
 
 export interface SchemaViewerOptions {
   /** Pre-serialized JSON example string. Auto-generated from the schema if omitted or null. */

@@ -5,6 +5,28 @@ import { useNav } from "./nav-context";
 import { useSpec } from "../spec/spec-context";
 import { selectEndpoint, selectSchema } from "../../shared/state/actions";
 import { methodBadgeClasses } from "../../shared/utils/badges";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface NavTheme {
+  container:         ThemeSlot;
+  divider:           ThemeSlot;
+  searchWrapper:     ThemeSlot;
+  searchInput:       ThemeSlot; // variants: focused, hasValue
+  searchIcon:        ThemeSlot;
+  searchClearButton: ThemeSlot;
+  tabBar:            ThemeSlot;
+  tab:               ThemeSlot; // variants: active
+  tagHeader:         ThemeSlot;
+  tagChevron:        ThemeSlot; // variants: open
+  tagCount:          ThemeSlot;
+  endpointItem:      ThemeSlot; // variants: active, deprecated
+  endpointPath:      ThemeSlot;
+  methodBadge:       ThemeSlot; // variants: get, post, put, patch, delete, head, options
+  schemaItem:        ThemeSlot; // variants: active
+  schemaName:        ThemeSlot;
+  schemaTypeBadge:   ThemeSlot;
+  emptyState:        ThemeSlot;
+}
 
 /** Renders the sidebar with a single search input and a scrollable endpoint + schema list. */
 export default function Nav() {

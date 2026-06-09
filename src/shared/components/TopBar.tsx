@@ -4,6 +4,17 @@ import { useAuth } from "../../features/auth/auth-context";
 import { authActions } from "../../features/auth/auth-context";
 import { modalActions } from "../contexts/modal-context";
 import ServerConfig from "../../features/server/ServerConfig";
+import type { ThemeSlot } from "../../themes/slot";
+
+export interface TopBarTheme {
+  container:       ThemeSlot;
+  title:           ThemeSlot;
+  serverChip:      ThemeSlot; // variants: open
+  themeButton:     ThemeSlot;
+  authButton:      ThemeSlot; // variants: configured
+  shortcutsButton: ThemeSlot;
+  loadButton:      ThemeSlot;
+}
 
 interface Props {
   onToggleDark: () => void;

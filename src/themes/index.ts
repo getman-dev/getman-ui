@@ -3,28 +3,20 @@
  * Import from here to resolve a theme by name or to compose a custom one.
  */
 import type { AppTheme } from './contract';
-import { lightTheme } from './presets/light';
-import { darkTheme }  from './presets/dark';
 
 export type { AppTheme } from './contract';
-export { lightTheme } from './presets/light';
-export { darkTheme }  from './presets/dark';
 export { useTheme, ThemeProvider } from './context';
 export { slot } from './slot';
 export type { ThemeSlot } from './slot';
 
-/** All built-in themes keyed by their preset name. */
-export const THEMES: Record<string, AppTheme> = {
-  light: lightTheme,
-  dark:  darkTheme,
-};
+/** All built-in themes keyed by their preset name. Populated in Phase 2. */
+export const THEMES: Record<string, AppTheme> = {};
 
 /**
- * Returns the built-in theme for the given name, falling back to lightTheme if
- * the name is not recognised.
+ * Returns the built-in theme for the given name, or undefined if not registered.
  */
-export function getTheme(name: string): AppTheme {
-  return THEMES[name] ?? lightTheme;
+export function getTheme(name: string): AppTheme | undefined {
+  return THEMES[name];
 }
 
 /** Returns the names of all registered built-in themes. */
@@ -40,7 +32,7 @@ type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } 
  * unspecified slots are inherited from the base.
  *
  * @example
- * mergeTheme(lightTheme, { nav: { container: 'bg-brand-950 border-r border-brand-800' } })
+ * mergeTheme(myTheme, { nav: { container: 'bg-brand-950 border-r border-brand-800' } })
  */
 export function mergeTheme(base: AppTheme, overrides: DeepPartial<AppTheme>): AppTheme {
   const result = { ...base };

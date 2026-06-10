@@ -1,9 +1,8 @@
 /** React context that provides the active AppTheme to all components via useTheme(). */
 import { createContext, useContext, type ReactNode } from 'react';
 import type { AppTheme } from './contract';
-import { lightTheme } from './presets/light';
 
-const ThemeContext = createContext<AppTheme>(lightTheme);
+const ThemeContext = createContext<AppTheme>(null as unknown as AppTheme);
 
 /** Returns the currently active AppTheme. Call inside any component wrapped by ThemeProvider. */
 export function useTheme(): AppTheme {

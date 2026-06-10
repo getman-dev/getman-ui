@@ -7,7 +7,7 @@ import type { EndpointTheme }     from '../features/endpoint/EndpointDetail';
 import type { PlaygroundTheme }   from '../features/playground/Playground';
 import type { TopBarTheme }       from '../shared/components/TopBar';
 import type { ModalTheme }        from '../shared/components/Modal';
-import type { SchemaTheme }       from '../features/schema/SchemaViewer';
+import type {SchemaViewerTheme} from '../features/schema/SchemaViewer';
 import type { AuthModalTheme }    from '../features/auth/AuthModal';
 import type { ServerConfigTheme } from '../features/server/ServerConfig';
 import type { CommandBarTheme }   from '../shared/components/CommandBar';
@@ -35,7 +35,7 @@ export interface AppTheme {
   playground:   PlaygroundTheme;
   topBar:       TopBarTheme;
   modal:        ModalTheme;
-  schema:       SchemaTheme;
+  schema:       SchemaViewerTheme;
   authModal:    AuthModalTheme;
   serverConfig: ServerConfigTheme;
   commandBar:   CommandBarTheme;

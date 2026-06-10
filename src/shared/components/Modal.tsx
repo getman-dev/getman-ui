@@ -1,16 +1,34 @@
 /** Reusable modal shell: dimmed backdrop, container, header with close button, and footer slot. */
 import type { ReactNode } from "react";
 import type { ThemeSlot } from "../../themes/slot";
+import { slot } from "../../themes/slot";
+import type { ThemeMode } from "../../themes/types";
+import { useThemeMode } from "../contexts/theme-mode-context";
 
 export interface ModalTheme {
   backdrop:    ThemeSlot;
   container:   ThemeSlot;
   header:      ThemeSlot;
-  title:       ThemeSlot;
   closeButton: ThemeSlot;
-  body:        ThemeSlot;
   footer:      ThemeSlot;
 }
+
+export const modalTheme: Record<ThemeMode, ModalTheme> = {
+  default: {
+    backdrop:    'fixed inset-0 bg-black/30 flex items-center justify-center z-50',
+    container:   'bg-white rounded-xl shadow-xl w-full mx-4 overflow-hidden',
+    header:      'flex items-center justify-between px-5 py-4 border-b border-gray-100',
+    closeButton: 'text-gray-400 hover:text-gray-600 text-xl leading-none',
+    footer:      'px-5 py-3 bg-gray-50 border-t border-gray-100',
+  },
+  dark: {
+    backdrop:    'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
+    container:   'bg-gray-800 rounded-xl shadow-xl w-full mx-4 overflow-hidden',
+    header:      'flex items-center justify-between px-5 py-4 border-b border-gray-700',
+    closeButton: 'text-gray-500 hover:text-gray-300 text-xl leading-none',
+    footer:      'px-5 py-3 bg-gray-700/50 border-t border-gray-700',
+  },
+};
 
 interface ModalProps {
   /** Whether the modal is rendered. */
@@ -39,24 +57,21 @@ export default function Modal({
   maxWidth = "max-w-md",
   scrollable = false,
 }: ModalProps) {
+  const t = modalTheme[useThemeMode()];
+
   if (!visible) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50"
+      className={slot(t.backdrop)}
       style={{ minHeight: "100vh" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full ${maxWidth} mx-4 overflow-hidden${scrollable ? " max-h-[90vh] flex flex-col" : ""}`}>
+      <div className={`${slot(t.container)} ${maxWidth}${scrollable ? " max-h-[90vh] flex flex-col" : ""}`}>
 
-        <div className={`flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700${scrollable ? " shrink-0" : ""}`}>
+        <div className={`${slot(t.header)}${scrollable ? " shrink-0" : ""}`}>
           {title}
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none"
-          >
-            ×
-          </button>
+          <button onClick={onClose} className={slot(t.closeButton)}>×</button>
         </div>
 
         {scrollable ? (
@@ -66,7 +81,7 @@ export default function Modal({
         )}
 
         {footer != null && (
-          <div className={`px-5 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700${scrollable ? " shrink-0" : ""}`}>
+          <div className={`${slot(t.footer)}${scrollable ? " shrink-0" : ""}`}>
             {footer}
           </div>
         )}

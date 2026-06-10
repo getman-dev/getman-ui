@@ -6,20 +6,34 @@ import { schemaToExample } from "../spec/example-gen";
 import { highlightJson } from "../../shared/utils/highlight";
 import SchemaNode from "./SchemaNode";
 import type { ThemeSlot } from "../../themes/slot";
+import { slot } from "../../themes/slot";
+import type { ThemeMode } from "../../themes/types";
+import { useThemeMode } from "../../shared/contexts/theme-mode-context";
 
-export interface SchemaTheme {
-  container:       ThemeSlot;
-  tabBar:          ThemeSlot;
-  tab:             ThemeSlot; // variants: active
-  nodeRow:         ThemeSlot; // variants: required, deprecated
-  nodeKey:         ThemeSlot;
-  nodeType:        ThemeSlot; // variants: string, integer, number, boolean, object, array
-  nodeDescription: ThemeSlot;
-  nodeRequired:    ThemeSlot;
-  nodeExpandButton:ThemeSlot; // variants: open
-  nodeNested:      ThemeSlot;
-  exampleBlock:    ThemeSlot;
+export interface SchemaViewerTheme {
+  tabBar:      ThemeSlot;
+  tabActive:   ThemeSlot;
+  tabInactive: ThemeSlot;
+  description: ThemeSlot;
+  exampleBlock:ThemeSlot;
 }
+
+export const schemaViewerTheme: Record<ThemeMode, SchemaViewerTheme> = {
+  default: {
+    tabBar:      'flex gap-1 px-3 py-2 bg-gray-50 border-b border-gray-100',
+    tabActive:   'px-3 py-1 text-[11px] font-medium rounded-md bg-white text-gray-700 border border-gray-200',
+    tabInactive: 'px-3 py-1 text-[11px] font-medium rounded-md text-gray-400 hover:text-gray-600 transition-colors',
+    description: 'px-4 pt-3 pb-0 text-[11px] text-gray-500 leading-relaxed',
+    exampleBlock:'text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed',
+  },
+  dark: {
+    tabBar:      'flex gap-1 px-3 py-2 bg-gray-800/80 border-b border-gray-700',
+    tabActive:   'px-3 py-1 text-[11px] font-medium rounded-md bg-gray-700 text-gray-200 border border-gray-600',
+    tabInactive: 'px-3 py-1 text-[11px] font-medium rounded-md text-gray-500 hover:text-gray-300 transition-colors',
+    description: 'px-4 pt-3 pb-0 text-[11px] text-gray-400 leading-relaxed',
+    exampleBlock:'text-[11px] bg-gray-900 rounded-md p-3 overflow-x-auto text-gray-300 font-mono leading-relaxed',
+  },
+};
 
 export interface SchemaViewerOptions {
   /** Pre-serialized JSON example string. Auto-generated from the schema if omitted or null. */
@@ -34,11 +48,9 @@ interface Props {
   options?: SchemaViewerOptions;
 }
 
-const TAB_ACTIVE   = "px-3 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600";
-const TAB_INACTIVE = "px-3 py-1 text-[11px] font-medium rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors";
-
 /** Renders schema fields and/or an example JSON block with optional tabs between them. */
 export default function SchemaViewer({ schema, components, options = {} }: Props) {
+  const t = schemaViewerTheme[useThemeMode()];
   const [activeTab, setActiveTab] = useState<"schema" | "example">("schema");
 
   const resolved  = resolveSchema(schema, components);
@@ -81,16 +93,14 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
   if (!resolved && exampleJson) {
     return (
       <pre
-        className="text-[11px] bg-gray-50 dark:bg-gray-900 rounded-md p-3 overflow-x-auto text-gray-700 dark:text-gray-300 font-mono leading-relaxed"
+        className={slot(t.exampleBlock)}
         dangerouslySetInnerHTML={{ __html: highlightedExample! }}
       />
     );
   }
 
   const topLevelDescription = resolved?.description ? (
-    <p className="px-4 pt-3 pb-0 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-      {resolved.description}
-    </p>
+    <p className={slot(t.description)}>{resolved.description}</p>
   ) : null;
 
   if (resolved && !exampleJson) {
@@ -105,11 +115,11 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
   if (resolved && exampleJson) {
     return (
       <div>
-        <div className="flex gap-1 px-3 py-2 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-100 dark:border-gray-700">
-          <button className={activeTab === "schema" ? TAB_ACTIVE : TAB_INACTIVE} onClick={() => setActiveTab("schema")}>
+        <div className={slot(t.tabBar)}>
+          <button className={activeTab === "schema" ? slot(t.tabActive) : slot(t.tabInactive)} onClick={() => setActiveTab("schema")}>
             Schema
           </button>
-          <button className={activeTab === "example" ? TAB_ACTIVE : TAB_INACTIVE} onClick={() => setActiveTab("example")}>
+          <button className={activeTab === "example" ? slot(t.tabActive) : slot(t.tabInactive)} onClick={() => setActiveTab("example")}>
             Example
           </button>
         </div>
@@ -121,7 +131,7 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
         ) : (
           <div className="px-4 py-3">
             <pre
-              className="text-[11px] bg-gray-50 dark:bg-gray-900 rounded-md p-3 overflow-x-auto text-gray-700 dark:text-gray-300 font-mono leading-relaxed"
+              className={slot(t.exampleBlock)}
               dangerouslySetInnerHTML={{ __html: highlightedExample! }}
             />
           </div>

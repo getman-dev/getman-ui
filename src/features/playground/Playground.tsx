@@ -16,11 +16,18 @@ import AuthStatus from "./AuthStatus";
 import BodyEditor from "./BodyEditor";
 import ResponsePanel from "./ResponsePanel";
 import VerticalResizable from "../../shared/components/VerticalResizable";
-import type { ThemeSlot } from "../../themes/slot";
+import { slot, type ThemeSlot } from "../../themes/slot";
+import type { ThemeMode } from "../../themes/types";
+import { useThemeMode } from "../../shared/contexts/theme-mode-context";
 
 export interface PlaygroundTheme {
   container:           ThemeSlot;
   header:              ThemeSlot;
+  headerTitle:         ThemeSlot;
+  emptyState:          ThemeSlot;
+  emptyIconWrapper:    ThemeSlot;
+  emptyIcon:           ThemeSlot;
+  emptyText:           ThemeSlot;
   inputLabel:          ThemeSlot;
   textInput:           ThemeSlot; // variants: focused, error, disabled
   selectInput:         ThemeSlot; // variants: focused, error
@@ -39,6 +46,61 @@ export interface PlaygroundTheme {
   responseEmpty:       ThemeSlot;
   errorBanner:         ThemeSlot;
 }
+
+export const playgroundTheme: Record<ThemeMode, PlaygroundTheme> = {
+  default: {
+    container:           'h-full flex flex-col bg-white',
+    header:              'flex items-center gap-2 px-5 border-b border-gray-100 shrink-0 h-[50px]',
+    headerTitle:         'text-xs font-semibold text-gray-700',
+    emptyState:          'h-full flex flex-col items-center justify-center text-center px-6 gap-3 bg-white',
+    emptyIconWrapper:    'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center',
+    emptyIcon:           'w-5 h-5 text-gray-400',
+    emptyText:           'text-sm text-gray-400',
+    inputLabel:          'text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-3',
+    textInput:           'w-full text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors font-mono',
+    selectInput:         'w-full text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer transition-colors',
+    fileInput:           'block w-full text-xs text-gray-600 cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100',
+    fileInputButton:     { base: 'file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100', hasFile: 'file:bg-blue-100' },
+    bodyEditor:          'w-full text-[11px] border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 font-mono resize-y transition-colors leading-relaxed',
+    contentTypeSelector: 'text-[10px] font-mono text-gray-500 border border-gray-200 rounded px-2 py-0.5 bg-gray-50',
+    sendButton:          { base: 'shrink-0 px-4 rounded-lg text-xs font-semibold transition-all bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white shadow-sm', loading: 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none', disabled: 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' },
+    responsePanel:       'h-full border-t border-gray-100 flex flex-col',
+    responseStatus:      { base: 'text-[10px] rounded px-1.5 py-0.5 font-mono font-semibold border bg-gray-50 text-gray-600 border-gray-200', success: 'bg-green-50 text-green-600 border-green-200', redirect: 'bg-blue-50 text-blue-600 border-blue-200', clientError: 'bg-amber-50 text-amber-600 border-amber-200', serverError: 'bg-red-50 text-red-600 border-red-200' },
+    responseTime:        'text-[10px] text-gray-400 font-mono border border-gray-200 rounded px-1.5 py-0.5',
+    responseSize:        'text-[10px] text-gray-400 font-mono',
+    responseTabs:        'flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-gray-50/50 shrink-0',
+    responseTab:         { base: 'px-2.5 py-1 text-[10px] rounded font-medium transition-colors text-gray-400 hover:text-gray-600', active: 'bg-white shadow-sm text-gray-700 border border-gray-200' },
+    responseBody:        'flex-1 overflow-auto bg-white',
+    responseEmpty:       'shrink-0 border-t border-gray-100 h-10 flex items-center justify-center text-[10px] text-gray-300',
+    errorBanner:         'mx-5 mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600',
+  },
+  dark: {
+    container:           'h-full flex flex-col bg-gray-900',
+    header:              'flex items-center gap-2 px-5 border-b border-gray-700 shrink-0 h-[50px]',
+    headerTitle:         'text-xs font-semibold text-gray-300',
+    emptyState:          'h-full flex flex-col items-center justify-center text-center px-6 gap-3 bg-gray-900',
+    emptyIconWrapper:    'w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center',
+    emptyIcon:           'w-5 h-5 text-gray-500',
+    emptyText:           'text-sm text-gray-500',
+    inputLabel:          'text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-3',
+    textInput:           'w-full text-xs border border-gray-600 rounded-lg px-3 py-2 bg-gray-700 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors font-mono',
+    selectInput:         'w-full text-xs border border-gray-600 rounded-lg px-3 py-2 bg-gray-700 text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer transition-colors',
+    fileInput:           'block w-full text-xs text-gray-400 cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-900/40 file:text-blue-400 hover:file:bg-blue-900/60',
+    fileInputButton:     { base: 'file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-900/40 file:text-blue-400 hover:file:bg-blue-900/60', hasFile: 'file:bg-blue-900/60' },
+    bodyEditor:          'w-full text-[11px] border border-gray-600 rounded-lg px-3 py-2.5 bg-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 font-mono resize-y transition-colors leading-relaxed',
+    contentTypeSelector: 'text-[10px] font-mono text-gray-400 border border-gray-600 rounded px-2 py-0.5 bg-gray-700',
+    sendButton:          { base: 'shrink-0 px-4 rounded-lg text-xs font-semibold transition-all bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white shadow-sm', loading: 'bg-gray-700 text-gray-500 cursor-not-allowed shadow-none', disabled: 'bg-gray-700 text-gray-500 cursor-not-allowed shadow-none' },
+    responsePanel:       'h-full border-t border-gray-700 flex flex-col',
+    responseStatus:      { base: 'text-[10px] rounded px-1.5 py-0.5 font-mono font-semibold border bg-gray-800 text-gray-400 border-gray-600', success: 'bg-green-900/30 text-green-400 border-green-700', redirect: 'bg-blue-900/30 text-blue-400 border-blue-700', clientError: 'bg-amber-900/30 text-amber-400 border-amber-700', serverError: 'bg-red-900/30 text-red-400 border-red-700' },
+    responseTime:        'text-[10px] text-gray-500 font-mono border border-gray-600 rounded px-1.5 py-0.5',
+    responseSize:        'text-[10px] text-gray-500 font-mono',
+    responseTabs:        'flex items-center gap-2 px-4 py-2 border-b border-gray-700 bg-gray-800/30 shrink-0',
+    responseTab:         { base: 'px-2.5 py-1 text-[10px] rounded font-medium transition-colors text-gray-500 hover:text-gray-300', active: 'bg-gray-700 shadow-sm text-gray-200 border border-gray-600' },
+    responseBody:        'flex-1 overflow-auto bg-gray-900',
+    responseEmpty:       'shrink-0 border-t border-gray-700 h-10 flex items-center justify-center text-[10px] text-gray-600',
+    errorBanner:         'mx-5 mb-4 px-3 py-2 bg-red-900/30 border border-red-700 rounded-lg text-xs text-red-400',
+  },
+};
 
 /**
  * Converts a resolved Parameter into a FieldSpec, lifting schema fields to the top level.
@@ -125,6 +187,7 @@ function PlaygroundForm({
   multipartFields, bodyParams, onBodyParamChange,
   op, bodyContentType, bodyValue, onBodyChange, onRawFile,
 }: PlaygroundFormProps) {
+  const t = playgroundTheme[useThemeMode()];
   return (
     <div className="px-5 py-6 flex flex-col gap-7">
       <AuthStatus
@@ -135,7 +198,7 @@ function PlaygroundForm({
 
       {hasParams && (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">Parameters</p>
+          <p className={slot(t.inputLabel)}>Parameters</p>
           <div className="flex flex-col gap-4">
             {paramFields.map(f => (
               <ParamField
@@ -299,15 +362,17 @@ export default function Playground() {
     setFileValues({ ...fileValues, [name]: multiple ? Array.from(files) : files[0] });
   }
 
+  const t = playgroundTheme[useThemeMode()];
+
   if (!endpoint) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center px-6 gap-3 bg-white dark:bg-gray-900">
-        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-          <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={slot(t.emptyState)}>
+        <div className={slot(t.emptyIconWrapper)}>
+          <svg className={slot(t.emptyIcon)} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
         </div>
-        <p className="text-sm text-gray-400 dark:text-gray-500">Select an endpoint to use the playground</p>
+        <p className={slot(t.emptyText)}>Select an endpoint to use the playground</p>
       </div>
     );
   }
@@ -315,10 +380,10 @@ export default function Playground() {
   const hasParams = paramFields.length > 0 || multipartFields.length > 0;
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+    <div className={slot(t.container)}>
 
-      <div className="flex items-center gap-2 px-5 border-b border-gray-100 dark:border-gray-700 shrink-0 h-[50px]">
-        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Playground</span>
+      <div className={slot(t.header)}>
+        <span className={slot(t.headerTitle)}>Playground</span>
         <div className="flex-1" />
         <ServerConfig source="playground" />
       </div>

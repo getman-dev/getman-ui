@@ -17,6 +17,56 @@ import LoadModal from "./shared/components/LoadModal";
 import AuthModal from "./features/auth/AuthModal";
 import CommandBar from "./shared/components/CommandBar";
 import { ErrorBoundary } from "./shared/components/ErrorBoundary";
+import { ThemeModeProvider } from "./shared/contexts/theme-mode-context";
+import type { ThemeSlot } from "./themes/slot";
+import { slot } from "./themes/slot";
+import type { ThemeMode } from "./themes/types";
+
+export interface AppRootTheme {
+  root:              ThemeSlot;
+  navPane:           ThemeSlot;
+  detailPane:        ThemeSlot;
+  tryPane:           ThemeSlot;
+  shortcutsBackdrop: ThemeSlot;
+  shortcutsPanel:    ThemeSlot;
+  shortcutsHeader:   ThemeSlot;
+  shortcutsTitle:    ThemeSlot;
+  shortcutsClose:    ThemeSlot;
+  shortcutsRow:      ThemeSlot;
+  shortcutsDesc:     ThemeSlot;
+  shortcutsKbd:      ThemeSlot;
+}
+
+export const appTheme: Record<ThemeMode, AppRootTheme> = {
+  default: {
+    root:              'flex flex-col h-full overflow-hidden bg-white',
+    navPane:           'shrink-0 bg-gray-50 overflow-y-auto flex flex-col',
+    detailPane:        'flex-1 min-w-0 bg-white overflow-hidden',
+    tryPane:           'shrink-0 bg-white overflow-hidden',
+    shortcutsBackdrop: 'fixed inset-0 bg-black/30 flex items-center justify-center z-50',
+    shortcutsPanel:    'bg-white rounded-xl shadow-xl w-72 mx-4 overflow-hidden',
+    shortcutsHeader:   'flex items-center justify-between px-5 py-3.5 border-b border-gray-100',
+    shortcutsTitle:    'text-sm font-semibold text-gray-800',
+    shortcutsClose:    'text-gray-400 hover:text-gray-600 text-xl leading-none transition-colors',
+    shortcutsRow:      'flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0',
+    shortcutsDesc:     'text-xs text-gray-600',
+    shortcutsKbd:      'text-[10px] font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded border border-gray-200 shrink-0',
+  },
+  dark: {
+    root:              'flex flex-col h-full overflow-hidden bg-gray-900',
+    navPane:           'shrink-0 bg-gray-800 overflow-y-auto flex flex-col',
+    detailPane:        'flex-1 min-w-0 bg-gray-900 overflow-hidden',
+    tryPane:           'shrink-0 bg-gray-900 overflow-hidden',
+    shortcutsBackdrop: 'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
+    shortcutsPanel:    'bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden',
+    shortcutsHeader:   'flex items-center justify-between px-5 py-3.5 border-b border-gray-700',
+    shortcutsTitle:    'text-sm font-semibold text-gray-200',
+    shortcutsClose:    'text-gray-500 hover:text-gray-300 text-xl leading-none transition-colors',
+    shortcutsRow:      'flex items-center justify-between py-1.5 border-b border-gray-700/50 last:border-0',
+    shortcutsDesc:     'text-xs text-gray-300',
+    shortcutsKbd:      'text-[10px] font-mono bg-gray-700 text-gray-400 px-2 py-0.5 rounded border border-gray-600 shrink-0',
+  },
+};
 
 const DARK_KEY = "api-explorer-dark";
 
@@ -123,11 +173,13 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
   }, []);
 
   const showPlayground = !!activeEndpoint;
+  const t = appTheme[darkMode ? 'dark' : 'default'];
 
   return (
+    <ThemeModeProvider mode={darkMode ? 'dark' : 'default'}>
     <div
       ref={rootRef}
-      className={clsx("flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900", darkMode && "dark")}
+      className={clsx(slot(t.root), darkMode && "dark")}
       style={{ fontFamily: "'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif" }}
     >
       <LoadModal />
@@ -136,22 +188,22 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
 
       {shortcutsVisible && (
         <div
-          className="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50"
+          className={slot(t.shortcutsBackdrop)}
           onClick={(e) => { if (e.target === e.currentTarget) modalActions.setShortcutsVisible(false); }}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Keyboard shortcuts</span>
+          <div className={slot(t.shortcutsPanel)}>
+            <div className={slot(t.shortcutsHeader)}>
+              <span className={slot(t.shortcutsTitle)}>Keyboard shortcuts</span>
               <button
                 onClick={() => modalActions.setShortcutsVisible(false)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none transition-colors"
+                className={slot(t.shortcutsClose)}
               >×</button>
             </div>
             <div className="px-5 py-2">
               {shortcutRows.map(([key, desc]) => (
-                <div key={key} className="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
-                  <span className="text-xs text-gray-600 dark:text-gray-300">{desc}</span>
-                  <kbd className="text-[10px] font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded border border-gray-200 dark:border-gray-600 shrink-0">{key}</kbd>
+                <div key={key} className={slot(t.shortcutsRow)}>
+                  <span className={slot(t.shortcutsDesc)}>{desc}</span>
+                  <kbd className={slot(t.shortcutsKbd)}>{key}</kbd>
                 </div>
               ))}
             </div>
@@ -163,7 +215,7 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
 
       <ErrorBoundary>
         <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
-          <aside id="nav-pane" className="shrink-0 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex flex-col">
+          <aside id="nav-pane" className={slot(t.navPane)}>
             <Nav />
           </aside>
 
@@ -171,7 +223,7 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
             <div className="pane-handle-line" />
           </div>
 
-          <main id="detail-pane" className="flex-1 min-w-0 bg-white dark:bg-gray-900 overflow-hidden">
+          <main id="detail-pane" className={slot(t.detailPane)}>
             <DetailPane />
           </main>
 
@@ -179,12 +231,13 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
             <div className="pane-handle-line" />
           </div>
 
-          <aside id="try-pane" className="shrink-0 bg-white dark:bg-gray-900 overflow-hidden" style={{ display: showPlayground ? "" : "none" }}>
+          <aside id="try-pane" className={slot(t.tryPane)} style={{ display: showPlayground ? "" : "none" }}>
             <Playground />
           </aside>
         </div>
       </ErrorBoundary>
     </div>
+    </ThemeModeProvider>
   );
 }
 

@@ -1,40 +1,7 @@
 /** Security scheme status rows shown above the parameter list in the playground. */
 import type { SecurityScheme, AuthValues } from "../spec/openapi";
-import type { ThemeSlot } from "../../themes/slot";
 import { slot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../../shared/contexts/theme-mode-context";
-
-export interface AuthStatusTheme {
-  sectionLabel:      ThemeSlot;
-  emptyText:         ThemeSlot;
-  schemeRow:         ThemeSlot;
-  schemeName:        ThemeSlot;
-  schemeType:        ThemeSlot;
-  authorizedBadge:   ThemeSlot;
-  unauthorizedBadge: ThemeSlot;
-}
-
-export const authStatusTheme: Record<ThemeMode, AuthStatusTheme> = {
-  default: {
-    sectionLabel:      'text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-3',
-    emptyText:         'text-[10px] text-gray-400',
-    schemeRow:         'flex items-center justify-between py-2.5 px-3 rounded-lg border border-gray-100 bg-gray-50/60',
-    schemeName:        'text-[11px] font-mono text-gray-700',
-    schemeType:        'ml-1.5 text-[10px] text-gray-400',
-    authorizedBadge:   'text-[9px] text-green-600 bg-green-50 border border-green-200 rounded px-1.5 py-0.5 font-semibold uppercase tracking-wide',
-    unauthorizedBadge: 'text-[9px] text-gray-400 bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5 uppercase tracking-wide',
-  },
-  dark: {
-    sectionLabel:      'text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-3',
-    emptyText:         'text-[10px] text-gray-500',
-    schemeRow:         'flex items-center justify-between py-2.5 px-3 rounded-lg border border-gray-700 bg-gray-700/30',
-    schemeName:        'text-[11px] font-mono text-gray-300',
-    schemeType:        'ml-1.5 text-[10px] text-gray-500',
-    authorizedBadge:   'text-[9px] text-green-400 bg-green-900/30 border border-green-700 rounded px-1.5 py-0.5 font-semibold uppercase tracking-wide',
-    unauthorizedBadge: 'text-[9px] text-gray-500 bg-gray-700 border border-gray-600 rounded px-1.5 py-0.5 uppercase tracking-wide',
-  },
-};
+import { useTheme } from "../../themes/context";
 
 interface Props {
   schemeNames: string[] | null;
@@ -55,7 +22,7 @@ function schemeShortLabel(type: string, schemeOrIn?: string): string {
  * Renders nothing when schemeNames is null or no schemes are defined on the spec.
  */
 export default function AuthStatus({ schemeNames, allSchemes, authValues }: Props) {
-  const t = authStatusTheme[useThemeMode()];
+  const t = useTheme().authStatus;
 
   if (schemeNames === null || Object.keys(allSchemes).length === 0) return null;
 

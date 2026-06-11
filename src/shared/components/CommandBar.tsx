@@ -7,89 +7,8 @@ import { authActions } from "../contexts";
 import { selectEndpoint, selectSchema } from "../state/actions";
 import { methodBadgeClasses } from "../utils/badges";
 import { escapeHtml } from "../utils/html";
-import type { ThemeSlot } from "../../themes/slot";
 import { slot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../contexts/theme-mode-context";
-
-export interface CommandBarTheme {
-  backdrop:       ThemeSlot;
-  container:      ThemeSlot;
-  searchRow:      ThemeSlot;
-  searchIcon:     ThemeSlot;
-  input:          ThemeSlot;
-  clearButton:    ThemeSlot;
-  groupTitle:     ThemeSlot;
-  resultItem:     ThemeSlot; // variants: active
-  actionIcon:     ThemeSlot; // variants: active
-  resultLabel:    ThemeSlot;
-  resultSubtitle: ThemeSlot;
-  activeChevron:  ThemeSlot;
-  emptyIcon:      ThemeSlot;
-  emptyText:      ThemeSlot;
-  footer:         ThemeSlot;
-  shortcutText:   ThemeSlot;
-  shortcutBadge:  ThemeSlot;
-  specTitle:      ThemeSlot;
-  highlightMark:  string;
-}
-
-export const commandBarTheme: Record<ThemeMode, CommandBarTheme> = {
-  default: {
-    backdrop:       'fixed inset-0 bg-black/40 z-[60] flex items-start justify-center pt-[12vh]',
-    container:      'bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 flex flex-col overflow-hidden border border-gray-200 max-h-[70vh]',
-    searchRow:      'flex items-center gap-3 px-4 py-3 border-b border-gray-100 shrink-0',
-    searchIcon:     'w-4 h-4 text-gray-400 shrink-0',
-    input:          'flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none',
-    clearButton:    'text-gray-400 hover:text-gray-600 text-lg leading-none shrink-0 transition-colors',
-    groupTitle:     'px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400 select-none',
-    resultItem:     {
-      base:   'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-50',
-      active: 'bg-blue-50 hover:bg-blue-50',
-    },
-    actionIcon:     {
-      base:   'w-7 h-7 rounded-md flex items-center justify-center shrink-0 bg-gray-100 text-gray-500',
-      active: 'bg-blue-100 text-blue-600',
-    },
-    resultLabel:    'text-sm font-medium text-gray-800 truncate',
-    resultSubtitle: 'text-xs text-gray-400 truncate mt-0.5',
-    activeChevron:  'w-3.5 h-3.5 text-blue-400 shrink-0',
-    emptyIcon:      'w-8 h-8 text-gray-300 mb-3',
-    emptyText:      'text-sm text-gray-400',
-    footer:         'shrink-0 flex items-center gap-4 px-4 py-2 border-t border-gray-100 bg-gray-50',
-    shortcutText:   'flex items-center gap-1 text-[11px] text-gray-400',
-    shortcutBadge:  'font-mono text-[10px] bg-white border border-gray-200 rounded px-1 py-px',
-    specTitle:      'ml-auto text-[11px] text-gray-300 truncate',
-    highlightMark:  'bg-yellow-100 text-inherit not-italic rounded-sm',
-  },
-  dark: {
-    backdrop:       'fixed inset-0 bg-black/60 z-[60] flex items-start justify-center pt-[12vh]',
-    container:      'bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg mx-4 flex flex-col overflow-hidden border border-gray-700 max-h-[70vh]',
-    searchRow:      'flex items-center gap-3 px-4 py-3 border-b border-gray-800 shrink-0',
-    searchIcon:     'w-4 h-4 text-gray-500 shrink-0',
-    input:          'flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-500 outline-none',
-    clearButton:    'text-gray-500 hover:text-gray-300 text-lg leading-none shrink-0 transition-colors',
-    groupTitle:     'px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-500 select-none',
-    resultItem:     {
-      base:   'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-800/60',
-      active: 'bg-blue-900/30 hover:bg-blue-900/30',
-    },
-    actionIcon:     {
-      base:   'w-7 h-7 rounded-md flex items-center justify-center shrink-0 bg-gray-800 text-gray-400',
-      active: 'bg-blue-800/50 text-blue-400',
-    },
-    resultLabel:    'text-sm font-medium text-gray-200 truncate',
-    resultSubtitle: 'text-xs text-gray-500 truncate mt-0.5',
-    activeChevron:  'w-3.5 h-3.5 text-blue-500 shrink-0',
-    emptyIcon:      'w-8 h-8 text-gray-600 mb-3',
-    emptyText:      'text-sm text-gray-500',
-    footer:         'shrink-0 flex items-center gap-4 px-4 py-2 border-t border-gray-800 bg-gray-800/50',
-    shortcutText:   'flex items-center gap-1 text-[11px] text-gray-500',
-    shortcutBadge:  'font-mono text-[10px] bg-gray-700 border border-gray-600 rounded px-1 py-px',
-    specTitle:      'ml-auto text-[11px] text-gray-600 truncate',
-    highlightMark:  'bg-yellow-900/50 text-inherit not-italic rounded-sm',
-  },
-};
+import { useTheme } from "../../themes/context";
 
 interface Props {
   onToggleDark: () => void;
@@ -135,7 +54,7 @@ function hl(text: string, q: string, markClass: string): string {
 
 /** Renders the ⌘K command palette overlay. Visible when commandBarVisible is true. */
 export default function CommandBar({ onToggleDark }: Props) {
-  const t = commandBarTheme[useThemeMode()];
+  const t = useTheme().commandBar;
   const { commandBarVisible } = useModal();
   const { spec, groups: specGroups } = useSpec();
 

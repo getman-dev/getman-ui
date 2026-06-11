@@ -1,36 +1,6 @@
 /** Dynamic row list for array parameters — one input per item, newline-joined internally. */
-import type { ThemeSlot } from "../../../themes/slot";
 import { slot } from "../../../themes/slot";
-import type { ThemeMode } from "../../../themes/types";
-import { useThemeMode } from "../../../shared/contexts/theme-mode-context";
-
-export interface ArrayInputTheme {
-  rowInput:         ThemeSlot;
-  rowInputInvalid:  ThemeSlot;
-  rowIndex:         ThemeSlot;
-  removeButton:     ThemeSlot;
-  addButton:        ThemeSlot;
-  hint:             ThemeSlot;
-}
-
-export const arrayInputTheme: Record<ThemeMode, ArrayInputTheme> = {
-  default: {
-    rowInput:         'flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors font-mono',
-    rowInputInvalid:  'flex-1 text-xs border border-red-400 rounded-lg px-3 py-2 bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-red-400 focus:border-red-400 transition-colors font-mono',
-    rowIndex:         'text-[9px] text-gray-300 font-mono w-4 text-right shrink-0',
-    removeButton:     'shrink-0 w-5 h-5 flex items-center justify-center rounded text-gray-300 hover:text-red-400 hover:bg-red-50 disabled:opacity-0 transition-colors',
-    addButton:        'flex items-center gap-1 text-[10px] text-blue-500 hover:text-blue-600 transition-colors',
-    hint:             'text-[9px] text-gray-300 font-mono',
-  },
-  dark: {
-    rowInput:         'flex-1 text-xs border border-gray-600 rounded-lg px-3 py-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors font-mono',
-    rowInputInvalid:  'flex-1 text-xs border border-red-500 rounded-lg px-3 py-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-400 focus:border-red-400 transition-colors font-mono',
-    rowIndex:         'text-[9px] text-gray-600 font-mono w-4 text-right shrink-0',
-    removeButton:     'shrink-0 w-5 h-5 flex items-center justify-center rounded text-gray-600 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-0 transition-colors',
-    addButton:        'flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 transition-colors',
-    hint:             'text-[9px] text-gray-600 font-mono',
-  },
-};
+import { useTheme } from "../../../themes/context";
 
 interface Props {
   value: string;
@@ -57,7 +27,7 @@ function toItems(value: string): string[] {
 
 /** Dynamic row list: one input per item with × to remove, and an Add item button. */
 export default function ArrayInput({ value, style, explode, invalid, onChange }: Props) {
-  const t = arrayInputTheme[useThemeMode()];
+  const t = useTheme().inputArray;
   const items = toItems(value);
 
   function update(index: number, newVal: string) {

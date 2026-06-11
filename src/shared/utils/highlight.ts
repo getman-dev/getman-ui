@@ -1,14 +1,5 @@
 import { escapeHtml } from "./html";
 
-/** Token color values for JSON syntax highlighting. Used by highlightJson via CSS custom properties. */
-export interface SyntaxTheme {
-  key:     string;
-  string:  string;
-  boolean: string;
-  null:    string;
-  number:  string;
-}
-
 // Regex matches (in order): keys, strings, true/false, null, numbers
 // Operates on already-HTML-escaped text, so quotes appear as &quot;
 const TOKEN_RE =
@@ -23,8 +14,8 @@ function tokenClass(token: string): string {
   return                               "color:var(--hl-num)";
 }
 
+/** Returns a syntax-highlighted HTML string for a JSON value. Falls back to plain escaped text for non-JSON or large inputs. */
 export function highlightJson(raw: string): string {
-  // Bail out for non-JSON and very large payloads
   const trimmed = raw.trimStart();
   if ((trimmed[0] !== "{" && trimmed[0] !== "[") || raw.length > 200_000) {
     return escapeHtml(raw);

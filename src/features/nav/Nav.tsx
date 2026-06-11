@@ -4,90 +4,14 @@ import clsx from "clsx";
 import { useNav } from "./nav-context";
 import { useSpec } from "../spec/spec-context";
 import { selectEndpoint, selectSchema } from "../../shared/state/actions";
-import { slot, type ThemeSlot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../../shared/contexts/theme-mode-context";
-
-export interface NavTheme {
-  container:         ThemeSlot;
-  divider:           ThemeSlot;
-  searchWrapper:     ThemeSlot;
-  searchInput:       ThemeSlot;
-  searchIcon:        ThemeSlot;
-  searchClearButton: ThemeSlot;
-  searchHint:        ThemeSlot;       // the "/" keyboard shortcut hint
-  loadingSpinner:    ThemeSlot;
-  tabBar:            ThemeSlot;
-  tab:               ThemeSlot;       // variants: active
-  tagHeader:         ThemeSlot;
-  tagChevron:        ThemeSlot;       // rotation handled by clsx; this slot is layout only
-  tagCount:          ThemeSlot;
-  endpointItem:      ThemeSlot;       // variants: active, deprecated
-  endpointPath:      ThemeSlot;
-  methodBadge:       ThemeSlot;       // variants: get, post, put, patch, delete, head, options
-  schemaItem:        ThemeSlot;       // variants: active
-  schemaName:        ThemeSlot;       // variants: active
-  schemaTypeBadge:   ThemeSlot;
-  schemaDescription: ThemeSlot;
-  emptyState:        ThemeSlot;
-}
-
-const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded uppercase w-[36px] text-center';
-
-export const navTheme: Record<ThemeMode, NavTheme> = {
-  default: {
-    container:         'shrink-0 bg-gray-50 overflow-y-auto flex flex-col h-full',
-    divider:           'mt-1 border-t border-gray-100',
-    searchWrapper:     'px-4 py-3 border-b border-gray-100 shrink-0',
-    searchInput:       'w-full pl-7 pr-6 py-2 text-[11px] border border-gray-200 rounded-md bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors',
-    searchIcon:        'absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none',
-    searchClearButton: 'absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 leading-none text-sm',
-    searchHint:        'absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 border border-gray-200 rounded px-1 font-mono pointer-events-none leading-none',
-    loadingSpinner:    'w-5 h-5 animate-spin text-blue-400',
-    tabBar:            'flex gap-1 px-4 py-2 border-b border-gray-100',
-    tab:               { base: 'px-2.5 py-1 text-[11px] font-medium rounded transition-colors text-gray-400 hover:text-gray-600', active: 'bg-white text-gray-700 border border-gray-200 shadow-sm' },
-    tagHeader:         'w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors',
-    tagChevron:        'w-3 h-3 transition-transform',
-    tagCount:          'text-[10px] text-gray-400 font-mono',
-    endpointItem:      { base: 'nav-endpoint w-full flex items-center gap-2.5 px-4 py-2 text-left transition-colors text-gray-500 hover:bg-gray-50 hover:text-gray-800', active: 'bg-gray-100 text-gray-900' },
-    endpointPath:      'truncate text-[11px] font-mono',
-    methodBadge:       { base: methodBadgeBase, get: 'bg-blue-50 text-blue-700', post: 'bg-green-50 text-green-700', put: 'bg-amber-50 text-amber-700', delete: 'bg-red-50 text-red-700', patch: 'bg-pink-50 text-pink-700', options: 'bg-gray-100 text-gray-600', head: 'bg-gray-100 text-gray-600' },
-    schemaItem:        { base: 'w-full text-left gap-2.5 px-4 py-2 transition-colors hover:bg-gray-50', active: 'bg-gray-100' },
-    schemaName:        { base: 'truncate text-[11px] font-mono text-gray-700', active: 'text-gray-900' },
-    schemaTypeBadge:   'shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-50 text-purple-700 uppercase',
-    schemaDescription: 'mt-0.5 text-[10px] text-gray-400 truncate pl-[38px]',
-    emptyState:        'text-[11px] text-gray-400',
-  },
-  dark: {
-    container:         'shrink-0 bg-gray-800 overflow-y-auto flex flex-col h-full',
-    divider:           'mt-1 border-t border-gray-700',
-    searchWrapper:     'px-4 py-3 border-b border-gray-700 shrink-0',
-    searchInput:       'w-full pl-7 pr-6 py-2 text-[11px] border border-gray-600 rounded-md bg-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 transition-colors',
-    searchIcon:        'absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none',
-    searchClearButton: 'absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 leading-none text-sm',
-    searchHint:        'absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-600 border border-gray-600 rounded px-1 font-mono pointer-events-none leading-none',
-    loadingSpinner:    'w-5 h-5 animate-spin text-blue-500',
-    tabBar:            'flex gap-1 px-4 py-2 border-b border-gray-700',
-    tab:               { base: 'px-2.5 py-1 text-[11px] font-medium rounded transition-colors text-gray-500 hover:text-gray-300', active: 'bg-gray-700 text-gray-200 border border-gray-600 shadow-sm' },
-    tagHeader:         'w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-gray-500 hover:text-gray-300 transition-colors',
-    tagChevron:        'w-3 h-3 transition-transform',
-    tagCount:          'text-[10px] text-gray-500 font-mono',
-    endpointItem:      { base: 'nav-endpoint w-full flex items-center gap-2.5 px-4 py-2 text-left transition-colors text-gray-400 hover:bg-gray-700/50 hover:text-gray-200', active: 'bg-gray-700 text-gray-100' },
-    endpointPath:      'truncate text-[11px] font-mono',
-    methodBadge:       { base: methodBadgeBase, get: 'bg-blue-900/30 text-blue-400', post: 'bg-green-900/30 text-green-400', put: 'bg-amber-900/30 text-amber-400', delete: 'bg-red-900/30 text-red-400', patch: 'bg-pink-900/30 text-pink-400', options: 'bg-gray-700 text-gray-400', head: 'bg-gray-700 text-gray-400' },
-    schemaItem:        { base: 'w-full text-left gap-2.5 px-4 py-2 transition-colors hover:bg-gray-700/50', active: 'bg-gray-700' },
-    schemaName:        { base: 'truncate text-[11px] font-mono text-gray-300', active: 'text-gray-100' },
-    schemaTypeBadge:   'shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded bg-purple-900/30 text-purple-400 uppercase',
-    schemaDescription: 'mt-0.5 text-[10px] text-gray-500 truncate pl-[38px]',
-    emptyState:        'text-[11px] text-gray-500',
-  },
-};
+import { slot } from "../../themes/slot";
+import { useTheme } from "../../themes/context";
 
 /** Renders the sidebar with a single search input and a scrollable endpoint + schema list. */
 export default function Nav() {
   const { searchQuery, activeEndpoint, activeSchema, setSearchQuery } = useNav();
   const { spec, groups, specLoading } = useSpec();
-  const t = navTheme[useThemeMode()];
+  const t = useTheme().nav;
 
   const [collapsedTags, setCollapsedTags] = useState(new Set<string>());
   const [schemasCollapsed, setSchemasCollapsed] = useState(false);

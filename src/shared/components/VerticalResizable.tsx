@@ -1,6 +1,8 @@
 /** Generic two-pane vertical splitter with a draggable handle and localStorage persistence. */
 import { useState, useRef } from "react";
 import type React from "react";
+import { slot } from "../../themes/slot";
+import { useTheme } from "../../themes/context";
 
 const HANDLE_H = 8;
 
@@ -26,6 +28,8 @@ export default function VerticalResizable({
   top,
   bottom,
 }: VerticalResizableProps) {
+  const t = useTheme().verticalResizable;
+
   const [bottomHeight, setBottomHeight] = useState<number>(() => {
     try {
       const stored = localStorage.getItem(storageKey);
@@ -78,7 +82,7 @@ export default function VerticalResizable({
         onMouseDown={handleMouseDown}
         aria-hidden="true"
       >
-        <div className="w-8 h-0.5 rounded-full bg-gray-200 dark:bg-gray-600 group-hover:bg-blue-400 dark:group-hover:bg-blue-500 transition-colors" />
+        <div className={slot(t.handle)} />
       </div>
       <div className="shrink-0 overflow-hidden" style={{ height: bottomHeight }}>
         {bottom}

@@ -1,34 +1,7 @@
 /** Reusable modal shell: dimmed backdrop, container, header with close button, and footer slot. */
 import type { ReactNode } from "react";
-import type { ThemeSlot } from "../../themes/slot";
 import { slot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../contexts/theme-mode-context";
-
-export interface ModalTheme {
-  backdrop:    ThemeSlot;
-  container:   ThemeSlot;
-  header:      ThemeSlot;
-  closeButton: ThemeSlot;
-  footer:      ThemeSlot;
-}
-
-export const modalTheme: Record<ThemeMode, ModalTheme> = {
-  default: {
-    backdrop:    'fixed inset-0 bg-black/30 flex items-center justify-center z-50',
-    container:   'bg-white rounded-xl shadow-xl w-full mx-4 overflow-hidden',
-    header:      'flex items-center justify-between px-5 py-4 border-b border-gray-100',
-    closeButton: 'text-gray-400 hover:text-gray-600 text-xl leading-none',
-    footer:      'px-5 py-3 bg-gray-50 border-t border-gray-100',
-  },
-  dark: {
-    backdrop:    'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
-    container:   'bg-gray-800 rounded-xl shadow-xl w-full mx-4 overflow-hidden',
-    header:      'flex items-center justify-between px-5 py-4 border-b border-gray-700',
-    closeButton: 'text-gray-500 hover:text-gray-300 text-xl leading-none',
-    footer:      'px-5 py-3 bg-gray-700/50 border-t border-gray-700',
-  },
-};
+import { useTheme } from "../../themes/context";
 
 interface ModalProps {
   /** Whether the modal is rendered. */
@@ -57,7 +30,7 @@ export default function Modal({
   maxWidth = "max-w-md",
   scrollable = false,
 }: ModalProps) {
-  const t = modalTheme[useThemeMode()];
+  const t = useTheme().modal;
 
   if (!visible) return null;
 

@@ -4,56 +4,8 @@ import { useAuth } from "../../features/auth/auth-context";
 import { authActions } from "../../features/auth/auth-context";
 import { modalActions } from "../contexts/modal-context";
 import ServerConfig from "../../features/server/ServerConfig";
-import type { ThemeSlot } from "../../themes/slot";
 import { slot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../contexts/theme-mode-context";
-
-export interface TopBarTheme {
-  container:              ThemeSlot;
-  specTitle:              ThemeSlot;
-  specVersion:            ThemeSlot;
-  specDescription:        ThemeSlot;
-  noSpecIcon:             ThemeSlot;
-  noSpecIconSvg:          ThemeSlot;
-  noSpecTitle:            ThemeSlot;
-  divider:                ThemeSlot;
-  authButtonConfigured:   ThemeSlot;
-  authButtonUnconfigured: ThemeSlot;
-  neutralButton:          ThemeSlot;
-  loadButton:             ThemeSlot;
-}
-
-export const topBarTheme: Record<ThemeMode, TopBarTheme> = {
-  default: {
-    container:              'relative flex items-center gap-4 px-6 h-16 border-b border-gray-100 bg-white shrink-0 z-10',
-    specTitle:              'text-sm font-semibold text-gray-900 truncate',
-    specVersion:            'text-[10px] text-gray-400 border border-gray-200 rounded-full px-1.5 py-px font-mono shrink-0 leading-tight',
-    specDescription:        'text-[10px] text-gray-400 truncate leading-tight mt-px',
-    noSpecIcon:             'w-7 h-7 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shrink-0',
-    noSpecIconSvg:          'w-4 h-4 text-gray-400',
-    noSpecTitle:            'text-sm font-semibold text-gray-400',
-    divider:                'w-px h-5 bg-gray-200 mx-1 shrink-0',
-    authButtonConfigured:   'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
-    authButtonUnconfigured: 'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-gray-600 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300',
-    neutralButton:          'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-gray-600 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300',
-    loadButton:             'flex items-center gap-1.5 text-xs text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-md px-3 py-1.5 font-medium transition-colors shrink-0 shadow-sm',
-  },
-  dark: {
-    container:              'relative flex items-center gap-4 px-6 h-16 border-b border-gray-700 bg-gray-900 shrink-0 z-10',
-    specTitle:              'text-sm font-semibold text-gray-100 truncate',
-    specVersion:            'text-[10px] text-gray-500 border border-gray-600 rounded-full px-1.5 py-px font-mono shrink-0 leading-tight',
-    specDescription:        'text-[10px] text-gray-500 truncate leading-tight mt-px',
-    noSpecIcon:             'w-7 h-7 rounded-lg bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center shrink-0',
-    noSpecIconSvg:          'w-4 h-4 text-gray-500',
-    noSpecTitle:            'text-sm font-semibold text-gray-500',
-    divider:                'w-px h-5 bg-gray-700 mx-1 shrink-0',
-    authButtonConfigured:   'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-emerald-400 bg-emerald-900/30 border-emerald-700 hover:bg-emerald-900/50',
-    authButtonUnconfigured: 'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-gray-400 bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-gray-500',
-    neutralButton:          'flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 font-medium border transition-all shrink-0 text-gray-400 bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-gray-500',
-    loadButton:             'flex items-center gap-1.5 text-xs text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-md px-3 py-1.5 font-medium transition-colors shrink-0 shadow-sm',
-  },
-};
+import { useTheme } from "../../themes/context";
 
 interface Props {
   onToggleDark: () => void;
@@ -61,8 +13,9 @@ interface Props {
 
 /** Renders the top bar with API identity, server selector, auth, dark mode, and load spec button. */
 export default function TopBar({ onToggleDark }: Props) {
-  const t = topBarTheme[useThemeMode()];
-  const isDark = useThemeMode() === 'dark';
+  const theme = useTheme();
+  const t = theme.topBar;
+  const isDark = theme.name === 'dark';
   const { spec } = useSpec();
   const { authValues } = useAuth();
 

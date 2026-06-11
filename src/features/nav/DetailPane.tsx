@@ -3,20 +3,23 @@ import { useNav } from "./nav-context";
 import { useSpec, specActions } from "../spec/spec-context";
 import EndpointDetail from "../endpoint/EndpointDetail";
 import SchemaDetail from "../schema/SchemaDetail";
+import { slot } from "../../themes/slot";
+import { useTheme } from "../../themes/context";
 
 /** Displays a spec load error with a dismiss action. */
 function SpecLoadError({ message }: { message: string }) {
+  const t = useTheme().detailPane;
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-8 gap-3">
-      <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center shrink-0">
-        <svg className="w-5 h-5 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={slot(t.errorIcon)}>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
         </svg>
       </div>
-      <p className="text-sm text-red-600 dark:text-red-400">{message}</p>
+      <p className={slot(t.errorMessage)}>{message}</p>
       <button
         onClick={() => specActions.setLoadError("")}
-        className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 underline underline-offset-2"
+        className={slot(t.retryLink)}
       >
         Dismiss
       </button>
@@ -28,11 +31,12 @@ function SpecLoadError({ message }: { message: string }) {
 export default function DetailPane() {
   const { activeSchema, activeEndpoint } = useNav();
   const { spec, specLoading, loadError } = useSpec();
+  const t = useTheme().detailPane;
 
   if (specLoading && !spec) {
     return (
       <div className="h-full flex items-center justify-center">
-        <svg className="w-5 h-5 animate-spin text-blue-400 dark:text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg className={slot(t.spinner)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
@@ -52,12 +56,12 @@ export default function DetailPane() {
 
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-8 gap-3">
-      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={slot(t.emptyIcon)}>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
       </div>
-      <p className="text-sm text-gray-400 dark:text-gray-500">Select an endpoint to view documentation</p>
+      <p className={slot(t.emptyMessage)}>Select an endpoint to view documentation</p>
     </div>
   );
 }

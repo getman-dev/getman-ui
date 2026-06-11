@@ -3,14 +3,20 @@
  * Import from here to resolve a theme by name or to compose a custom one.
  */
 import type { AppTheme } from './contract';
+import { lightTheme } from './presets/light';
+import { darkTheme }  from './presets/dark';
 
 export type { AppTheme } from './contract';
 export { useTheme, ThemeProvider } from './context';
 export { slot } from './slot';
 export type { ThemeSlot } from './slot';
+export { lightTheme, darkTheme };
 
-/** All built-in themes keyed by their preset name. Populated in Phase 2. */
-export const THEMES: Record<string, AppTheme> = {};
+/** All built-in themes keyed by their preset name. */
+export const THEMES: Record<string, AppTheme> = {
+  light: lightTheme,
+  dark:  darkTheme,
+};
 
 /**
  * Returns the built-in theme for the given name, or undefined if not registered.

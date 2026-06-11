@@ -1,4 +1,4 @@
-  /** Root application component: layout, dark mode, keyboard shortcuts, hash routing. */
+/** Root application component: layout, dark mode, keyboard shortcuts, hash routing. */
 import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { AppProviders } from "./shared/contexts";
@@ -17,56 +17,10 @@ import LoadModal from "./shared/components/LoadModal";
 import AuthModal from "./features/auth/AuthModal";
 import CommandBar from "./shared/components/CommandBar";
 import { ErrorBoundary } from "./shared/components/ErrorBoundary";
-import { ThemeModeProvider } from "./shared/contexts/theme-mode-context";
-import type { ThemeSlot } from "./themes/slot";
+import { ThemeProvider, useTheme } from "./themes/context";
+import { lightTheme } from "./themes/presets/light";
+import { darkTheme } from "./themes/presets/dark";
 import { slot } from "./themes/slot";
-import type { ThemeMode } from "./themes/types";
-
-export interface AppRootTheme {
-  root:              ThemeSlot;
-  navPane:           ThemeSlot;
-  detailPane:        ThemeSlot;
-  tryPane:           ThemeSlot;
-  shortcutsBackdrop: ThemeSlot;
-  shortcutsPanel:    ThemeSlot;
-  shortcutsHeader:   ThemeSlot;
-  shortcutsTitle:    ThemeSlot;
-  shortcutsClose:    ThemeSlot;
-  shortcutsRow:      ThemeSlot;
-  shortcutsDesc:     ThemeSlot;
-  shortcutsKbd:      ThemeSlot;
-}
-
-export const appTheme: Record<ThemeMode, AppRootTheme> = {
-  default: {
-    root:              'flex flex-col h-full overflow-hidden bg-white',
-    navPane:           'shrink-0 bg-gray-50 overflow-y-auto flex flex-col',
-    detailPane:        'flex-1 min-w-0 bg-white overflow-hidden',
-    tryPane:           'shrink-0 bg-white overflow-hidden',
-    shortcutsBackdrop: 'fixed inset-0 bg-black/30 flex items-center justify-center z-50',
-    shortcutsPanel:    'bg-white rounded-xl shadow-xl w-72 mx-4 overflow-hidden',
-    shortcutsHeader:   'flex items-center justify-between px-5 py-3.5 border-b border-gray-100',
-    shortcutsTitle:    'text-sm font-semibold text-gray-800',
-    shortcutsClose:    'text-gray-400 hover:text-gray-600 text-xl leading-none transition-colors',
-    shortcutsRow:      'flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0',
-    shortcutsDesc:     'text-xs text-gray-600',
-    shortcutsKbd:      'text-[10px] font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded border border-gray-200 shrink-0',
-  },
-  dark: {
-    root:              'flex flex-col h-full overflow-hidden bg-gray-900',
-    navPane:           'shrink-0 bg-gray-800 overflow-y-auto flex flex-col',
-    detailPane:        'flex-1 min-w-0 bg-gray-900 overflow-hidden',
-    tryPane:           'shrink-0 bg-gray-900 overflow-hidden',
-    shortcutsBackdrop: 'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
-    shortcutsPanel:    'bg-gray-800 rounded-xl shadow-xl w-72 mx-4 overflow-hidden',
-    shortcutsHeader:   'flex items-center justify-between px-5 py-3.5 border-b border-gray-700',
-    shortcutsTitle:    'text-sm font-semibold text-gray-200',
-    shortcutsClose:    'text-gray-500 hover:text-gray-300 text-xl leading-none transition-colors',
-    shortcutsRow:      'flex items-center justify-between py-1.5 border-b border-gray-700/50 last:border-0',
-    shortcutsDesc:     'text-xs text-gray-300',
-    shortcutsKbd:      'text-[10px] font-mono bg-gray-700 text-gray-400 px-2 py-0.5 rounded border border-gray-600 shrink-0',
-  },
-};
 
 const DARK_KEY = "api-explorer-dark";
 
@@ -80,27 +34,12 @@ const shortcutRows: [string, string][] = [
   ["?",    "Toggle this panel"],
 ];
 
-/** Inner app: layout, dark mode, shortcuts — rendered inside context providers. */
-function AppInner({ initialUrl }: { initialUrl?: string }) {
+/** Inner app: layout, dark mode, shortcuts — rendered inside context providers and ThemeProvider. */
+function AppLayout({ onToggleDark }: { onToggleDark: () => void }) {
   const { activeEndpoint } = useNav();
   const { shortcutsVisible } = useModal();
-
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const stored = localStorage.getItem(DARK_KEY);
-    return stored !== null
-      ? stored === "true"
-      : (window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
-  });
-
+  const t = useTheme().appRoot;
   const rootRef = useRef<HTMLDivElement>(null);
-
-  function toggleDark() {
-    setDarkMode(prev => {
-      const next = !prev;
-      try { localStorage.setItem(DARK_KEY, String(next)); } catch { /* ignore */ }
-      return next;
-    });
-  }
 
   // Register keyboard shortcuts and hashchange listener once.
   useEffect(() => {
@@ -162,29 +101,22 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
     };
   }, []);
 
-  // Load initial spec URL once.
-  useEffect(() => {
-    if (initialUrl) loadSpecFromUrl(initialUrl);
-  }, [initialUrl]);
-
   // Initialize resizable panes after first DOM commit.
   useEffect(() => {
     if (rootRef.current) initResizablePanes(rootRef.current);
   }, []);
 
   const showPlayground = !!activeEndpoint;
-  const t = appTheme[darkMode ? 'dark' : 'default'];
 
   return (
-    <ThemeModeProvider mode={darkMode ? 'dark' : 'default'}>
     <div
       ref={rootRef}
-      className={clsx(slot(t.root), darkMode && "dark")}
+      className={slot(t.root)}
       style={{ fontFamily: "'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif" }}
     >
       <LoadModal />
       <AuthModal />
-      <CommandBar onToggleDark={toggleDark} />
+      <CommandBar onToggleDark={onToggleDark} />
 
       {shortcutsVisible && (
         <div
@@ -211,7 +143,7 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
         </div>
       )}
 
-      <TopBar onToggleDark={toggleDark} />
+      <TopBar onToggleDark={onToggleDark} />
 
       <ErrorBoundary>
         <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
@@ -237,7 +169,39 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
         </div>
       </ErrorBoundary>
     </div>
-    </ThemeModeProvider>
+  );
+}
+
+/** Inner app: selects the theme preset based on dark mode state, then renders AppLayout inside ThemeProvider. */
+function AppInner({ initialUrl }: { initialUrl?: string }) {
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem(DARK_KEY);
+    return stored !== null
+      ? stored === "true"
+      : (window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
+  });
+
+  // Load initial spec URL once.
+  useEffect(() => {
+    if (initialUrl) loadSpecFromUrl(initialUrl);
+  }, [initialUrl]);
+
+  function toggleDark() {
+    setDarkMode(prev => {
+      const next = !prev;
+      try { localStorage.setItem(DARK_KEY, String(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }
+
+  const activeTheme = darkMode ? darkTheme : lightTheme;
+
+  return (
+    <ThemeProvider theme={activeTheme}>
+      <div className={clsx(darkMode && "dark")} style={{ display: "contents" }}>
+        <AppLayout onToggleDark={toggleDark} />
+      </div>
+    </ThemeProvider>
   );
 }
 

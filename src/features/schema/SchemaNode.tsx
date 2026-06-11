@@ -1,66 +1,8 @@
 /** Recursive component that renders a single OpenAPI schema property row with type, constraints, and nested children. */
 import type { Schema, Components } from "../spec/openapi";
 import { resolveSchema } from "../spec/ref-resolver";
-import type { ThemeSlot } from "../../themes/slot";
 import { slot } from "../../themes/slot";
-import type { ThemeMode } from "../../themes/types";
-import { useThemeMode } from "../../shared/contexts/theme-mode-context";
-
-export interface SchemaNodeTheme {
-  name:          ThemeSlot;
-  typeBadge:     ThemeSlot;
-  nullableBadge: ThemeSlot;
-  constraint:    ThemeSlot;
-  enumValue:     ThemeSlot;
-  description:   ThemeSlot;
-  enumKey:       ThemeSlot;
-  enumDesc:      ThemeSlot;
-  nestedBorder:  ThemeSlot;
-  typeBadgeColors: Record<string, string>;
-}
-
-export const schemaNodeTheme: Record<ThemeMode, SchemaNodeTheme> = {
-  default: {
-    name:          'font-mono text-[11px] text-gray-800',
-    typeBadge:     'text-[10px] rounded px-1.5 py-0.5 font-mono',
-    nullableBadge: 'text-[9px] bg-gray-100 text-gray-500 rounded px-1 font-mono',
-    constraint:    'text-[9px] font-mono text-gray-400',
-    enumValue:     'text-[9px] text-gray-400 font-mono',
-    description:   'text-[11px] text-gray-500 mt-0.5 leading-relaxed',
-    enumKey:       'font-mono text-gray-700',
-    enumDesc:      'text-gray-400',
-    nestedBorder:  'border-l-2 border-gray-100 ml-3 pl-3 mt-0.5',
-    typeBadgeColors: {
-      string:  'bg-emerald-50 text-emerald-700',
-      integer: 'bg-blue-50 text-blue-700',
-      number:  'bg-blue-50 text-blue-700',
-      boolean: 'bg-purple-50 text-purple-700',
-      object:  'bg-amber-50 text-amber-700',
-      array:   'bg-cyan-50 text-cyan-700',
-      default: 'bg-gray-100 text-gray-600',
-    },
-  },
-  dark: {
-    name:          'font-mono text-[11px] text-gray-200',
-    typeBadge:     'text-[10px] rounded px-1.5 py-0.5 font-mono',
-    nullableBadge: 'text-[9px] bg-gray-700 text-gray-400 rounded px-1 font-mono',
-    constraint:    'text-[9px] font-mono text-gray-500',
-    enumValue:     'text-[9px] text-gray-500 font-mono',
-    description:   'text-[11px] text-gray-400 mt-0.5 leading-relaxed',
-    enumKey:       'font-mono text-gray-300',
-    enumDesc:      'text-gray-500',
-    nestedBorder:  'border-l-2 border-gray-700 ml-3 pl-3 mt-0.5',
-    typeBadgeColors: {
-      string:  'bg-emerald-900/30 text-emerald-400',
-      integer: 'bg-blue-900/30 text-blue-400',
-      number:  'bg-blue-900/30 text-blue-400',
-      boolean: 'bg-purple-900/30 text-purple-400',
-      object:  'bg-amber-900/30 text-amber-400',
-      array:   'bg-cyan-900/30 text-cyan-400',
-      default: 'bg-gray-700 text-gray-400',
-    },
-  },
-};
+import { useTheme } from "../../themes/context";
 
 function schemaTypeLabel(s: Schema): string {
   if (s.type === "array") {
@@ -84,7 +26,7 @@ interface Props {
 
 /** Renders one schema field row: type badge, nullability, constraints, description, and recursive children. */
 export default function SchemaNode({ name, schema, components, depth = 0, required = false }: Props) {
-  const t = schemaNodeTheme[useThemeMode()];
+  const t = useTheme().schemaNode;
 
   const resolved  = resolveSchema(schema, components);
   if (depth > 5 || !resolved) return null;

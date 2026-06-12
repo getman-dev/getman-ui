@@ -88,6 +88,13 @@ export const darkTheme: AppTheme = {
     loadButton:             'flex items-center gap-1.5 text-xs text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-md px-3 py-1.5 font-medium transition-colors shrink-0 shadow-sm',
   },
 
+  themePicker: {
+    dropdown: 'bg-gray-800 border border-gray-700 rounded-xl shadow-xl py-1.5 overflow-hidden',
+    item:     { base: 'w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-700/50 transition-colors', active: 'bg-gray-700' },
+    name:     'text-sm text-gray-200 font-medium flex-1',
+    check:    'w-3.5 h-3.5 text-blue-400 shrink-0',
+  },
+
   modal: {
     backdrop:    'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
     container:   'bg-gray-800 rounded-xl shadow-xl w-full mx-4 overflow-hidden',

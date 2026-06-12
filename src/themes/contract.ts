@@ -29,6 +29,7 @@ import type { CommandBarTheme }      from './components/command-bar';
 import type { LoadModalTheme }       from './components/load-modal';
 import type { ModalTheme }           from './components/modal';
 import type { TopBarTheme }          from './components/top-bar';
+import type { ThemePickerTheme }     from './components/theme-picker';
 import type { DetailPaneTheme }      from './components/detail-pane';
 import type { VerticalResizableTheme } from './components/vertical-resizable';
 import type { SyntaxTheme }          from './components/syntax';
@@ -59,6 +60,7 @@ export type {
   LoadModalTheme,
   ModalTheme,
   TopBarTheme,
+  ThemePickerTheme,
   DetailPaneTheme,
   VerticalResizableTheme,
   SyntaxTheme,
@@ -104,6 +106,7 @@ export interface AppTheme {
 
   // Shared components
   topBar:            TopBarTheme;
+  themePicker:       ThemePickerTheme;
   modal:             ModalTheme;
   loadModal:         LoadModalTheme;
   commandBar:        CommandBarTheme;

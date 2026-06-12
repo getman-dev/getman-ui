@@ -89,6 +89,13 @@ export const lightTheme: AppTheme = {
     loadButton:             'flex items-center gap-1.5 text-xs text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-md px-3 py-1.5 font-medium transition-colors shrink-0 shadow-sm',
   },
 
+  themePicker: {
+    dropdown: 'bg-white border border-gray-200 rounded-xl shadow-lg py-1.5 overflow-hidden',
+    item:     { base: 'w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors', active: 'bg-blue-50' },
+    name:     'text-sm text-gray-700 font-medium flex-1',
+    check:    'w-3.5 h-3.5 text-blue-600 shrink-0',
+  },
+
   modal: {
     backdrop:    'fixed inset-0 bg-black/30 flex items-center justify-center z-50',
     container:   'bg-white rounded-xl shadow-xl w-full mx-4 overflow-hidden',

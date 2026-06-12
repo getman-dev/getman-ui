@@ -18,11 +18,10 @@ import AuthModal from "./features/auth/AuthModal";
 import CommandBar from "./shared/components/CommandBar";
 import { ErrorBoundary } from "./shared/components/ErrorBoundary";
 import { ThemeProvider, useTheme } from "./themes/context";
-import { lightTheme } from "./themes/presets/light";
-import { darkTheme } from "./themes/presets/dark";
+import { THEMES } from "./themes";
 import { slot } from "./themes/slot";
 
-const DARK_KEY = "api-explorer-dark";
+const THEME_KEY = "api-explorer-theme";
 
 const shortcutRows: [string, string][] = [
   ["/",    "Focus search"],
@@ -35,7 +34,7 @@ const shortcutRows: [string, string][] = [
 ];
 
 /** Inner app: layout, dark mode, shortcuts — rendered inside context providers and ThemeProvider. */
-function AppLayout({ onToggleDark }: { onToggleDark: () => void }) {
+function AppLayout({ onSetTheme }: { onSetTheme: (name: string) => void }) {
   const { activeEndpoint } = useNav();
   const { shortcutsVisible } = useModal();
   const t = useTheme().appRoot;
@@ -116,7 +115,7 @@ function AppLayout({ onToggleDark }: { onToggleDark: () => void }) {
     >
       <LoadModal />
       <AuthModal />
-      <CommandBar onToggleDark={onToggleDark} />
+      <CommandBar onSetTheme={onSetTheme} />
 
       {shortcutsVisible && (
         <div
@@ -143,7 +142,7 @@ function AppLayout({ onToggleDark }: { onToggleDark: () => void }) {
         </div>
       )}
 
-      <TopBar onToggleDark={onToggleDark} />
+      <TopBar onSetTheme={onSetTheme} />
 
       <ErrorBoundary>
         <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
@@ -172,13 +171,12 @@ function AppLayout({ onToggleDark }: { onToggleDark: () => void }) {
   );
 }
 
-/** Inner app: selects the theme preset based on dark mode state, then renders AppLayout inside ThemeProvider. */
+/** Inner app: selects the theme preset based on stored theme name, then renders AppLayout inside ThemeProvider. */
 function AppInner({ initialUrl }: { initialUrl?: string }) {
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const stored = localStorage.getItem(DARK_KEY);
-    return stored !== null
-      ? stored === "true"
-      : (window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
+  const [themeName, setThemeName] = useState<string>(() => {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored && THEMES[stored]) return stored;
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   });
 
   // Load initial spec URL once.
@@ -186,20 +184,18 @@ function AppInner({ initialUrl }: { initialUrl?: string }) {
     if (initialUrl) loadSpecFromUrl(initialUrl);
   }, [initialUrl]);
 
-  function toggleDark() {
-    setDarkMode(prev => {
-      const next = !prev;
-      try { localStorage.setItem(DARK_KEY, String(next)); } catch { /* ignore */ }
-      return next;
-    });
+  function setTheme(name: string) {
+    if (!THEMES[name]) return;
+    setThemeName(name);
+    try { localStorage.setItem(THEME_KEY, name); } catch { /* ignore */ }
   }
 
-  const activeTheme = darkMode ? darkTheme : lightTheme;
+  const activeTheme = THEMES[themeName] ?? THEMES.light;
 
   return (
     <ThemeProvider theme={activeTheme}>
-      <div className={clsx(darkMode && "dark")} style={{ display: "contents" }}>
-        <AppLayout onToggleDark={toggleDark} />
+      <div className={clsx(themeName !== "light" && "dark")} style={{ display: "contents" }}>
+        <AppLayout onSetTheme={setTheme} />
       </div>
     </ThemeProvider>
   );

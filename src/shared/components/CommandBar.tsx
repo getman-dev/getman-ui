@@ -11,7 +11,7 @@ import { slot } from "../../themes/slot";
 import { useTheme } from "../../themes/context";
 
 interface Props {
-  onToggleDark: () => void;
+  onSetTheme: (name: string) => void;
 }
 
 interface CommandItem {
@@ -30,12 +30,14 @@ interface CommandGroup {
   offset: number;
 }
 
-const I_UPLOAD   = "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5";
-const I_LOCK     = "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z";
-const I_MOON     = "M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z";
-const I_KEYBOARD = "M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z";
-const I_CUBE     = "M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9";
-const I_GLOBE    = "M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418";
+const I_UPLOAD    = "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5";
+const I_LOCK      = "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z";
+const I_SUN       = "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z";
+const I_MOON      = "M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z";
+const I_SNOWFLAKE = "M12 3v18M3 12h18M5.636 5.636l12.728 12.728M18.364 5.636L5.636 18.364";
+const I_KEYBOARD  = "M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z";
+const I_CUBE      = "M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9";
+const I_GLOBE     = "M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418";
 
 /** Returns HTML with the matched substring wrapped in a highlight mark. */
 function hl(text: string, q: string, markClass: string): string {
@@ -53,7 +55,7 @@ function hl(text: string, q: string, markClass: string): string {
 }
 
 /** Renders the ⌘K command palette overlay. Visible when commandBarVisible is true. */
-export default function CommandBar({ onToggleDark }: Props) {
+export default function CommandBar({ onSetTheme }: Props) {
   const t = useTheme().commandBar;
   const { commandBarVisible } = useModal();
   const { spec, groups: specGroups } = useSpec();
@@ -92,10 +94,22 @@ export default function CommandBar({ onToggleDark }: Props) {
       action: () => { close(); authActions.setAuthModalVisible(true); },
     },
     {
-      id: "toggle-dark", kind: "action",
-      label: "Toggle Dark Mode", subtitle: "Switch between light and dark theme",
+      id: "theme-light", kind: "action",
+      label: "Light Theme", subtitle: "Switch to light theme",
+      iconPath: I_SUN,
+      action: () => { close(); onSetTheme("light"); },
+    },
+    {
+      id: "theme-dark", kind: "action",
+      label: "Dark Theme", subtitle: "Switch to dark theme",
       iconPath: I_MOON,
-      action: () => { close(); onToggleDark(); },
+      action: () => { close(); onSetTheme("dark"); },
+    },
+    {
+      id: "theme-nord", kind: "action",
+      label: "Nord Theme", subtitle: "Arctic, blue-grey color palette",
+      iconPath: I_SNOWFLAKE,
+      action: () => { close(); onSetTheme("nord"); },
     },
     {
       id: "shortcuts", kind: "action",
@@ -103,9 +117,9 @@ export default function CommandBar({ onToggleDark }: Props) {
       iconPath: I_KEYBOARD,
       action: () => { close(); modalActions.setShortcutsVisible(true); },
     },
-  // onToggleDark identity is stable (defined with useCallback in App or passed as arrow)
+  // onSetTheme identity is stable (defined in AppInner, stable reference)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [onToggleDark]);
+  ], [onSetTheme]);
 
   const allEndpoints = useMemo(() => specGroups.flatMap(g => g.endpoints), [specGroups]);
   const allSchemaNames = useMemo(() => Object.keys(spec?.components?.schemas ?? {}), [spec]);

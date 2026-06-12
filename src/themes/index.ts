@@ -3,19 +3,23 @@
  * Import from here to resolve a theme by name or to compose a custom one.
  */
 import type { AppTheme } from './contract';
-import { lightTheme } from './presets/light';
-import { darkTheme }  from './presets/dark';
+import { lightTheme }      from './presets/light';
+import { darkTheme }       from './presets/dark';
+import { nordTheme }       from './presets/nord';
+import { catppuccinTheme } from './presets/catppuccin';
 
 export type { AppTheme } from './contract';
 export { useTheme, ThemeProvider } from './context';
 export { slot } from './slot';
 export type { ThemeSlot } from './slot';
-export { lightTheme, darkTheme };
+export { lightTheme, darkTheme, nordTheme, catppuccinTheme };
 
 /** All built-in themes keyed by their preset name. */
 export const THEMES: Record<string, AppTheme> = {
-  light: lightTheme,
-  dark:  darkTheme,
+  light:      lightTheme,
+  dark:       darkTheme,
+  nord:       nordTheme,
+  catppuccin: catppuccinTheme,
 };
 
 /**

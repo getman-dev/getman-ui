@@ -37,7 +37,8 @@ const shortcutRows: [string, string][] = [
 function AppLayout({ onSetTheme }: { onSetTheme: (name: string) => void }) {
   const { activeEndpoint } = useNav();
   const { shortcutsVisible } = useModal();
-  const t = useTheme().appRoot;
+  const theme = useTheme();
+  const t = theme.appRoot;
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Register keyboard shortcuts and hashchange listener once.
@@ -111,7 +112,7 @@ function AppLayout({ onSetTheme }: { onSetTheme: (name: string) => void }) {
     <div
       ref={rootRef}
       className={slot(t.root)}
-      style={{ fontFamily: "'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif" }}
+      style={{ fontFamily: theme.fontFamily }}
     >
       <LoadModal />
       <AuthModal />

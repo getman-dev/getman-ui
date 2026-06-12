@@ -380,6 +380,7 @@ export const darkTheme: AppTheme = {
   },
 
   paneHandle:  'bg-gray-600',
+  fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-blue-400 focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-gray-600', thumbHover: 'bg-gray-500' },
 };

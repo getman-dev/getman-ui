@@ -381,6 +381,7 @@ export const catppuccinTheme: AppTheme = {
   },
 
   paneHandle:  'bg-[#45475A]',
+  fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-[#CBA6F7] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#45475A]', thumbHover: 'bg-[#585B70]' },
 };

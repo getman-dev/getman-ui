@@ -118,4 +118,6 @@ export interface AppTheme {
   /** Tailwind ring classes applied to focused interactive elements. */
   focusRing:         string;
   scrollbar:         { thumb: string; thumbHover: string };
+  /** CSS font-family value applied to the app root element. */
+  fontFamily:        string;
 }

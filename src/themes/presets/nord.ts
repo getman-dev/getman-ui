@@ -381,6 +381,7 @@ export const nordTheme: AppTheme = {
   },
 
   paneHandle:  'bg-[#4C566A]',
+  fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-[#88C0D0] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#4C566A]', thumbHover: 'bg-[#81A1C1]' },
 };

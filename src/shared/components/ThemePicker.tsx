@@ -10,6 +10,7 @@ const THEME_LABELS: Record<string, string> = {
   dark:       'Dark',
   nord:       'Nord',
   catppuccin: 'Catppuccin',
+  terminal:   'Terminal',
 };
 
 /**
@@ -21,6 +22,7 @@ const THEME_SWATCHES: Record<string, [string, string, string]> = {
   dark:       ['#1f2937', '#60a5fa', '#f3f4f6'],
   nord:       ['#2E3440', '#88C0D0', '#ECEFF4'],
   catppuccin: ['#1E1E2E', '#CBA6F7', '#CDD6F4'],
+  terminal:   ['#030a03', '#00ff41', '#33cc33'],
 };
 
 interface Props {

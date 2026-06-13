@@ -30,12 +30,12 @@ interface Props {
 }
 
 /** Renders schema fields and/or an example JSON block with optional tabs between them. */
-export default function SchemaViewer({ schema, components, options = {} }: Props) {
+export default function SchemaViewer({schema, components, options = {}}: Props) {
   const t = useTheme().schema;
   const [activeTab, setActiveTab] = useState<"schema" | "example">("schema");
 
-  const resolved  = resolveSchema(schema, components);
-  const combined  = resolved?.allOf ?? resolved?.oneOf ?? resolved?.anyOf ?? null;
+  const resolved = resolveSchema(schema, components);
+  const combined = resolved?.allOf ?? resolved?.oneOf ?? resolved?.anyOf ?? null;
 
   const exampleJson: string | null = (() => {
     if (options.example !== undefined && options.example !== null) return options.example;
@@ -48,76 +48,78 @@ export default function SchemaViewer({ schema, components, options = {} }: Props
   function renderSchemaTree() {
     if (combined?.length) {
       return combined.map((child, i) => (
-        <SchemaNode key={i} name={`[${i}]`} schema={child} components={components} />
+          <SchemaNode key={i} name={`[${i}]`} schema={child} components={components}/>
       ));
     }
     if (resolved?.type === "object" && resolved.properties) {
       return Object.entries(resolved.properties).map(([key, prop]) => (
-        <SchemaNode
-          key={key}
-          name={key}
-          schema={prop}
-          components={components}
-          required={resolved.required?.includes(key) ?? false}
-        />
+          <SchemaNode
+              key={key}
+              name={key}
+              schema={prop}
+              components={components}
+              required={resolved.required?.includes(key) ?? false}
+          />
       ));
     }
     if (resolved?.type === "array" && resolved.items) {
-      return <SchemaNode name="[item]" schema={resolved.items} components={components} />;
+      return <SchemaNode name="[item]" schema={resolved.items} components={components}/>;
     }
     if (resolved) {
-      return <SchemaNode name="body" schema={resolved} components={components} required={options.required} />;
+      return <SchemaNode name="body" schema={resolved} components={components} required={options.required}/>;
     }
     return null;
   }
 
   if (!resolved && exampleJson) {
     return (
-      <pre
-        className={slot(t.exampleBlock)}
-        dangerouslySetInnerHTML={{ __html: highlightedExample! }}
-      />
+        <pre
+            className={slot(t.exampleBlock)}
+            dangerouslySetInnerHTML={{__html: highlightedExample!}}
+        />
     );
   }
 
   const topLevelDescription = resolved?.description ? (
-    <p className={slot(t.description)}>{resolved.description}</p>
+      <p className={slot(t.description)}>{resolved.description}</p>
   ) : null;
 
   if (resolved && !exampleJson) {
     return (
-      <div>
-        {topLevelDescription}
-        <div className="px-4 py-3">{renderSchemaTree()}</div>
-      </div>
+        <div>
+          {topLevelDescription}
+          <div className="px-4 py-3">{renderSchemaTree()}</div>
+        </div>
     );
   }
 
   if (resolved && exampleJson) {
     return (
-      <div>
-        <div className={slot(t.tabBar)}>
-          <button className={activeTab === "schema" ? slot(t.tabActive) : slot(t.tabInactive)} onClick={() => setActiveTab("schema")}>
-            Schema
-          </button>
-          <button className={activeTab === "example" ? slot(t.tabActive) : slot(t.tabInactive)} onClick={() => setActiveTab("example")}>
-            Example
-          </button>
-        </div>
-        {activeTab === "schema" ? (
-          <div>
-            {topLevelDescription}
-            <div className="px-4 py-3">{renderSchemaTree()}</div>
+        <div>
+          <div className={slot(t.tabBar)}>
+            <button className={activeTab === "schema" ? slot(t.tabActive) : slot(t.tabInactive)}
+                    onClick={() => setActiveTab("schema")}>
+              Schema
+            </button>
+            <button className={activeTab === "example" ? slot(t.tabActive) : slot(t.tabInactive)}
+                    onClick={() => setActiveTab("example")}>
+              Example
+            </button>
           </div>
-        ) : (
-          <div className="px-4 py-3">
+          {activeTab === "schema" ? (
+              <div>
+                {topLevelDescription}
+                <div className="px-4 py-3">{renderSchemaTree()}</div>
+              </div>
+          ) : (
+              <div className="px-4 py-3">
             <pre
-              className={slot(t.exampleBlock)}
-              dangerouslySetInnerHTML={{ __html: highlightedExample! }}
+                className={slot(t.exampleBlock)}
+                dangerouslySetInnerHTML={{__html: highlightedExample!}}
             />
-          </div>
-        )}
-      </div>
+              </div>
+          )}
+        </div>
     );
   }
 

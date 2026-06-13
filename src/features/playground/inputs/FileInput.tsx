@@ -12,14 +12,17 @@ interface Props {
 }
 
 /** Renders a file input. Pass multiple=true for array-of-binary (file[]) fields. */
-export default function FileInput({ multiple, onFileChange }: Props) {
+export default function FileInput({multiple, onFileChange}: Props) {
   const t = useTheme().inputFile;
   return (
-    <input
-      type="file"
-      multiple={multiple}
-      className={slot(t.input)}
-      onChange={(e) => { const f = e.target.files; if (f?.length) onFileChange(f); }}
-    />
+      <input
+          type="file"
+          multiple={multiple}
+          className={slot(t.input)}
+          onChange={(e) => {
+            const f = e.target.files;
+            if (f?.length) onFileChange(f);
+          }}
+      />
   );
 }

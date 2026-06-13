@@ -23,36 +23,36 @@ variants and have never been converted to slot theming at all.
 
 ### Full inventory
 
-| Component file | Interface | Style object |
-|---|---|---|
-| `src/App.tsx` | `AppRootTheme` | `appTheme` |
-| `src/features/nav/Nav.tsx` | `NavTheme` | `navTheme` |
-| `src/features/endpoint/EndpointDetail.tsx` | `EndpointTheme` | `endpointTheme` |
-| `src/features/auth/AuthModal.tsx` | `AuthModalTheme` | `authModalTheme` |
-| `src/features/server/ServerConfig.tsx` | `ServerConfigTheme` | `serverConfigTheme` |
-| `src/features/schema/SchemaViewer.tsx` | `SchemaViewerTheme` | `schemaViewerTheme` |
-| `src/features/schema/SchemaNode.tsx` | `SchemaNodeTheme` | `schemaNodeTheme` |
-| `src/features/schema/SchemaDetail.tsx` | `SchemaDetailTheme` | `schemaDetailTheme` |
-| `src/features/playground/Playground.tsx` | `PlaygroundTheme` | `playgroundTheme` |
-| `src/features/playground/AuthStatus.tsx` | `AuthStatusTheme` | `authStatusTheme` |
-| `src/features/playground/BodyEditor.tsx` | `BodyEditorTheme` | `bodyEditorTheme` |
-| `src/features/playground/ParamLabel.tsx` | `ParamLabelTheme` | `paramLabelTheme` |
-| `src/features/playground/ResponsePanel.tsx` | `ResponsePanelTheme` | `responsePanelTheme` |
-| `src/features/playground/SendBar.tsx` | `SendBarTheme` | `sendBarTheme` |
-| `src/features/playground/inputs/ArrayInput.tsx` | `ArrayInputTheme` | `arrayInputTheme` |
-| `src/features/playground/inputs/BooleanSelect.tsx` | `BooleanSelectTheme` | `booleanSelectTheme` |
-| `src/features/playground/inputs/EnumSelect.tsx` | `EnumSelectTheme` | `enumSelectTheme` |
-| `src/features/playground/inputs/FileInput.tsx` | `FileInputTheme` | `fileInputTheme` |
-| `src/features/playground/inputs/MultiSelect.tsx` | `MultiSelectTheme` | `multiSelectTheme` |
-| `src/features/playground/inputs/ObjectInput.tsx` | `ObjectInputTheme` | `objectInputTheme` |
-| `src/features/playground/inputs/ScalarInput.tsx` | `ScalarInputTheme` | `scalarInputTheme` |
-| `src/shared/components/CommandBar.tsx` | `CommandBarTheme` | `commandBarTheme` |
-| `src/shared/components/LoadModal.tsx` | `LoadModalTheme` | `loadModalTheme` |
-| `src/shared/components/Modal.tsx` | `ModalTheme` | `modalTheme` |
-| `src/shared/components/TopBar.tsx` | `TopBarTheme` | `topBarTheme` |
-| `src/shared/utils/highlight.ts` | `SyntaxTheme` | _(inline, via CSS vars)_ |
-| `src/features/nav/DetailPane.tsx` | _(none yet — uses `dark:`)_ | _(none yet)_ |
-| `src/shared/components/VerticalResizable.tsx` | _(none yet — uses `dark:`)_ | _(none yet)_ |
+| Component file                                     | Interface                   | Style object             |
+|----------------------------------------------------|-----------------------------|--------------------------|
+| `src/App.tsx`                                      | `AppRootTheme`              | `appTheme`               |
+| `src/features/nav/Nav.tsx`                         | `NavTheme`                  | `navTheme`               |
+| `src/features/endpoint/EndpointDetail.tsx`         | `EndpointTheme`             | `endpointTheme`          |
+| `src/features/auth/AuthModal.tsx`                  | `AuthModalTheme`            | `authModalTheme`         |
+| `src/features/server/ServerConfig.tsx`             | `ServerConfigTheme`         | `serverConfigTheme`      |
+| `src/features/schema/SchemaViewer.tsx`             | `SchemaViewerTheme`         | `schemaViewerTheme`      |
+| `src/features/schema/SchemaNode.tsx`               | `SchemaNodeTheme`           | `schemaNodeTheme`        |
+| `src/features/schema/SchemaDetail.tsx`             | `SchemaDetailTheme`         | `schemaDetailTheme`      |
+| `src/features/playground/Playground.tsx`           | `PlaygroundTheme`           | `playgroundTheme`        |
+| `src/features/playground/AuthStatus.tsx`           | `AuthStatusTheme`           | `authStatusTheme`        |
+| `src/features/playground/BodyEditor.tsx`           | `BodyEditorTheme`           | `bodyEditorTheme`        |
+| `src/features/playground/ParamLabel.tsx`           | `ParamLabelTheme`           | `paramLabelTheme`        |
+| `src/features/playground/ResponsePanel.tsx`        | `ResponsePanelTheme`        | `responsePanelTheme`     |
+| `src/features/playground/SendBar.tsx`              | `SendBarTheme`              | `sendBarTheme`           |
+| `src/features/playground/inputs/ArrayInput.tsx`    | `ArrayInputTheme`           | `arrayInputTheme`        |
+| `src/features/playground/inputs/BooleanSelect.tsx` | `BooleanSelectTheme`        | `booleanSelectTheme`     |
+| `src/features/playground/inputs/EnumSelect.tsx`    | `EnumSelectTheme`           | `enumSelectTheme`        |
+| `src/features/playground/inputs/FileInput.tsx`     | `FileInputTheme`            | `fileInputTheme`         |
+| `src/features/playground/inputs/MultiSelect.tsx`   | `MultiSelectTheme`          | `multiSelectTheme`       |
+| `src/features/playground/inputs/ObjectInput.tsx`   | `ObjectInputTheme`          | `objectInputTheme`       |
+| `src/features/playground/inputs/ScalarInput.tsx`   | `ScalarInputTheme`          | `scalarInputTheme`       |
+| `src/shared/components/CommandBar.tsx`             | `CommandBarTheme`           | `commandBarTheme`        |
+| `src/shared/components/LoadModal.tsx`              | `LoadModalTheme`            | `loadModalTheme`         |
+| `src/shared/components/Modal.tsx`                  | `ModalTheme`                | `modalTheme`             |
+| `src/shared/components/TopBar.tsx`                 | `TopBarTheme`               | `topBarTheme`            |
+| `src/shared/utils/highlight.ts`                    | `SyntaxTheme`               | _(inline, via CSS vars)_ |
+| `src/features/nav/DetailPane.tsx`                  | _(none yet — uses `dark:`)_ | _(none yet)_             |
+| `src/shared/components/VerticalResizable.tsx`      | _(none yet — uses `dark:`)_ | _(none yet)_             |
 
 ---
 
@@ -108,38 +108,38 @@ export interface AppTheme {
   name: string;
 
   // already present — no key changes, just import source changes
-  nav:          NavTheme;
-  endpoint:     EndpointTheme;
-  topBar:       TopBarTheme;
-  modal:        ModalTheme;
-  authModal:    AuthModalTheme;
+  nav: NavTheme;
+  endpoint: EndpointTheme;
+  topBar: TopBarTheme;
+  modal: ModalTheme;
+  authModal: AuthModalTheme;
   serverConfig: ServerConfigTheme;
-  commandBar:   CommandBarTheme;
-  schema:       SchemaViewerTheme;
-  syntax:       SyntaxTheme;
-  paneHandle:   string;
-  focusRing:    string;
-  scrollbar:    { thumb: string; thumbHover: string };
+  commandBar: CommandBarTheme;
+  schema: SchemaViewerTheme;
+  syntax: SyntaxTheme;
+  paneHandle: string;
+  focusRing: string;
+  scrollbar: { thumb: string; thumbHover: string };
 
   // ADD — sub-components that currently bypass AppTheme
-  appRoot:          AppRootTheme;
-  loadModal:        LoadModalTheme;
-  schemaNode:       SchemaNodeTheme;
-  schemaDetail:     SchemaDetailTheme;
-  playground:       PlaygroundTheme;
-  authStatus:       AuthStatusTheme;
-  bodyEditor:       BodyEditorTheme;
-  paramLabel:       ParamLabelTheme;
-  responsePanel:    ResponsePanelTheme;
-  sendBar:          SendBarTheme;
-  inputScalar:      ScalarInputTheme;
-  inputBoolean:     BooleanSelectTheme;
-  inputEnum:        EnumSelectTheme;
-  inputFile:        FileInputTheme;
-  inputArray:       ArrayInputTheme;
+  appRoot: AppRootTheme;
+  loadModal: LoadModalTheme;
+  schemaNode: SchemaNodeTheme;
+  schemaDetail: SchemaDetailTheme;
+  playground: PlaygroundTheme;
+  authStatus: AuthStatusTheme;
+  bodyEditor: BodyEditorTheme;
+  paramLabel: ParamLabelTheme;
+  responsePanel: ResponsePanelTheme;
+  sendBar: SendBarTheme;
+  inputScalar: ScalarInputTheme;
+  inputBoolean: BooleanSelectTheme;
+  inputEnum: EnumSelectTheme;
+  inputFile: FileInputTheme;
+  inputArray: ArrayInputTheme;
   inputMultiSelect: MultiSelectTheme;
-  inputObject:      ObjectInputTheme;
-  detailPane:       DetailPaneTheme;
+  inputObject: ObjectInputTheme;
+  detailPane: DetailPaneTheme;
   verticalResizable: VerticalResizableTheme;
 }
 ```
@@ -158,22 +158,22 @@ For every component the transformation is identical; only the names differ.
 ```ts
 // interface defined in component file
 export interface SchemaViewerTheme {
-  tabBar:       ThemeSlot;
-  tabActive:    ThemeSlot;
-  tabInactive:  ThemeSlot;
-  description:  ThemeSlot;
+  tabBar: ThemeSlot;
+  tabActive: ThemeSlot;
+  tabInactive: ThemeSlot;
+  description: ThemeSlot;
   exampleBlock: ThemeSlot;
 }
 
 // style object in component file
 export const schemaViewerTheme: Record<ThemeMode, SchemaViewerTheme> = {
   default: {
-    tabBar:       'flex gap-1 px-3 py-2 bg-gray-50 border-b border-gray-100',
-    tabActive:    'px-3 py-1 text-[11px] ... bg-white text-gray-700 ...',
+    tabBar: 'flex gap-1 px-3 py-2 bg-gray-50 border-b border-gray-100',
+    tabActive: 'px-3 py-1 text-[11px] ... bg-white text-gray-700 ...',
     // ...
   },
   dark: {
-    tabBar:       'flex gap-1 px-3 py-2 bg-gray-800/80 border-b border-gray-700',
+    tabBar: 'flex gap-1 px-3 py-2 bg-gray-800/80 border-b border-gray-700',
     // ...
   },
 };
@@ -187,13 +187,13 @@ const t = schemaViewerTheme[useThemeMode()];
 **`src/themes/components/schema-viewer.ts`** — interface only, zero style values:
 
 ```ts
-import type { ThemeSlot } from '../slot';
+import type {ThemeSlot} from '../slot';
 
 export interface SchemaViewerTheme {
-  tabBar:       ThemeSlot;
-  tabActive:    ThemeSlot;
-  tabInactive:  ThemeSlot;
-  description:  ThemeSlot;
+  tabBar: ThemeSlot;
+  tabActive: ThemeSlot;
+  tabInactive: ThemeSlot;
+  description: ThemeSlot;
   exampleBlock: ThemeSlot;
 }
 ```
@@ -201,16 +201,16 @@ export interface SchemaViewerTheme {
 **`src/themes/presets/light.ts`** — all style values for all components, one object:
 
 ```ts
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 export const lightTheme: AppTheme = {
   name: 'light',
   // ...other components...
   schema: {
-    tabBar:       'flex gap-1 px-3 py-2 bg-gray-50 border-b border-gray-100',
-    tabActive:    'px-3 py-1 text-[11px] font-medium rounded-md bg-white text-gray-700 border border-gray-200',
-    tabInactive:  'px-3 py-1 text-[11px] font-medium rounded-md text-gray-400 hover:text-gray-600 transition-colors',
-    description:  'px-4 pt-3 pb-0 text-[11px] text-gray-500 leading-relaxed',
+    tabBar: 'flex gap-1 px-3 py-2 bg-gray-50 border-b border-gray-100',
+    tabActive: 'px-3 py-1 text-[11px] font-medium rounded-md bg-white text-gray-700 border border-gray-200',
+    tabInactive: 'px-3 py-1 text-[11px] font-medium rounded-md text-gray-400 hover:text-gray-600 transition-colors',
+    description: 'px-4 pt-3 pb-0 text-[11px] text-gray-500 leading-relaxed',
     exampleBlock: 'text-[11px] bg-gray-50 rounded-md p-3 overflow-x-auto text-gray-700 font-mono leading-relaxed',
   },
   // ...
@@ -224,7 +224,7 @@ export const lightTheme: AppTheme = {
 // REMOVED: export const schemaViewerTheme: Record<ThemeMode, ...> = { ... }
 // REMOVED: import { useThemeMode } from '../../shared/contexts/theme-mode-context';
 
-import { useTheme } from '../../themes/context';
+import {useTheme} from '../../themes/context';
 
 // inside component:
 const t = useTheme().schema;
@@ -278,6 +278,7 @@ At this point the app still runs unchanged (old component-local themes still use
 Order: `Modal` → `LoadModal` → `CommandBar` → `TopBar`
 
 For each:
+
 1. Copy interface to `src/themes/components/<name>.ts`.
 2. Fill `modal:` / `loadModal:` / `commandBar:` / `topBar:` in both preset files.
 3. In component: remove interface + style object + `useThemeMode()` import; add `useTheme()`;

@@ -17,12 +17,12 @@ export type ThemeSlot = string | ({ base: string } & Record<string, string>);
  * Condition keys not present in the slot definition are silently ignored.
  */
 export function slot(def: ThemeSlot, conditions?: Record<string, boolean>): string {
-  if (typeof def === 'string') return def;
-  const parts = [def.base];
-  if (conditions) {
-    for (const [key, active] of Object.entries(conditions)) {
-      if (active && def[key]) parts.push(def[key]);
+    if (typeof def === 'string') return def;
+    const parts = [def.base];
+    if (conditions) {
+        for (const [key, active] of Object.entries(conditions)) {
+            if (active && def[key]) parts.push(def[key]);
+        }
     }
-  }
-  return parts.filter(Boolean).join(' ');
+    return parts.filter(Boolean).join(' ');
 }

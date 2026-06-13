@@ -14,15 +14,15 @@ interface Props {
 }
 
 /** Renders a resizable textarea pre-configured for JSON object input. */
-export default function ObjectInput({ value, invalid, onChange }: Props) {
+export default function ObjectInput({value, invalid, onChange}: Props) {
   const t = useTheme().inputObject;
   return (
-    <textarea
-      rows={3}
-      className={invalid ? slot(t.textareaInvalid) : slot(t.textarea)}
-      placeholder='{"key": "value"}'
-      value={value}
-      onInput={(e) => onChange((e.target as HTMLTextAreaElement).value)}
-    />
+      <textarea
+          rows={3}
+          className={invalid ? slot(t.textareaInvalid) : slot(t.textarea)}
+          placeholder='{"key": "value"}'
+          value={value}
+          onInput={(e) => onChange((e.target as HTMLTextAreaElement).value)}
+      />
   );
 }

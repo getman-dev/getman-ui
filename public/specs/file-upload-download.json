@@ -5,11 +5,24 @@
     "description": "Demonstrates multipart/form-data file uploads (single and multiple files, with metadata), application/octet-stream binary upload and download, base64-encoded content, and the requestBody `encoding` object for fine-grained multipart control.",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://api.example.com/v1" }],
+  "servers": [
+    {
+      "url": "https://api.example.com/v1"
+    }
+  ],
   "tags": [
-    { "name": "upload", "description": "File upload endpoints" },
-    { "name": "download", "description": "File download endpoints" },
-    { "name": "base64", "description": "Base64-encoded binary content" }
+    {
+      "name": "upload",
+      "description": "File upload endpoints"
+    },
+    {
+      "name": "download",
+      "description": "File download endpoints"
+    },
+    {
+      "name": "base64",
+      "description": "Base64-encoded binary content"
+    }
   ],
   "paths": {
     "/files/upload/single": {
@@ -17,14 +30,18 @@
         "operationId": "uploadSingleFile",
         "summary": "Upload a single file",
         "description": "Accepts a `multipart/form-data` request with one file field and optional metadata.",
-        "tags": ["upload"],
+        "tags": [
+          "upload"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["file"],
+                "required": [
+                  "file"
+                ],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -56,15 +73,23 @@
             "description": "File uploaded",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FileRecord" }
+                "schema": {
+                  "$ref": "#/components/schemas/FileRecord"
+                }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "413": {
             "description": "File too large",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -75,18 +100,25 @@
         "operationId": "uploadMultipleFiles",
         "summary": "Upload multiple files",
         "description": "Accepts up to 10 files in a single `multipart/form-data` request. Each file gets a separate `files[]` part.",
-        "tags": ["upload"],
+        "tags": [
+          "upload"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["files"],
+                "required": [
+                  "files"
+                ],
                 "properties": {
                   "files": {
                     "type": "array",
-                    "items": { "type": "string", "format": "binary" },
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
                     "minItems": 1,
                     "maxItems": 10,
                     "description": "Array of files to upload"
@@ -97,7 +129,9 @@
                   },
                   "tags": {
                     "type": "array",
-                    "items": { "type": "string" },
+                    "items": {
+                      "type": "string"
+                    },
                     "description": "Tags to apply to all uploaded files"
                   }
                 }
@@ -115,15 +149,21 @@
                   "properties": {
                     "files": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/FileRecord" }
+                      "items": {
+                        "$ref": "#/components/schemas/FileRecord"
+                      }
                     },
-                    "count": { "type": "integer" }
+                    "count": {
+                      "type": "integer"
+                    }
                   }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
         }
       }
     },
@@ -132,14 +172,19 @@
         "operationId": "uploadWithEncoding",
         "summary": "Upload with custom multipart encoding",
         "description": "Uses the `encoding` object to set `Content-Type` and custom headers for specific multipart parts. Useful for uploads that mix JSON metadata with binary file data.",
-        "tags": ["upload"],
+        "tags": [
+          "upload"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["file", "metadata"],
+                "required": [
+                  "file",
+                  "metadata"
+                ],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -155,9 +200,18 @@
                     "type": "object",
                     "description": "Structured metadata — sent as JSON in its own part",
                     "properties": {
-                      "title": { "type": "string" },
-                      "alt": { "type": "string" },
-                      "tags": { "type": "array", "items": { "type": "string" } }
+                      "title": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 }
@@ -168,7 +222,14 @@
                   "headers": {
                     "X-Upload-Priority": {
                       "description": "Upload priority hint",
-                      "schema": { "type": "string", "enum": ["low", "normal", "high"] }
+                      "schema": {
+                        "type": "string",
+                        "enum": [
+                          "low",
+                          "normal",
+                          "high"
+                        ]
+                      }
                     }
                   }
                 },
@@ -183,7 +244,11 @@
           "201": {
             "description": "File and metadata stored",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FileRecord" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRecord"
+                }
+              }
             }
           }
         }
@@ -194,25 +259,35 @@
         "operationId": "uploadBinaryStream",
         "summary": "Upload raw binary (octet-stream)",
         "description": "Accepts the raw file bytes as `application/octet-stream`. File name and type are passed as query parameters. More efficient than multipart for large files.",
-        "tags": ["upload"],
+        "tags": [
+          "upload"
+        ],
         "parameters": [
           {
             "name": "filename",
             "in": "query",
             "required": true,
-            "schema": { "type": "string", "example": "report.pdf" }
+            "schema": {
+              "type": "string",
+              "example": "report.pdf"
+            }
           },
           {
             "name": "contentType",
             "in": "query",
             "description": "MIME type of the file being uploaded",
-            "schema": { "type": "string", "example": "application/pdf" }
+            "schema": {
+              "type": "string",
+              "example": "application/pdf"
+            }
           },
           {
             "name": "Content-Length",
             "in": "header",
             "description": "Byte length of the request body",
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "requestBody": {
@@ -231,104 +306,182 @@
           "201": {
             "description": "File stored",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FileRecord" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRecord"
+                }
+              }
             }
           },
           "413": {
             "description": "File exceeds maximum allowed size",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
       }
     },
     "/files/{fileId}": {
-      "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/FileId"
+        }
+      ],
       "get": {
         "operationId": "getFileMetadata",
         "summary": "Get file metadata",
-        "tags": ["download"],
+        "tags": [
+          "download"
+        ],
         "responses": {
           "200": {
             "description": "File metadata",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FileRecord" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRecord"
+                }
+              }
             }
           },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       },
       "delete": {
         "operationId": "deleteFile",
         "summary": "Delete a file",
-        "tags": ["download"],
+        "tags": [
+          "download"
+        ],
         "responses": {
-          "204": { "description": "File deleted" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "204": {
+            "description": "File deleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/files/{fileId}/download": {
-      "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/FileId"
+        }
+      ],
       "get": {
         "operationId": "downloadFile",
         "summary": "Download a file (binary stream)",
         "description": "Returns the raw file bytes as `application/octet-stream` with a `Content-Disposition: attachment` header.",
-        "tags": ["download"],
+        "tags": [
+          "download"
+        ],
         "responses": {
           "200": {
             "description": "File content",
             "headers": {
               "Content-Disposition": {
                 "description": "Attachment with the original filename",
-                "schema": { "type": "string", "example": "attachment; filename=\"report.pdf\"" }
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"report.pdf\""
+                }
               },
               "Content-Length": {
                 "description": "File size in bytes",
-                "schema": { "type": "integer" }
+                "schema": {
+                  "type": "integer"
+                }
               },
               "ETag": {
                 "description": "File content hash for caching",
-                "schema": { "type": "string" }
+                "schema": {
+                  "type": "string"
+                }
               }
             },
             "content": {
               "application/octet-stream": {
-                "schema": { "type": "string", "format": "binary" }
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/files/{fileId}/download/inline": {
-      "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/FileId"
+        }
+      ],
       "get": {
         "operationId": "downloadFileInline",
         "summary": "Stream file inline (browser preview)",
         "description": "Returns the file with its original `Content-Type` and `Content-Disposition: inline` so browsers render it directly (images, PDFs, etc.).",
-        "tags": ["download"],
+        "tags": [
+          "download"
+        ],
         "responses": {
           "200": {
             "description": "File content for inline display",
             "headers": {
               "Content-Disposition": {
-                "schema": { "type": "string", "example": "inline; filename=\"image.png\"" }
+                "schema": {
+                  "type": "string",
+                  "example": "inline; filename=\"image.png\""
+                }
               },
               "Content-Type": {
-                "schema": { "type": "string", "example": "image/png" }
+                "schema": {
+                  "type": "string",
+                  "example": "image/png"
+                }
               }
             },
             "content": {
-              "image/png": { "schema": { "type": "string", "format": "binary" } },
-              "image/jpeg": { "schema": { "type": "string", "format": "binary" } },
-              "image/webp": { "schema": { "type": "string", "format": "binary" } },
-              "application/pdf": { "schema": { "type": "string", "format": "binary" } }
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
             }
           },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
@@ -337,17 +490,28 @@
         "operationId": "encodeBase64",
         "summary": "Submit data as base64-encoded string",
         "description": "Accepts a JSON body where the file content is base64-encoded (`format: byte`). Less efficient than binary but avoids multipart.",
-        "tags": ["base64"],
+        "tags": [
+          "base64"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["filename", "content"],
+                "required": [
+                  "filename",
+                  "content"
+                ],
                 "properties": {
-                  "filename": { "type": "string", "example": "logo.png" },
-                  "mimeType": { "type": "string", "example": "image/png" },
+                  "filename": {
+                    "type": "string",
+                    "example": "logo.png"
+                  },
+                  "mimeType": {
+                    "type": "string",
+                    "example": "image/png"
+                  },
                   "content": {
                     "type": "string",
                     "format": "byte",
@@ -363,7 +527,11 @@
           "201": {
             "description": "File stored",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FileRecord" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRecord"
+                }
+              }
             }
           }
         }
@@ -374,8 +542,14 @@
         "operationId": "decodeBase64",
         "summary": "Retrieve file as base64-encoded JSON",
         "description": "Returns the file wrapped in a JSON object with its content base64-encoded. Useful for APIs that must return binary data inside JSON.",
-        "tags": ["base64"],
-        "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+        "tags": [
+          "base64"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FileId"
+          }
+        ],
         "responses": {
           "200": {
             "description": "File as base64 JSON",
@@ -384,9 +558,15 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "filename": { "type": "string" },
-                    "mimeType": { "type": "string" },
-                    "size": { "type": "integer" },
+                    "filename": {
+                      "type": "string"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
                     "content": {
                       "type": "string",
                       "format": "byte",
@@ -397,7 +577,9 @@
               }
             }
           },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     }
@@ -408,33 +590,90 @@
         "name": "fileId",
         "in": "path",
         "required": true,
-        "schema": { "type": "string", "format": "uuid" }
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
       }
     },
     "schemas": {
       "FileRecord": {
         "type": "object",
-        "required": ["id", "filename", "size", "mimeType", "url", "createdAt"],
+        "required": [
+          "id",
+          "filename",
+          "size",
+          "mimeType",
+          "url",
+          "createdAt"
+        ],
         "properties": {
-          "id": { "type": "string", "format": "uuid", "readOnly": true },
-          "filename": { "type": "string", "example": "report.pdf" },
-          "originalName": { "type": "string", "example": "Q4 Report.pdf" },
-          "mimeType": { "type": "string", "example": "application/pdf" },
-          "size": { "type": "integer", "description": "File size in bytes", "example": 204800 },
-          "url": { "type": "string", "format": "uri", "description": "Download URL", "readOnly": true },
-          "folder": { "type": "string", "example": "/documents/reports" },
-          "description": { "type": "string" },
-          "tags": { "type": "array", "items": { "type": "string" } },
-          "checksum": { "type": "string", "description": "SHA-256 hash of file content", "readOnly": true },
-          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "filename": {
+            "type": "string",
+            "example": "report.pdf"
+          },
+          "originalName": {
+            "type": "string",
+            "example": "Q4 Report.pdf"
+          },
+          "mimeType": {
+            "type": "string",
+            "example": "application/pdf"
+          },
+          "size": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 204800
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Download URL",
+            "readOnly": true
+          },
+          "folder": {
+            "type": "string",
+            "example": "/documents/reports"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checksum": {
+            "type": "string",
+            "description": "SHA-256 hash of file content",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
         }
       },
       "Error": {
         "type": "object",
-        "required": ["code", "message"],
+        "required": [
+          "code",
+          "message"
+        ],
         "properties": {
-          "code": { "type": "string" },
-          "message": { "type": "string" }
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
         }
       }
     },
@@ -442,13 +681,21 @@
       "BadRequest": {
         "description": "Invalid request",
         "content": {
-          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
         }
       },
       "NotFound": {
         "description": "File not found",
         "content": {
-          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
         }
       }
     }

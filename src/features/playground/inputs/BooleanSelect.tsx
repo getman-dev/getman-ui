@@ -17,17 +17,17 @@ interface Props {
  * Renders a <select> with —/true/false options.
  * A blank value means the parameter is not sent — distinct from explicitly sending false.
  */
-export default function BooleanSelect({ value, invalid, onChange }: Props) {
+export default function BooleanSelect({value, invalid, onChange}: Props) {
   const t = useTheme().inputBoolean;
   return (
-    <select
-      className={invalid ? slot(t.selectInvalid) : slot(t.select)}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      <option value="">—</option>
-      <option value="true">true</option>
-      <option value="false">false</option>
-    </select>
+      <select
+          className={invalid ? slot(t.selectInvalid) : slot(t.select)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">—</option>
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
   );
 }

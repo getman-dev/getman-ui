@@ -11,15 +11,15 @@ export interface SyntaxTheme {
 // Regex matches (in order): keys, strings, true/false, null, numbers
 // Operates on already-HTML-escaped text, so quotes appear as &quot;
 const TOKEN_RE =
-  /(&quot;(?:[^&]|&(?!quot;))*&quot;(?:\s*:)?|\b(?:true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
+    /(&quot;(?:[^&]|&(?!quot;))*&quot;(?:\s*:)?|\b(?:true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
 
 function tokenClass(token: string): string {
-  if (token.endsWith(":"))      return "color:var(--hl-key)";
-  if (token.startsWith("&"))    return "color:var(--hl-str)";
-  if (token === "true")         return "color:var(--hl-bool)";
-  if (token === "false")        return "color:var(--hl-bool)";
-  if (token === "null")         return "color:var(--hl-null)";
-  return                               "color:var(--hl-num)";
+  if (token.endsWith(":")) return "color:var(--hl-key)";
+  if (token.startsWith("&")) return "color:var(--hl-str)";
+  if (token === "true") return "color:var(--hl-bool)";
+  if (token === "false") return "color:var(--hl-bool)";
+  if (token === "null") return "color:var(--hl-null)";
+  return "color:var(--hl-num)";
 }
 
 /** Returns a syntax-highlighted HTML string for a JSON value. Falls back to plain escaped text for non-JSON or large inputs. */

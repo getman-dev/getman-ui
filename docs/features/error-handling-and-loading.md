@@ -37,6 +37,7 @@ embedded context the browser console is not visible to end users.
 `loadSpecFromUrl` is called from two places with different modal state:
 
 **Entry point 1 — Programmatic embed (broken)**
+
 ```
 mountApiExplorer(el, { url: "https://example.com/bad.json" })
   → AppInner.useEffect → loadSpecFromUrl(url)
@@ -47,6 +48,7 @@ mountApiExplorer(el, { url: "https://example.com/bad.json" })
 ```
 
 **Entry point 2 — Load modal URL / file (already works)**
+
 ```
 User opens LoadModal, pastes URL, clicks Load
   → LoadModal.loadUrl() → loadSpecFromUrl(url)
@@ -55,7 +57,8 @@ User opens LoadModal, pastes URL, clicks Load
   → LoadModal.tsx:88-92 renders the error inline inside the modal  ← error is visible
 ```
 
-`LoadModal` also handles file upload errors via `loadSpecFromFile`, which writes the same `modalError`. The file path works for the same reason: the modal is open throughout.
+`LoadModal` also handles file upload errors via `loadSpecFromFile`, which writes the same `modalError`. The file path
+works for the same reason: the modal is open throughout.
 
 The fix only needs to address entry point 1. Entry point 2 is correct as-is.
 
@@ -79,13 +82,18 @@ No new state needed — `modalError` is already set by `loadSpecFromUrl` and cle
 
 ```tsx
 // AppInner — between <TopBar /> and #pane-container
-{modalError && !modalVisible && (
-    <div className="flex items-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-950 border-b border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
-        <span className="shrink-0">⚠</span>
-        <span className="flex-1">{modalError}</span>
-        <button onClick={() => modalActions.setModalError("")} className="shrink-0 text-red-400 hover:text-red-600">×</button>
-    </div>
-)}
+{
+    modalError && !modalVisible && (
+        <div
+            className="flex items-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-950 border-b border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
+            <span className="shrink-0">⚠</span>
+            <span className="flex-1">{modalError}</span>
+            <button onClick={() => modalActions.setModalError("")}
+                    className="shrink-0 text-red-400 hover:text-red-600">×
+            </button>
+        </div>
+    )
+}
 ```
 
 **Pros:** Zero new state, no context changes, no changes to `LoadModal`. The condition `!modalVisible && !!modalError`

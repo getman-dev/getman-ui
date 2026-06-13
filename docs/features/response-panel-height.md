@@ -3,6 +3,7 @@
 **Priority:** P2 — polish  
 **Branch:** `fix/response-panel-height`  
 **Files touched:**
+
 - `src/shared/components/VerticalResizable.tsx` ← new file
 - `src/features/playground/Playground.tsx`
 - `src/features/playground/ResponsePanel.tsx`
@@ -41,16 +42,16 @@ A reusable `VerticalResizable` React component that:
 
 ```tsx
 interface VerticalResizableProps {
-  /** localStorage key — must be unique per usage site. */
-  storageKey: string;
-  /** Default height of the bottom pane in px, used when nothing is stored yet. */
-  defaultBottomHeight: number;
-  /** Minimum height of the top pane in px. Default: 80. */
-  minTop?: number;
-  /** Minimum height of the bottom pane in px. Default: 80. */
-  minBottom?: number;
-  top: React.ReactNode;
-  bottom: React.ReactNode;
+    /** localStorage key — must be unique per usage site. */
+    storageKey: string;
+    /** Default height of the bottom pane in px, used when nothing is stored yet. */
+    defaultBottomHeight: number;
+    /** Minimum height of the top pane in px. Default: 80. */
+    minTop?: number;
+    /** Minimum height of the bottom pane in px. Default: 80. */
+    minBottom?: number;
+    top: React.ReactNode;
+    bottom: React.ReactNode;
 }
 ```
 
@@ -72,12 +73,13 @@ interface VerticalResizableProps {
 ```tsx
 // Initialise from localStorage; fall back to defaultBottomHeight.
 const [bottomHeight, setBottomHeight] = useState<number>(() => {
-  try {
-    const stored = localStorage.getItem(storageKey);
-    const h = Number(stored);
-    if (isFinite(h) && h > 0) return h;
-  } catch { /* ignore */ }
-  return defaultBottomHeight;
+    try {
+        const stored = localStorage.getItem(storageKey);
+        const h = Number(stored);
+        if (isFinite(h) && h > 0) return h;
+    } catch { /* ignore */
+    }
+    return defaultBottomHeight;
 });
 
 // Keep a ref so drag callbacks always read the live value without stale closures.
@@ -88,34 +90,37 @@ const heightRef = useRef(bottomHeight);
 
 ```tsx
 function handleMouseDown(e: React.MouseEvent) {
-  e.preventDefault();
-  const startY      = e.clientY;
-  const startHeight = heightRef.current;
-  const containerH  = containerRef.current?.getBoundingClientRect().height ?? 0;
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = heightRef.current;
+    const containerH = containerRef.current?.getBoundingClientRect().height ?? 0;
 
-  document.body.style.cursor     = "row-resize";
-  document.body.style.userSelect = "none";
+    document.body.style.cursor = "row-resize";
+    document.body.style.userSelect = "none";
 
-  function onMove(ev: MouseEvent) {
-    // Drag up → larger bottom pane; drag down → smaller.
-    const next = Math.max(
-      effectiveMinBottom,
-      Math.min(startHeight + (startY - ev.clientY), containerH - effectiveMinTop - HANDLE_H),
-    );
-    heightRef.current = next;
-    setBottomHeight(next);
-  }
+    function onMove(ev: MouseEvent) {
+        // Drag up → larger bottom pane; drag down → smaller.
+        const next = Math.max(
+            effectiveMinBottom,
+            Math.min(startHeight + (startY - ev.clientY), containerH - effectiveMinTop - HANDLE_H),
+        );
+        heightRef.current = next;
+        setBottomHeight(next);
+    }
 
-  function onUp() {
-    document.body.style.cursor     = "";
-    document.body.style.userSelect = "";
-    try { localStorage.setItem(storageKey, String(heightRef.current)); } catch { /* ignore */ }
-    document.removeEventListener("mousemove", onMove);
-    document.removeEventListener("mouseup",  onUp);
-  }
+    function onUp() {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        try {
+            localStorage.setItem(storageKey, String(heightRef.current));
+        } catch { /* ignore */
+        }
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+    }
 
-  document.addEventListener("mousemove", onMove);
-  document.addEventListener("mouseup",  onUp);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
 }
 ```
 
@@ -126,12 +131,12 @@ function handleMouseDown(e: React.MouseEvent) {
 
 ```tsx
 <div
-  className="shrink-0 h-2 cursor-row-resize flex items-center justify-center group"
-  onMouseDown={handleMouseDown}
-  aria-hidden="true"
+    className="shrink-0 h-2 cursor-row-resize flex items-center justify-center group"
+    onMouseDown={handleMouseDown}
+    aria-hidden="true"
 >
-  <div className="w-8 h-0.5 rounded-full bg-gray-200 dark:bg-gray-600
-                  group-hover:bg-blue-400 dark:group-hover:bg-blue-500 transition-colors" />
+    <div className="w-8 h-0.5 rounded-full bg-gray-200 dark:bg-gray-600
+                  group-hover:bg-blue-400 dark:group-hover:bg-blue-500 transition-colors"/>
 </div>
 ```
 
@@ -146,22 +151,22 @@ Replace the standalone form scroll div + `<ResponsePanel>` with `<VerticalResiza
 ```tsx
 // Before:
 <div className="flex-1 min-h-0 overflow-y-auto px-5 py-6 flex flex-col gap-7">
-  {/* ...form content... */}
+    {/* ...form content... */}
 </div>
-<ResponsePanel loading={loading} response={response} />
+<ResponsePanel loading={loading} response={response}/>
 
 // After:
 <VerticalResizable
-  storageKey="try-pane-split"
-  defaultBottomHeight={280}
-  minTop={120}
-  minBottom={80}
-  top={
-    <div className="px-5 py-6 flex flex-col gap-7">
-      {/* ...unchanged form content... */}
-    </div>
-  }
-  bottom={<ResponsePanel loading={loading} response={response} />}
+    storageKey="try-pane-split"
+    defaultBottomHeight={280}
+    minTop={120}
+    minBottom={80}
+    top={
+        <div className="px-5 py-6 flex flex-col gap-7">
+            {/* ...unchanged form content... */}
+        </div>
+    }
+    bottom={<ResponsePanel loading={loading} response={response}/>}
 />
 ```
 
@@ -191,10 +196,10 @@ split in the app without change. Example future use:
 
 ```tsx
 <VerticalResizable
-  storageKey="schema-detail-split"
-  defaultBottomHeight={200}
-  top={<SchemaNode />}
-  bottom={<SchemaExamples />}
+    storageKey="schema-detail-split"
+    defaultBottomHeight={200}
+    top={<SchemaNode/>}
+    bottom={<SchemaExamples/>}
 />
 ```
 

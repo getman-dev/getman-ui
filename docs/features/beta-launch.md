@@ -2,7 +2,8 @@
 
 ## Goal
 
-Ship a stable, embeddable IIFE that can be dropped into existing projects via a script tag and pointed at a real API spec URL. Self-hosted on a custom server.
+Ship a stable, embeddable IIFE that can be dropped into existing projects via a script tag and pointed at a real API
+spec URL. Self-hosted on a custom server.
 
 ## Constraints
 
@@ -21,9 +22,13 @@ Ship a stable, embeddable IIFE that can be dropped into existing projects via a 
 
 **Priority: P0 — bug**
 
-When `mountApiExplorer(el, { url: "..." })` is called and the fetch fails (404, network error, CORS-blocked), `loadSpecFromUrl` calls `modalActions.setModalError(...)` but the LoadModal is closed (default state). The error is stored but never displayed — the user sees a permanently empty UI with no explanation.
+When `mountApiExplorer(el, { url: "..." })` is called and the fetch fails (404, network error, CORS-blocked),
+`loadSpecFromUrl` calls `modalActions.setModalError(...)` but the LoadModal is closed (default state). The error is
+stored but never displayed — the user sees a permanently empty UI with no explanation.
 
-**Fix:** Add a top-level inline error banner to `AppInner` that reads `modalError` from context and renders when `!modalVisible && !!modalError`. This banner appears in the main content area (not in a modal) and is appropriate for programmatic embed.
+**Fix:** Add a top-level inline error banner to `AppInner` that reads `modalError` from context and renders when
+`!modalVisible && !!modalError`. This banner appears in the main content area (not in a modal) and is appropriate for
+programmatic embed.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -35,7 +40,8 @@ When `mountApiExplorer(el, { url: "..." })` is called and the fetch fails (404, 
 └──────────┴──────────────────────────────────────────────┘
 ```
 
-**Files:** `src/App.tsx` (add banner in `AppInner`), `src/shared/contexts/modal-context.tsx` (verify `modalError` is already in snapshot — it is).
+**Files:** `src/App.tsx` (add banner in `AppInner`), `src/shared/contexts/modal-context.tsx` (verify `modalError` is
+already in snapshot — it is).
 
 ---
 
@@ -43,13 +49,18 @@ When `mountApiExplorer(el, { url: "..." })` is called and the fetch fails (404, 
 
 **Priority: P0 — UX regression for embeds**
 
-When `initialUrl` is passed, the app renders a fully empty nav + empty detail pane for the duration of the fetch (no skeleton, no spinner). Depending on network latency this is a multi-second blank screen.
+When `initialUrl` is passed, the app renders a fully empty nav + empty detail pane for the duration of the fetch (no
+skeleton, no spinner). Depending on network latency this is a multi-second blank screen.
 
-**Fix:** Add a `specLoading` boolean to `spec-context` (default `false`). `loadSpecFromUrl` sets it `true` before fetch and `false` in a `finally`. `Nav` and `DetailPane` read this flag and render a centered spinner instead of their normal empty states.
+**Fix:** Add a `specLoading` boolean to `spec-context` (default `false`). `loadSpecFromUrl` sets it `true` before fetch
+and `false` in a `finally`. `Nav` and `DetailPane` read this flag and render a centered spinner instead of their normal
+empty states.
 
-Loading state only fires on the initial programmatic fetch, not on modal-driven loads (where the modal itself provides visual feedback).
+Loading state only fires on the initial programmatic fetch, not on modal-driven loads (where the modal itself provides
+visual feedback).
 
-**Files:** `src/features/spec/spec-context.tsx`, `src/shared/state/actions.ts`, `src/features/nav/Nav.tsx`, `src/features/nav/DetailPane.tsx`.
+**Files:** `src/features/spec/spec-context.tsx`, `src/shared/state/actions.ts`, `src/features/nav/Nav.tsx`,
+`src/features/nav/DetailPane.tsx`.
 
 ---
 
@@ -57,13 +68,17 @@ Loading state only fires on the initial programmatic fetch, not on modal-driven 
 
 **Priority: P1 — reliability**
 
-No `ErrorBoundary` exists anywhere. A thrown exception in any component (e.g., a circular `$ref`, an unexpected spec shape) blanks the entire embedded UI with no message. Since the UI is embedded in a customer app, the browser console is typically not visible to end users.
+No `ErrorBoundary` exists anywhere. A thrown exception in any component (e.g., a circular `$ref`, an unexpected spec
+shape) blanks the entire embedded UI with no message. Since the UI is embedded in a customer app, the browser console is
+typically not visible to end users.
 
-**Fix:** Add a minimal `ErrorBoundary` class component in `src/shared/components/ErrorBoundary.tsx`. Wrap `AppInner`'s main content area (not `AppProviders`, so context is still available). On error, render a fallback banner with the error message and a "Reload" button that resets the boundary.
+**Fix:** Add a minimal `ErrorBoundary` class component in `src/shared/components/ErrorBoundary.tsx`. Wrap `AppInner`'s
+main content area (not `AppProviders`, so context is still available). On error, render a fallback banner with the error
+message and a "Reload" button that resets the boundary.
 
 ```tsx
 <ErrorBoundary>
-  <div id="pane-container">…</div>
+    <div id="pane-container">…</div>
 </ErrorBoundary>
 ```
 
@@ -75,34 +90,43 @@ No `ErrorBoundary` exists anywhere. A thrown exception in any component (e.g., a
 
 **Priority: P1 — required for actual adoption**
 
-There is no `README.md`. This is the primary documentation consumers will read. It must cover the two supported embed patterns.
+There is no `README.md`. This is the primary documentation consumers will read. It must cover the two supported embed
+patterns.
 
 **Contents:**
 
 #### Script-tag embed (auto-mount)
+
 ```html
+
 <div data-api-explorer="https://api.example.com/openapi.json" style="height:100vh"></div>
 <script src="https://your-host.com/loader.js"></script>
 ```
 
 #### Programmatic embed
+
 ```html
+
 <div id="api-docs" style="height:100vh"></div>
 <script src="https://your-host.com/loader.js"></script>
 <script>
-  ApiExplorer.mountApiExplorer(
-    document.getElementById('api-docs'),
-    { url: 'https://api.example.com/openapi.json' }
-  );
+    ApiExplorer.mountApiExplorer(
+            document.getElementById('api-docs'),
+            {url: 'https://api.example.com/openapi.json'}
+    );
 </script>
 ```
 
-> The IIFE exposes `window.ApiExplorer.mountApiExplorer`. The `name` in `vite.config.ts` is `"ApiExplorer"` — document this explicitly. Do not suggest ESM imports; the lib build is IIFE-only.
+> The IIFE exposes `window.ApiExplorer.mountApiExplorer`. The `name` in `vite.config.ts` is `"ApiExplorer"` — document
+> this explicitly. Do not suggest ESM imports; the lib build is IIFE-only.
 
 #### Required container CSS
-The container element **must** have an explicit height (e.g., `height: 100vh` or `height: 600px`). The explorer fills its container via `h-full`. Without it, the UI collapses to zero height.
+
+The container element **must** have an explicit height (e.g., `height: 100vh` or `height: 600px`). The explorer fills
+its container via `h-full`. Without it, the UI collapses to zero height.
 
 #### Building and self-hosting
+
 ```bash
 npm install
 npm run build:lib      # produces dist/loader.js
@@ -110,6 +134,7 @@ npm run build:lib      # produces dist/loader.js
 ```
 
 For the standalone app (no embedding, direct navigation):
+
 ```bash
 npm run build          # produces dist/ static site
 # Serve the dist/ folder from any static file server
@@ -126,15 +151,18 @@ npm run build          # produces dist/ static site
 No GitHub Actions workflows exist. For a self-hosted deploy, define two workflows:
 
 #### `ci.yml` — runs on every PR
+
 - `npm ci`
 - `npm run typecheck`
 - `npm run build:lib`
 
 #### `deploy.yml` — runs on push to `main`
+
 - Build both `npm run build` (standalone app) and `npm run build:lib` (IIFE)
 - Upload `dist/` to the self-hosted server via `rsync` / `scp` / provider-specific action
 
-The deploy target (server address, SSH key, deploy path) is stored as GitHub repository secrets. The spec should include a placeholder workflow that the user fills in with their server details.
+The deploy target (server address, SSH key, deploy path) is stored as GitHub repository secrets. The spec should include
+a placeholder workflow that the user fills in with their server details.
 
 **Files:** New `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`.
 
@@ -144,9 +172,11 @@ The deploy target (server address, SSH key, deploy path) is stored as GitHub rep
 
 **Priority: P2 — polish**
 
-`ResponsePanel` has a hardcoded `style={{ height: 280 }}`. Long JSON responses require excessive scrolling within a tiny window. The playground pane already has resizable sides but not a resizable response split.
+`ResponsePanel` has a hardcoded `style={{ height: 280 }}`. Long JSON responses require excessive scrolling within a tiny
+window. The playground pane already has resizable sides but not a resizable response split.
 
-**Fix:** Replace the fixed height with a `min-h-[200px]` flex-grow approach, or extend `initResizablePanes` to include a vertical drag handle between the request form and the response panel inside the try-pane.
+**Fix:** Replace the fixed height with a `min-h-[200px]` flex-grow approach, or extend `initResizablePanes` to include a
+vertical drag handle between the request form and the response panel inside the try-pane.
 
 Simpler interim fix: increase default height to `360px` and add `max-h-[60vh]` so it doesn't overflow on short screens.
 
@@ -158,7 +188,8 @@ Simpler interim fix: increase default height to `360px` and add `max-h-[60vh]` s
 
 **Priority: P2 — polish**
 
-`SchemaNode` silently stops rendering at `depth > 5` (`src/features/schema/SchemaNode.tsx:40`). Deep schemas are truncated with no visual indication, which can confuse users looking for nested properties.
+`SchemaNode` silently stops rendering at `depth > 5` (`src/features/schema/SchemaNode.tsx:40`). Deep schemas are
+truncated with no visual indication, which can confuse users looking for nested properties.
 
 **Fix:** At the cutoff depth, render a muted `…` row indicating truncation rather than returning `null`.
 

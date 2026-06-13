@@ -1,95 +1,126 @@
 @import "tailwindcss";
+
 @config "../tailwind.config.ts";
 
 /* Class-based dark mode — toggled by adding .dark to the root element */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  :root {
-    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    :root {
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+        --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Syntax highlight token colors */
-    --hl-key:  #2563eb;
-    --hl-str:  #16a34a;
-    --hl-bool: #9333ea;
-    --hl-null: #9ca3af;
-    --hl-num:  #d97706;
+        /* Syntax highlight token colors */
+        --hl-key: #2563eb;
+        --hl-str: #16a34a;
+        --hl-bool: #9333ea;
+        --hl-null: #9ca3af;
+        --hl-num: #d97706;
 
-    /* Pane handle */
-    --handle-color: rgb(243, 244, 246);
-  }
+        /* Pane handle */
+        --handle-color: rgb(243, 244, 246);
+    }
 
-  .dark {
-    --hl-key:  #60a5fa;
-    --hl-str:  #4ade80;
-    --hl-bool: #c084fc;
-    --hl-null: #6b7280;
-    --hl-num:  #fbbf24;
+    .dark {
+        --hl-key: #60a5fa;
+        --hl-str: #4ade80;
+        --hl-bool: #c084fc;
+        --hl-null: #6b7280;
+        --hl-num: #fbbf24;
 
-    --handle-color: rgb(55, 65, 81);
-  }
+        --handle-color: rgb(55, 65, 81);
+    }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
 
-  code, pre, .font-mono {
-    font-family: var(--font-mono);
-  }
+    code, pre, .font-mono {
+        font-family: var(--font-mono);
+    }
 
-  /* Thin scrollbars */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
-  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    /* Thin scrollbars */
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
 
-  .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
-  .dark ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-  :focus-visible { outline: 2px solid #3b82f6; outline-offset: 1px; }
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+        background: #4b5563;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: #6b7280;
+    }
+
+    :focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 1px;
+    }
 }
 
 /* ── Blueprint theme — CSS grid backgrounds ──────────────────────── */
 .bp-grid {
-  background-image:
-    linear-gradient(rgba(30, 144, 255, 0.08) 1px, transparent 1px),
+    background-image: linear-gradient(rgba(30, 144, 255, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(30, 144, 255, 0.08) 1px, transparent 1px),
     linear-gradient(rgba(30, 144, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(30, 144, 255, 0.03) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+    background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
 }
+
 .bp-grid-sm {
-  background-image:
-    linear-gradient(rgba(30, 144, 255, 0.10) 1px, transparent 1px),
+    background-image: linear-gradient(rgba(30, 144, 255, 0.10) 1px, transparent 1px),
     linear-gradient(90deg, rgba(30, 144, 255, 0.10) 1px, transparent 1px);
-  background-size: 20px 20px;
+    background-size: 20px 20px;
 }
 
 /* ── Theme-specific nav active indicators ────────────────────────── */
 .theme-blueprint .nav-endpoint.active::before {
-  background: #1e90ff;
-  border-radius: 0;
+    background: #1e90ff;
+    border-radius: 0;
 }
 
 .theme-brutalist .nav-endpoint.active::before {
-  background: #000000;
-  border-radius: 0;
-  width: 3px;
+    background: #000000;
+    border-radius: 0;
+    width: 3px;
 }
 
 @layer components {
-  .nav-tag-chevron  { transition: transform 150ms ease; }
-  .response-chevron { transition: transform 150ms ease; }
+    .nav-tag-chevron {
+        transition: transform 150ms ease;
+    }
 
-  .nav-endpoint.active { position: relative; }
-  .nav-endpoint.active::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: #3b82f6;
-    border-radius: 0 1px 1px 0;
-  }
+    .response-chevron {
+        transition: transform 150ms ease;
+    }
+
+    .nav-endpoint.active {
+        position: relative;
+    }
+
+    .nav-endpoint.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #3b82f6;
+        border-radius: 0 1px 1px 0;
+    }
 }

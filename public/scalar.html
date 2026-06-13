@@ -1,73 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scalar API Reference</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { min-height: 100vh; }
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Scalar API Reference</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    #error-screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      gap: 16px;
-      padding: 32px;
-      text-align: center;
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
-    }
+        body {
+            min-height: 100vh;
+        }
 
-    #error-screen.visible { display: flex; }
+        #error-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 16px;
+            padding: 32px;
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e2e8f0;
+        }
 
-    #error-screen .icon { font-size: 48px; }
-    #error-screen h1 { font-size: 1.5rem; color: #f87171; }
-    #error-screen p { color: #94a3b8; max-width: 480px; line-height: 1.6; }
-    #error-screen code {
-      background: #1e2533;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      color: #7dd3fc;
-    }
-  </style>
+        #error-screen.visible {
+            display: flex;
+        }
+
+        #error-screen .icon {
+            font-size: 48px;
+        }
+
+        #error-screen h1 {
+            font-size: 1.5rem;
+            color: #f87171;
+        }
+
+        #error-screen p {
+            color: #94a3b8;
+            max-width: 480px;
+            line-height: 1.6;
+        }
+
+        #error-screen code {
+            background: #1e2533;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #7dd3fc;
+        }
+    </style>
 </head>
 <body>
 
 <div id="error-screen">
-  <div class="icon">🔌</div>
-  <h1>No API URL provided</h1>
-  <p>
-    Pass an OpenAPI spec URL via the <code>url</code> query parameter.<br /><br />
-    Example:<br />
-    <code>scalar.html?url=https://example.com/openapi.json</code>
-  </p>
+    <div class="icon">🔌</div>
+    <h1>No API URL provided</h1>
+    <p>
+        Pass an OpenAPI spec URL via the <code>url</code> query parameter.<br/><br/>
+        Example:<br/>
+        <code>scalar.html?url=https://example.com/openapi.json</code>
+    </p>
 </div>
 
 <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
 <script>
-  (function () {
-    const params = new URLSearchParams(window.location.search);
-    const apiUrl = params.get('url');
+    (function () {
+        const params = new URLSearchParams(window.location.search);
+        const apiUrl = params.get('url');
 
-    if (!apiUrl) {
-      document.getElementById('error-screen').classList.add('visible');
-      document.getElementById('app').style.display = 'none';
-      return;
-    }
+        if (!apiUrl) {
+            document.getElementById('error-screen').classList.add('visible');
+            document.getElementById('app').style.display = 'none';
+            return;
+        }
 
-    document.title = 'Scalar — ' + apiUrl;
+        document.title = 'Scalar — ' + apiUrl;
 
-    Scalar.createApiReference('#app', {
-      url: apiUrl,
-    });
-  })();
+        Scalar.createApiReference('#app', {
+            url: apiUrl,
+        });
+    })();
 </script>
 </body>
 </html>

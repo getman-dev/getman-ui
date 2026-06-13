@@ -30,44 +30,46 @@ interface ModalProps {
 
 /** Modal shell with a dimmed backdrop, a header, an optional scrollable body, and a footer slot. */
 export default function Modal({
-  visible,
-  onClose,
-  title,
-  children,
-  footer,
-  maxWidth = "max-w-md",
-  scrollable = false,
-}: ModalProps) {
+                                visible,
+                                onClose,
+                                title,
+                                children,
+                                footer,
+                                maxWidth = "max-w-md",
+                                scrollable = false,
+                              }: ModalProps) {
   const t = useTheme().modal;
 
   if (!visible) return null;
 
   return (
-    <div
-      className={slot(t.backdrop)}
-      style={{ minHeight: "100vh" }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className={`${slot(t.container)} ${maxWidth}${scrollable ? " max-h-[90vh] flex flex-col" : ""}`}>
+      <div
+          className={slot(t.backdrop)}
+          style={{minHeight: "100vh"}}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+      >
+        <div className={`${slot(t.container)} ${maxWidth}${scrollable ? " max-h-[90vh] flex flex-col" : ""}`}>
 
-        <div className={`${slot(t.header)}${scrollable ? " shrink-0" : ""}`}>
-          {title}
-          <button onClick={onClose} className={slot(t.closeButton)}>×</button>
-        </div>
-
-        {scrollable ? (
-          <div className="overflow-y-auto flex-1">{children}</div>
-        ) : (
-          children
-        )}
-
-        {footer != null && (
-          <div className={`${slot(t.footer)}${scrollable ? " shrink-0" : ""}`}>
-            {footer}
+          <div className={`${slot(t.header)}${scrollable ? " shrink-0" : ""}`}>
+            {title}
+            <button onClick={onClose} className={slot(t.closeButton)}>×</button>
           </div>
-        )}
 
+          {scrollable ? (
+              <div className="overflow-y-auto flex-1">{children}</div>
+          ) : (
+              children
+          )}
+
+          {footer != null && (
+              <div className={`${slot(t.footer)}${scrollable ? " shrink-0" : ""}`}>
+                {footer}
+              </div>
+          )}
+
+        </div>
       </div>
-    </div>
   );
 }

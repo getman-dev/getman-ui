@@ -1,6 +1,7 @@
 # API Explorer
 
-A modern OpenAPI 3.x UI you can embed in any page with a single function call. Built with React 19 + TypeScript, delivered as a self-contained IIFE — no framework required on the consumer side.
+A modern OpenAPI 3.x UI you can embed in any page with a single function call. Built with React 19 + TypeScript,
+delivered as a self-contained IIFE — no framework required on the consumer side.
 
 ## Features
 
@@ -40,7 +41,8 @@ Add a container element, load the script from jsDelivr, and call `mountApiExplor
 
 The script injects all required styles and fonts — no separate CSS import needed.
 
-> **Container height** — the explorer fills its container via `height: 100%`. Give the container an explicit height (e.g. `height: 100vh` or `height: 600px`), otherwise it collapses to zero.
+> **Container height** — the explorer fills its container via `height: 100%`. Give the container an explicit height (
+> e.g. `height: 100vh` or `height: 600px`), otherwise it collapses to zero.
 
 ---
 
@@ -60,8 +62,8 @@ const unmount = ApiExplorer.mountApiExplorer(
 unmount();
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
+| Option | Type     | Description                                                |
+|--------|----------|------------------------------------------------------------|
 | `url`  | `string` | URL of the OpenAPI spec to load on startup (JSON or YAML). |
 
 ---
@@ -132,11 +134,11 @@ If you host `loader.js` yourself instead of using jsDelivr:
 
 Every endpoint and schema gets its own URL fragment:
 
-| Fragment | Links to |
-|----------|----------|
-| `#endpoints/getPetById` | Endpoint by `operationId` |
+| Fragment                              | Links to                                          |
+|---------------------------------------|---------------------------------------------------|
+| `#endpoints/getPetById`               | Endpoint by `operationId`                         |
 | `#endpoints/GET%3A%2Fpets%2F%7Bid%7D` | Endpoint by method + path (when no `operationId`) |
-| `#schemas/Pet` | Component schema |
+| `#schemas/Pet`                        | Component schema                                  |
 
 The fragment updates automatically as you navigate — copying the URL always gives a shareable deep link.
 
@@ -144,15 +146,15 @@ The fragment updates automatically as you navigate — copying the URL always gi
 
 ## Keyboard shortcuts
 
-| Key | Action |
-|-----|--------|
-| `/` | Focus endpoint search |
-| `↑` `↓` | Navigate endpoints |
-| `Enter` | Select focused endpoint |
-| `Esc` | Close modal / dismiss |
-| `⌘ K` | Open command bar |
-| `⌘ ↵` | Send request (Try it out) |
-| `?` | Toggle shortcuts panel |
+| Key     | Action                    |
+|---------|---------------------------|
+| `/`     | Focus endpoint search     |
+| `↑` `↓` | Navigate endpoints        |
+| `Enter` | Select focused endpoint   |
+| `Esc`   | Close modal / dismiss     |
+| `⌘ K`   | Open command bar          |
+| `⌘ ↵`   | Send request (Try it out) |
+| `?`     | Toggle shortcuts panel    |
 
 ---
 
@@ -165,7 +167,8 @@ npm install
 npm run dev        # Vite dev server at http://localhost:5173
 ```
 
-Place an `openapi.json` at the project root and it will load automatically, or use the load modal to point at any spec URL.
+Place an `openapi.json` at the project root and it will load automatically, or use the load modal to point at any spec
+URL.
 
 ### Build
 

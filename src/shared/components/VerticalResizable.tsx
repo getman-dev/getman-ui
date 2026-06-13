@@ -25,13 +25,13 @@ interface VerticalResizableProps {
 
 /** Renders two children separated by a draggable horizontal handle, with bottom pane height persisted to localStorage. */
 export default function VerticalResizable({
-  storageKey,
-  defaultBottomHeight,
-  minTop = 80,
-  minBottom = 80,
-  top,
-  bottom,
-}: VerticalResizableProps) {
+                                            storageKey,
+                                            defaultBottomHeight,
+                                            minTop = 80,
+                                            minBottom = 80,
+                                            top,
+                                            bottom,
+                                          }: VerticalResizableProps) {
   const t = useTheme().verticalResizable;
 
   const [bottomHeight, setBottomHeight] = useState<number>(() => {
@@ -39,7 +39,8 @@ export default function VerticalResizable({
       const stored = localStorage.getItem(storageKey);
       const h = Number(stored);
       if (isFinite(h) && h > 0) return h;
-    } catch { /* ignore */ }
+    } catch { /* ignore */
+    }
     return defaultBottomHeight;
   });
 
@@ -48,49 +49,52 @@ export default function VerticalResizable({
 
   function handleMouseDown(e: React.MouseEvent) {
     e.preventDefault();
-    const startY      = e.clientY;
+    const startY = e.clientY;
     const startHeight = heightRef.current;
-    const containerH  = containerRef.current?.getBoundingClientRect().height ?? 0;
+    const containerH = containerRef.current?.getBoundingClientRect().height ?? 0;
 
-    document.body.style.cursor     = "row-resize";
+    document.body.style.cursor = "row-resize";
     document.body.style.userSelect = "none";
 
     function onMove(ev: MouseEvent) {
       const next = Math.max(
-        minBottom,
-        Math.min(startHeight + (startY - ev.clientY), containerH - minTop - HANDLE_H),
+          minBottom,
+          Math.min(startHeight + (startY - ev.clientY), containerH - minTop - HANDLE_H),
       );
       heightRef.current = next;
       setBottomHeight(next);
     }
 
     function onUp() {
-      document.body.style.cursor     = "";
+      document.body.style.cursor = "";
       document.body.style.userSelect = "";
-      try { localStorage.setItem(storageKey, String(heightRef.current)); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(storageKey, String(heightRef.current));
+      } catch { /* ignore */
+      }
       document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup",  onUp);
+      document.removeEventListener("mouseup", onUp);
     }
 
     document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup",  onUp);
+    document.addEventListener("mouseup", onUp);
   }
 
   return (
-    <div ref={containerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        {top}
+      <div ref={containerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {top}
+        </div>
+        <div
+            className="shrink-0 h-2 cursor-row-resize flex items-center justify-center group"
+            onMouseDown={handleMouseDown}
+            aria-hidden="true"
+        >
+          <div className={slot(t.handle)}/>
+        </div>
+        <div className="shrink-0 overflow-hidden" style={{height: bottomHeight}}>
+          {bottom}
+        </div>
       </div>
-      <div
-        className="shrink-0 h-2 cursor-row-resize flex items-center justify-center group"
-        onMouseDown={handleMouseDown}
-        aria-hidden="true"
-      >
-        <div className={slot(t.handle)} />
-      </div>
-      <div className="shrink-0 overflow-hidden" style={{ height: bottomHeight }}>
-        {bottom}
-      </div>
-    </div>
   );
 }

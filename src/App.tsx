@@ -37,6 +37,7 @@ export interface AppRootTheme {
 }
 
 const THEME_KEY = "api-explorer-theme";
+const NAV_OPEN_KEY = "api-explorer-nav-open";
 
 const shortcutRows: [string, string][] = [
     ["/", "Focus search"],
@@ -55,6 +56,23 @@ function AppLayout({onSetTheme}: { onSetTheme: (name: string) => void }) {
     const theme = useTheme();
     const t = theme.appRoot;
     const rootRef = useRef<HTMLDivElement>(null);
+
+    const [navOpen, setNavOpen] = useState<boolean>(() => {
+        try {
+            return localStorage.getItem(NAV_OPEN_KEY) !== "false";
+        } catch {
+            return true;
+        }
+    });
+
+    function toggleNav() {
+        const next = !navOpen;
+        setNavOpen(next);
+        try {
+            localStorage.setItem(NAV_OPEN_KEY, String(next));
+        } catch { /* ignore */
+        }
+    }
 
     // Register keyboard shortcuts and hashchange listener once.
     useEffect(() => {
@@ -181,16 +199,16 @@ function AppLayout({onSetTheme}: { onSetTheme: (name: string) => void }) {
                 </div>
             )}
 
-            <TopBar onSetTheme={onSetTheme}/>
+            <TopBar onSetTheme={onSetTheme} navOpen={navOpen} onToggleNav={toggleNav}/>
 
             <ErrorBoundary>
                 <div id="pane-container" className="flex flex-1 min-h-0 overflow-hidden">
-                    <aside id="nav-pane" className={slot(t.navPane)}>
+                    <aside id="nav-pane" className={slot(t.navPane)} style={{display: navOpen ? "" : "none"}}>
                         <Nav/>
                     </aside>
 
                     <div id="handle-left" className={`w-1 shrink-0 cursor-col-resize group ${theme.paneHandle}`}
-                         aria-hidden="true"/>
+                         aria-hidden="true" style={{display: navOpen ? "" : "none"}}/>
 
                     <main id="detail-pane" className={slot(t.detailPane)}>
                         <DetailPane/>

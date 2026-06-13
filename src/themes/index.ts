@@ -9,21 +9,31 @@ import { nordTheme }       from './presets/nord';
 import { catppuccinTheme } from './presets/catppuccin';
 import { terminalTheme }   from './presets/terminal';
 import { parchmentTheme }  from './presets/parchment';
+import { blueprintTheme }  from './presets/blueprint';
+import { brutalistTheme }  from './presets/brutalist';
+import { notebookTheme }   from './presets/notebook';
+import { broadsheetTheme } from './presets/broadsheet';
+import { wireframeTheme }  from './presets/wireframe';
 
 export type { AppTheme } from './contract';
 export { useTheme, ThemeProvider } from './context';
 export { slot } from './slot';
 export type { ThemeSlot } from './slot';
-export { lightTheme, darkTheme, nordTheme, catppuccinTheme, terminalTheme, parchmentTheme };
+export { lightTheme, darkTheme, nordTheme, catppuccinTheme, terminalTheme, parchmentTheme, blueprintTheme, brutalistTheme, notebookTheme, broadsheetTheme, wireframeTheme };
 
 /** All built-in themes keyed by their preset name. */
 export const THEMES: Record<string, AppTheme> = {
-  light:      lightTheme,
-  dark:       darkTheme,
-  nord:       nordTheme,
-  catppuccin: catppuccinTheme,
-  terminal:   terminalTheme,
-  parchment:  parchmentTheme,
+  light:       lightTheme,
+  dark:        darkTheme,
+  nord:        nordTheme,
+  catppuccin:  catppuccinTheme,
+  terminal:    terminalTheme,
+  parchment:   parchmentTheme,
+  blueprint:   blueprintTheme,
+  brutalist:   brutalistTheme,
+  notebook:    notebookTheme,
+  broadsheet:  broadsheetTheme,
+  wireframe:   wireframeTheme,
 };
 
 /**

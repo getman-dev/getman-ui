@@ -1,0 +1,391 @@
+/**
+ * Brutalist theme preset — stark black nav, white content, electric yellow accent only.
+ * Thick 2px solid borders everywhere, zero border radius, ultra-bold type.
+ * Three-color palette: #000000 black · #ffffff white · #ffff00 yellow.
+ * Anti-corporate by design — the zine aesthetic for indie developers.
+ */
+import type { AppTheme } from '../contract';
+
+// Nav badges (on black background) — white outlined or yellow fill.
+const navBadge = 'method-badge shrink-0 text-[9px] font-black px-[5px] py-[2px] rounded-none uppercase w-[36px] text-center border-2 tracking-wide';
+// Detail/playground badges (on white background) — black fill or outlined.
+const detailBadge = 'method-badge shrink-0 text-[9px] font-black px-[5px] py-[2px] rounded-none uppercase w-[36px] text-center border-2 tracking-wide';
+
+export const brutalistTheme: AppTheme = {
+  name: 'brutalist',
+  fontFamily: "'IBM Plex Sans', 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif",
+
+  appRoot: {
+    root:              'flex flex-col h-full overflow-hidden bg-white theme-brutalist',
+    navPane:           'shrink-0 bg-black overflow-y-auto flex flex-col',
+    detailPane:        'flex-1 min-w-0 bg-white overflow-hidden',
+    tryPane:           'shrink-0 bg-white overflow-hidden',
+    shortcutsBackdrop: 'fixed inset-0 bg-black/60 flex items-center justify-center z-50',
+    shortcutsPanel:    'bg-white rounded-none border-4 border-black shadow-[8px_8px_0_#000] w-72 mx-4 overflow-hidden',
+    shortcutsHeader:   'flex items-center justify-between px-5 py-3.5 border-b-4 border-black',
+    shortcutsTitle:    'text-sm font-black text-black uppercase tracking-widest',
+    shortcutsClose:    'text-black hover:text-black text-xl leading-none font-black',
+    shortcutsRow:      'flex items-center justify-between py-2 border-b-2 border-black/10 last:border-0',
+    shortcutsDesc:     'text-xs font-bold text-black',
+    shortcutsKbd:      'text-[10px] font-black bg-[#ffff00] text-black px-2 py-0.5 rounded-none border-2 border-black shrink-0',
+  },
+
+  nav: {
+    container:         'shrink-0 bg-black overflow-y-auto flex flex-col h-full',
+    divider:           'mt-1 border-t-2 border-white/10',
+    searchWrapper:     'px-3 py-3 border-b-2 border-white/20 shrink-0',
+    searchInput:       'w-full pl-7 pr-6 py-2 text-[11px] font-bold border-2 border-white/30 rounded-none bg-transparent text-white placeholder-white/30 focus:outline-none focus:border-[#ffff00] transition-colors uppercase tracking-wider',
+    searchIcon:        'absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-white/30 pointer-events-none',
+    searchClearButton: 'absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white leading-none text-sm font-black',
+    searchHint:        'absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-white/30 border border-white/20 rounded-none px-1 pointer-events-none leading-none',
+    loadingSpinner:    'w-5 h-5 animate-spin text-[#ffff00]',
+    tabBar:            'flex gap-0 px-3 py-2 border-b-2 border-white/20',
+    tab:               { base: 'px-2.5 py-1 text-[11px] font-black rounded-none transition-colors text-white/40 hover:text-white uppercase tracking-wider border-b-2 border-transparent', active: 'text-[#ffff00] border-b-2 border-[#ffff00]' },
+    tagHeader:         'w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors',
+    tagChevron:        'w-3 h-3 transition-transform',
+    tagCount:          'text-[10px] font-mono text-white/30',
+    endpointItem:      { base: 'nav-endpoint w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors text-white/50 hover:text-white hover:bg-white/5', active: 'bg-[#ffff00] text-black' },
+    endpointPath:      'truncate text-[11px] font-bold',
+    methodBadge:       { base: navBadge, get: 'border-white/50 text-white', post: 'bg-[#ffff00] border-[#ffff00] text-black', put: 'border-white/50 text-white', delete: 'bg-white border-white text-black', patch: 'border-white/30 text-white/70', options: 'border-white/20 text-white/40', head: 'border-white/20 text-white/40' },
+    schemaItem:        { base: 'w-full text-left gap-2.5 px-4 py-2.5 transition-colors hover:bg-white/5', active: 'bg-[#ffff00]' },
+    schemaName:        { base: 'truncate text-[11px] font-bold text-white/50', active: 'text-black' },
+    schemaTypeBadge:   'shrink-0 text-[9px] font-black px-[5px] py-[2px] rounded-none border-2 border-[#ffff00] text-[#ffff00] bg-transparent uppercase',
+    schemaDescription: 'mt-0.5 text-[10px] text-white/30 truncate pl-[38px] font-mono',
+    emptyState:        'text-[11px] font-bold text-white/30 uppercase tracking-wide',
+  },
+
+  endpoint: {
+    container:           'h-full flex flex-col',
+    header:              'flex items-center gap-3 px-6 py-5 border-b-4 border-black shrink-0 h-[50px]',
+    methodBadge:         { base: detailBadge, get: 'bg-black border-black text-white', post: 'bg-[#ffff00] border-black text-black', put: 'border-black text-black bg-transparent', delete: 'bg-black border-black text-[#ffff00]', patch: 'border-black/60 text-black/70 bg-transparent', options: 'border-black/30 text-black/50 bg-transparent', head: 'border-black/30 text-black/50 bg-transparent' },
+    path:                'font-mono text-sm text-black font-black tracking-tight',
+    summary:             'text-sm text-black mb-2 font-bold',
+    description:         'text-xs text-neutral-600',
+    deprecated:          'ml-auto text-[10px] font-black bg-black text-[#ffff00] border-2 border-black rounded-none px-2 py-0.5 uppercase tracking-wide',
+    paramSection:        'border-2 border-black rounded-none overflow-hidden',
+    paramSectionTitle:   'text-xs font-black uppercase tracking-wider text-black mb-4',
+    paramLocTitle:       'text-[10px] font-black uppercase tracking-wider text-black mb-3',
+    paramRow:            'border-b-2 border-black/10 last:border-0 hover:bg-neutral-50 transition-colors',
+    paramName:           'font-mono text-[11px] text-black font-black',
+    paramType:           'text-[10px] font-mono bg-transparent text-black rounded-none px-1.5 py-0.5 border-2 border-black',
+    paramRequired:       'text-black text-[9px] font-black ml-1 bg-[#ffff00] px-1',
+    paramDescription:    'px-4 py-3 w-full text-xs text-neutral-600',
+    mutedText:           'text-neutral-400',
+    responseAccordion:   'border-2 border-black rounded-none overflow-hidden divide-y-2 divide-black',
+    responseHeader:      'w-full flex items-center gap-3 px-4 py-3.5 hover:bg-neutral-50 transition-colors text-left',
+    responseStatusCode:  { base: 'text-xs font-mono font-black', success: 'text-black', redirect: 'text-black', clientError: 'text-black', serverError: 'text-black' },
+    responseDescription: 'text-xs text-neutral-600 flex-1',
+    bodySection:         'px-3 py-1.5 bg-neutral-50 border-b-2 border-black flex items-center gap-2',
+    bodyContentType:     'text-[10px] font-mono text-neutral-500',
+  },
+
+  topBar: {
+    container:              'relative flex items-center gap-4 px-6 h-16 border-b-4 border-[#ffff00] bg-black shrink-0 z-10',
+    specTitle:              'text-sm font-black text-white truncate uppercase tracking-widest',
+    specVersion:            'text-[9px] font-mono text-[#ffff00] border border-[#ffff00] rounded-none px-1.5 py-px shrink-0 leading-tight',
+    specDescription:        'text-[10px] text-white/40 truncate leading-tight mt-px',
+    noSpecIcon:             'w-7 h-7 rounded-none border-2 border-white/30 flex items-center justify-center shrink-0',
+    noSpecIconSvg:          'w-4 h-4 text-white/30',
+    noSpecTitle:            'text-sm font-black text-white/30 uppercase tracking-widest',
+    divider:                'w-px h-5 bg-white/20 mx-1 shrink-0',
+    authButtonConfigured:   'flex items-center gap-1.5 text-xs font-black rounded-none px-2.5 py-1.5 border-2 transition-all shrink-0 text-black bg-[#ffff00] border-[#ffff00] hover:bg-white hover:border-white uppercase tracking-wide',
+    authButtonUnconfigured: 'flex items-center gap-1.5 text-xs font-bold rounded-none px-2.5 py-1.5 border-2 transition-all shrink-0 text-white/60 bg-transparent border-white/30 hover:border-white hover:text-white uppercase tracking-wide',
+    neutralButton:          'flex items-center gap-1.5 text-xs font-bold rounded-none px-2.5 py-1.5 border-2 transition-all shrink-0 text-white/60 bg-transparent border-white/30 hover:border-white hover:text-white uppercase tracking-wide',
+    loadButton:             'flex items-center gap-1.5 text-xs font-black text-black bg-[#ffff00] hover:bg-white active:bg-neutral-200 rounded-none px-3 py-1.5 border-2 border-[#ffff00] hover:border-white transition-colors shrink-0 uppercase tracking-wide',
+  },
+
+  themePicker: {
+    dropdown: 'bg-white border-2 border-black rounded-none shadow-[4px_4px_0_#000] py-0 overflow-hidden',
+    item:     { base: 'w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[#ffff00] transition-colors border-b border-black/10 last:border-0', active: 'bg-[#ffff00] border-b border-black/10' },
+    name:     'text-sm font-bold text-black flex-1',
+    check:    'w-3.5 h-3.5 text-black shrink-0',
+  },
+
+  modal: {
+    backdrop:    'fixed inset-0 bg-black/60 flex items-center justify-center z-50',
+    container:   'bg-white rounded-none border-4 border-black shadow-[8px_8px_0_#000] w-full mx-4 overflow-hidden',
+    header:      'flex items-center justify-between px-5 py-4 border-b-4 border-black',
+    closeButton: 'text-black hover:text-black text-xl leading-none font-black',
+    footer:      'px-5 py-3 bg-neutral-50 border-t-4 border-black',
+  },
+
+  loadModal: {
+    title:        'text-sm font-black text-black uppercase tracking-wide',
+    footerText:   'text-[10px] text-neutral-500',
+    petstoreLink: 'text-xs font-bold text-black underline',
+    urlLabel:     'block text-xs font-black text-black mb-1.5 uppercase tracking-wide',
+    urlInput:     'flex-1 text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none focus:border-black transition-colors',
+    dividerLine:  'flex-1 border-t-2 border-black',
+    dividerText:  'text-[10px] font-black text-black uppercase tracking-wider',
+    fileLabel:    'block text-xs font-black text-black mb-1.5 uppercase tracking-wide',
+    fileDropZone: 'flex items-center justify-center gap-2 border-4 border-dashed border-black rounded-none px-4 py-5 cursor-pointer hover:bg-[#ffff00] transition-colors',
+    fileDropIcon: 'w-4 h-4 text-black',
+    fileDropText: 'text-xs font-bold text-black',
+    errorBanner:  'text-xs font-bold text-white bg-black border-2 border-black rounded-none px-3 py-2',
+  },
+
+  authModal: {
+    tabBar:            'flex gap-0 px-4 py-2 bg-black border-b-4 border-[#ffff00] overflow-x-auto',
+    tabActive:         'px-3 py-1.5 text-[11px] font-black rounded-none bg-[#ffff00] text-black border-2 border-[#ffff00] flex items-center gap-1.5 shrink-0 uppercase tracking-wide',
+    tabInactive:       'px-3 py-1.5 text-[11px] font-bold rounded-none text-white/50 hover:text-white transition-colors flex items-center gap-1.5 shrink-0 uppercase tracking-wide',
+    titleIcon:         'w-4 h-4 text-black',
+    titleText:         'text-sm font-black text-black uppercase tracking-wide',
+    closeButton:       'text-xs font-black bg-black hover:bg-neutral-800 text-white px-4 py-2 rounded-none border-2 border-black transition-colors uppercase tracking-wide',
+    schemeType:        'text-[10px] font-mono text-neutral-500 uppercase',
+    authorizedBadge:   'text-[9px] font-black text-black bg-[#ffff00] border-2 border-black rounded-none px-1.5 py-0.5 uppercase tracking-wide',
+    schemeDescription: 'text-[10px] text-neutral-500',
+    fieldLabel:        'block text-[10px] font-black text-black mb-1 uppercase tracking-wide',
+    fieldLabelHint:    'text-neutral-400',
+    input:             'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none focus:border-black',
+    tokenWrapper:      'flex items-stretch border-2 border-black rounded-none overflow-hidden bg-white focus-within:border-black transition-all',
+    tokenPrefix:       'px-2.5 flex items-center text-[10px] font-mono text-neutral-500 bg-neutral-100 border-r-2 border-black shrink-0 select-none',
+    tokenField:        'flex-1 text-xs px-2.5 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none font-mono min-w-0',
+    saveButton:        'text-xs font-black bg-black text-white px-3 py-1.5 rounded-none border-2 border-black hover:bg-neutral-800 transition-colors uppercase tracking-wide',
+    clearButton:       'text-xs font-bold border-2 border-black text-black hover:bg-neutral-100 px-3 py-1.5 rounded-none transition-colors uppercase tracking-wide',
+  },
+
+  serverConfig: {
+    chip: {
+      base: 'flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-none border-2 transition-colors shrink-0 text-white/60 border-white/30 bg-transparent hover:border-white hover:text-white uppercase tracking-wide',
+      open: 'bg-[#ffff00] text-black border-[#ffff00] hover:bg-[#ffff00] hover:border-[#ffff00] hover:text-black',
+    },
+    chipIcon:            'w-3 h-3 shrink-0',
+    backdrop:            'fixed inset-0 bg-black/60 flex items-center justify-center z-[60]',
+    popover:             'bg-white rounded-none border-4 border-black shadow-[8px_8px_0_#000] w-full max-w-sm mx-4 overflow-hidden',
+    popoverHeader:       'flex items-center justify-between px-5 py-4 border-b-4 border-black',
+    headerIcon:          'w-4 h-4 text-black',
+    headerTitle:         'text-sm font-black text-black uppercase tracking-wide',
+    closeButton:         'text-black text-xl leading-none font-black',
+    sectionDivider:      'px-5 py-4 border-b-2 border-black/10',
+    sectionLabel:        'block text-[10px] font-black uppercase tracking-wider text-black',
+    serverSelect:        'w-full text-[11px] font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none cursor-pointer',
+    variableName:        'text-[11px] font-mono font-black text-black',
+    variableDescription: 'text-[10px] text-neutral-500 leading-tight mt-0.5',
+    variableInput:       'text-[11px] font-mono border-2 border-black rounded-none px-2.5 py-1.5 bg-white text-black focus:outline-none w-full',
+    resolvedSection:     'px-5 py-4 bg-neutral-50 border-t-2 border-black',
+    resolvedLabel:       'text-[10px] font-black uppercase tracking-wider text-black mb-1.5',
+    resolvedValue:       'text-[11px] font-mono text-black break-all',
+  },
+
+  commandBar: {
+    backdrop:       'fixed inset-0 bg-black/60 z-[60] flex items-start justify-center pt-[12vh]',
+    container:      'bg-white rounded-none border-4 border-black shadow-[8px_8px_0_#000] w-full max-w-lg mx-4 flex flex-col overflow-hidden max-h-[70vh]',
+    searchRow:      'flex items-center gap-3 px-4 py-3 border-b-4 border-black shrink-0',
+    searchIcon:     'w-4 h-4 text-black shrink-0',
+    input:          'flex-1 bg-transparent text-sm font-bold text-black placeholder-neutral-400 outline-none uppercase',
+    clearButton:    'text-black hover:text-neutral-600 text-lg leading-none shrink-0 transition-colors font-black',
+    groupTitle:     'px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-neutral-400 select-none border-b-2 border-black/5',
+    resultItem:     { base: 'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-neutral-50 border-b border-black/5', active: 'bg-[#ffff00] hover:bg-[#ffff00] border-b border-black/5' },
+    actionIcon:     { base: 'w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-neutral-100 text-black border-2 border-black', active: 'bg-black text-[#ffff00] border-2 border-black' },
+    resultLabel:    'text-sm font-bold text-black truncate',
+    resultSubtitle: 'text-xs font-mono text-neutral-400 truncate mt-0.5',
+    activeChevron:  'w-3.5 h-3.5 text-black shrink-0',
+    emptyIcon:      'w-8 h-8 text-neutral-300 mb-3',
+    emptyText:      'text-sm font-bold text-neutral-400 uppercase tracking-wide',
+    footer:         'shrink-0 flex items-center gap-4 px-4 py-2 border-t-4 border-black bg-black',
+    shortcutText:   'flex items-center gap-1 text-[11px] font-bold text-white/60',
+    shortcutBadge:  'font-mono text-[10px] bg-[#ffff00] text-black border-2 border-[#ffff00] rounded-none px-1 py-px font-black',
+    specTitle:      'ml-auto text-[11px] font-mono text-white/30 truncate',
+    highlightMark:  'bg-[#ffff00] text-black not-italic',
+  },
+
+  schema: {
+    tabBar:       'flex gap-0 px-3 py-2 bg-neutral-50 border-b-4 border-black',
+    tabActive:    'px-3 py-1 text-[11px] font-black rounded-none bg-black text-[#ffff00] border-2 border-black uppercase tracking-wide',
+    tabInactive:  'px-3 py-1 text-[11px] font-bold rounded-none text-neutral-500 hover:text-black transition-colors uppercase tracking-wide',
+    description:  'px-4 pt-3 pb-0 text-[11px] text-neutral-600 leading-relaxed',
+    exampleBlock: 'text-[11px] font-mono bg-neutral-50 border-2 border-black rounded-none p-3 overflow-x-auto text-black leading-relaxed',
+  },
+
+  schemaNode: {
+    name:          'font-mono text-[11px] text-black font-black',
+    typeBadge:     'text-[10px] rounded-none px-1.5 py-0.5 font-mono border-2',
+    nullableBadge: 'text-[9px] font-mono bg-neutral-100 text-neutral-500 rounded-none px-1 border border-black/20',
+    constraint:    'text-[9px] font-mono text-neutral-400',
+    enumValue:     'text-[9px] font-mono text-neutral-400',
+    description:   'text-[11px] text-neutral-600 mt-0.5 leading-relaxed',
+    enumKey:       'font-mono text-black font-bold',
+    enumDesc:      'text-neutral-500',
+    nestedBorder:  'border-l-4 border-black ml-3 pl-3 mt-0.5',
+    typeBadgeColors: {
+      string:  'border-black bg-[#ffff00] text-black',
+      integer: 'border-black bg-black text-white',
+      number:  'border-black bg-black text-white',
+      boolean: 'border-black bg-black text-white',
+      object:  'border-black bg-neutral-200 text-black',
+      array:   'border-black bg-neutral-100 text-black',
+      default: 'border-black/30 text-neutral-500 bg-transparent',
+    },
+  },
+
+  schemaDetail: {
+    header:      'flex items-center gap-3 px-6 py-5 border-b-4 border-black shrink-0',
+    typeBadge:   'text-[9px] font-black px-[5px] py-[2px] rounded-none uppercase border-2 border-black',
+    schemaName:  'font-mono text-sm text-black font-black',
+    description: 'text-sm text-neutral-600 mb-6 leading-relaxed',
+    sectionLabel:'text-xs font-black uppercase tracking-wider text-black mb-4',
+    schemaBox:   'border-2 border-black rounded-none overflow-hidden',
+    typeBadgeColors: {
+      string:  'border-black bg-[#ffff00] text-black',
+      integer: 'border-black bg-black text-white',
+      number:  'border-black bg-black text-white',
+      boolean: 'border-black bg-black text-white',
+      object:  'border-black bg-neutral-200 text-black',
+      array:   'border-black bg-neutral-100 text-black',
+      default: 'border-black/30 text-neutral-500 bg-transparent',
+    },
+  },
+
+  playground: {
+    container:           'h-full flex flex-col bg-white',
+    header:              'flex items-center gap-2 px-5 border-b-4 border-black shrink-0 h-[50px]',
+    headerTitle:         'text-xs font-black text-black uppercase tracking-wider',
+    emptyState:          'h-full flex flex-col items-center justify-center text-center px-6 gap-3 bg-white',
+    emptyIconWrapper:    'w-10 h-10 rounded-none border-2 border-black flex items-center justify-center',
+    emptyIcon:           'w-5 h-5 text-black',
+    emptyText:           'text-sm font-bold text-neutral-400 uppercase tracking-wide',
+    inputLabel:          'text-[10px] font-black uppercase tracking-wider text-black mb-3',
+    textInput:           'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors',
+    selectInput:         'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none cursor-pointer transition-colors',
+    fileInput:           'block w-full text-xs font-mono text-black cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-none file:border-2 file:border-black file:text-xs file:font-bold file:bg-[#ffff00] file:text-black hover:file:bg-neutral-200',
+    fileInputButton:     { base: 'file:py-1.5 file:px-3 file:rounded-none file:border-2 file:border-black file:text-xs file:font-bold file:bg-[#ffff00] file:text-black hover:file:bg-neutral-200', hasFile: 'file:bg-neutral-200' },
+    bodyEditor:          'w-full text-[11px] font-mono border-2 border-black rounded-none px-3 py-2.5 bg-white text-black placeholder-neutral-400 focus:outline-none resize-y transition-colors leading-relaxed',
+    contentTypeSelector: 'text-[10px] font-mono text-neutral-500 border-2 border-black rounded-none px-2 py-0.5 bg-white',
+    sendButton:          { base: 'shrink-0 px-4 rounded-none text-xs font-black transition-all bg-[#ffff00] hover:bg-black hover:text-[#ffff00] active:scale-[0.98] text-black border-2 border-black uppercase tracking-wide', loading: 'bg-neutral-100 text-neutral-400 border-2 border-black/30 cursor-not-allowed', disabled: 'bg-neutral-100 text-neutral-400 border-2 border-black/30 cursor-not-allowed' },
+    responsePanel:       'h-full border-t-4 border-black flex flex-col',
+    responseStatus:      { base: 'text-[10px] font-mono font-black rounded-none px-1.5 py-0.5 border-2 bg-neutral-100 text-black border-black', success: 'bg-[#ffff00] text-black border-black', redirect: 'bg-neutral-200 text-black border-black', clientError: 'bg-black text-white border-black', serverError: 'bg-black text-white border-black' },
+    responseTime:        'text-[10px] font-mono text-neutral-500 border-2 border-black rounded-none px-1.5 py-0.5',
+    responseSize:        'text-[10px] font-mono text-neutral-500',
+    responseTabs:        'flex items-center gap-0 px-4 py-2 border-b-4 border-black bg-neutral-50 shrink-0',
+    responseTab:         { base: 'px-2.5 py-1 text-[10px] font-black rounded-none transition-colors text-neutral-500 hover:text-black uppercase tracking-wide border-b-2 border-transparent', active: 'text-black border-b-2 border-black' },
+    responseBody:        'flex-1 overflow-auto bg-white',
+    responseEmpty:       'shrink-0 border-t-4 border-black h-10 flex items-center justify-center text-[10px] font-bold text-neutral-400 uppercase tracking-wide',
+    errorBanner:         'mx-5 mb-4 px-3 py-2 bg-black border-2 border-black rounded-none text-xs font-bold text-white',
+  },
+
+  authStatus: {
+    sectionLabel:      'text-[10px] font-black uppercase tracking-wider text-black mb-3',
+    emptyText:         'text-[10px] font-bold text-neutral-400 uppercase tracking-wide',
+    schemeRow:         'flex items-center justify-between py-2.5 px-3 border-2 border-black bg-white',
+    schemeName:        'text-[11px] font-mono font-bold text-black',
+    schemeType:        'ml-1.5 text-[10px] font-mono text-neutral-500',
+    authorizedBadge:   'text-[9px] font-black text-black bg-[#ffff00] border-2 border-black rounded-none px-1.5 py-0.5 uppercase tracking-wide',
+    unauthorizedBadge: 'text-[9px] font-bold text-neutral-500 bg-neutral-100 border-2 border-black/20 rounded-none px-1.5 py-0.5 uppercase tracking-wide',
+  },
+
+  bodyEditor: {
+    fileInput:    'block w-full text-xs font-mono text-black cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-none file:border-2 file:border-black file:text-xs file:font-bold file:bg-[#ffff00] file:text-black hover:file:bg-neutral-200',
+    formatButton: 'absolute top-1.5 right-1.5 z-10 text-[10px] font-black text-neutral-400 hover:text-black transition-colors px-1.5 py-0.5 rounded-none border border-transparent hover:border-black hover:bg-[#ffff00]',
+    textarea:     'w-full text-[11px] font-mono border-2 border-black rounded-none px-3 py-2.5 bg-white text-black placeholder-neutral-400 focus:outline-none resize-y transition-colors leading-relaxed',
+  },
+
+  paramLabel: {
+    nameText:        'font-mono text-[11px] text-black font-black',
+    nameDeprecated:  'font-mono text-[11px] line-through text-neutral-400',
+    locPath:         'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-black bg-[#ffff00] border-2 border-black',
+    locQuery:        'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-white bg-black border-2 border-black',
+    locHeader:       'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-black bg-neutral-200 border-2 border-black',
+    locCookie:       'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-black bg-neutral-100 border-2 border-black',
+    locForm:         'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-white bg-black border-2 border-black',
+    locDefault:      'text-[9px] font-mono rounded-none px-1.5 py-0.5 leading-none text-neutral-600 bg-neutral-100 border border-black/30',
+    typeBadge:       'text-[9px] font-mono text-black bg-neutral-100 border-2 border-black rounded-none px-1.5 py-0.5 leading-none',
+    requiredBadge:   'text-[9px] font-black text-black bg-[#ffff00] border-2 border-black rounded-none px-1.5 py-0.5 leading-none uppercase',
+    deprecatedBadge: 'text-[9px] font-black text-white bg-black border-2 border-black rounded-none px-1.5 py-0.5 leading-none uppercase',
+    constraintBadge: 'text-[9px] font-mono text-neutral-500 bg-neutral-100 border border-black/30 rounded-none px-1.5 py-0.5 leading-none',
+    tooltipIcon:     'w-3.5 h-3.5 text-neutral-400 cursor-help hover:text-black transition-colors',
+    tooltipPopup:    'pointer-events-none absolute bottom-full right-0 mb-2 w-56 rounded-none bg-black border-2 border-black px-2.5 py-2 text-[10px] font-mono text-white leading-snug shadow-[4px_4px_0_#000] opacity-0 group-hover/tip:opacity-100 transition-opacity z-50',
+  },
+
+  responsePanel: {
+    loadingState:  'shrink-0 border-t-4 border-black h-16 flex items-center justify-center gap-2 text-xs font-black text-black bg-neutral-50 uppercase tracking-wide',
+    emptyState:    'shrink-0 border-t-4 border-black h-10 flex items-center justify-center',
+    emptyText:     'text-[10px] font-bold text-neutral-400 uppercase tracking-wide',
+    container:     'h-full border-t-4 border-black flex flex-col',
+    tabBar:        'flex items-center gap-0 px-4 py-2 border-b-4 border-black bg-neutral-50 shrink-0',
+    tab:           { base: 'px-2.5 py-1 text-[10px] font-black rounded-none transition-colors text-neutral-500 hover:text-black uppercase tracking-wide border-b-2 border-transparent', active: 'text-black border-b-2 border-black' },
+    tabDivider:    'w-[2px] h-3 bg-black mx-1',
+    headerCount:   'ml-0.5 font-mono text-neutral-500',
+    copyButton:    { base: 'flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-none hover:bg-[#ffff00] transition-colors text-neutral-400 hover:text-black border-2 border-transparent hover:border-black', copied: 'text-black bg-[#ffff00] border-black' },
+    statusNeutral: 'text-[10px] font-mono border-2 rounded-none px-1.5 py-0.5 font-black text-black bg-neutral-100 border-black',
+    statusSuccess: 'text-[10px] font-mono border-2 rounded-none px-1.5 py-0.5 font-black text-black bg-[#ffff00] border-black',
+    statusError:   'text-[10px] font-mono border-2 rounded-none px-1.5 py-0.5 font-black text-white bg-black border-black',
+    bodyContainer: 'flex-1 overflow-auto bg-white',
+    bodyPre:       'text-[11px] p-3 font-mono text-black leading-relaxed',
+    headersPre:    'text-[11px] p-3 font-mono text-neutral-600 leading-relaxed',
+  },
+
+  sendBar: {
+    container:          'px-5 py-3 border-b-4 border-black shrink-0 bg-neutral-50',
+    urlBox:             'flex items-center gap-2 flex-1 min-w-0 bg-white rounded-none px-2.5 py-2 border-2 border-black',
+    urlCode:            'text-[10px] font-mono text-neutral-600 leading-tight flex-1 min-w-0 break-all',
+    sendButtonActive:   'shrink-0 px-4 rounded-none text-xs font-black transition-all bg-[#ffff00] hover:bg-black hover:text-[#ffff00] active:scale-[0.98] text-black border-2 border-black uppercase tracking-wide',
+    sendButtonDisabled: 'shrink-0 px-4 rounded-none text-xs font-black transition-all bg-neutral-100 text-neutral-400 border-2 border-black/30 cursor-not-allowed uppercase tracking-wide',
+  },
+
+  inputScalar: {
+    input:        'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors',
+    inputInvalid: 'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors',
+  },
+
+  inputBoolean: {
+    select:        'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors',
+    selectInvalid: 'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors',
+  },
+
+  inputEnum: {
+    select:        'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors',
+    selectInvalid: 'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors',
+  },
+
+  inputFile: {
+    input: 'block w-full text-xs font-mono text-black cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-none file:border-2 file:border-black file:text-xs file:font-bold file:bg-[#ffff00] file:text-black hover:file:bg-neutral-200',
+  },
+
+  inputArray: {
+    rowInput:        'flex-1 text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors',
+    rowInputInvalid: 'flex-1 text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors',
+    rowIndex:        'text-[9px] font-mono text-neutral-400 w-4 text-right shrink-0',
+    removeButton:    'shrink-0 w-5 h-5 flex items-center justify-center rounded-none text-neutral-400 hover:text-black hover:bg-[#ffff00] disabled:opacity-0 transition-colors border-0',
+    addButton:       'flex items-center gap-1 text-[10px] font-black text-black hover:text-black transition-colors underline uppercase tracking-wide',
+    hint:            'text-[9px] font-mono text-neutral-400',
+  },
+
+  inputMultiSelect: {
+    trigger:        'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors flex items-center justify-between text-left',
+    triggerInvalid: 'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black focus:outline-none transition-colors flex items-center justify-between text-left',
+    placeholder:    'text-neutral-400',
+    dropdown:       'absolute z-20 mt-0 w-full rounded-none border-2 border-black bg-white shadow-[4px_4px_0_#000] py-0',
+    dropdownItem:   'flex items-center gap-2 px-3 py-2 hover:bg-[#ffff00] cursor-pointer border-b border-black/10 last:border-0',
+    optionText:     'text-xs font-bold text-black',
+  },
+
+  inputObject: {
+    textarea:        'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors resize-y',
+    textareaInvalid: 'w-full text-xs font-mono border-2 border-black rounded-none px-3 py-2 bg-white text-black placeholder-neutral-400 focus:outline-none transition-colors resize-y',
+  },
+
+  detailPane: {
+    spinner:      'w-5 h-5 animate-spin text-black',
+    errorIcon:    'w-10 h-10 rounded-none border-2 border-black bg-[#ffff00] flex items-center justify-center shrink-0 text-black',
+    errorMessage: 'text-sm font-bold text-black',
+    retryLink:    'text-xs font-bold text-black underline',
+    emptyIcon:    'w-10 h-10 rounded-none border-2 border-black flex items-center justify-center text-neutral-400',
+    emptyMessage: 'text-sm font-bold text-neutral-400 uppercase tracking-wide',
+  },
+
+  verticalResizable: {
+    handle: 'w-8 h-0.5 rounded-none bg-black group-hover:bg-[#ffff00] transition-colors',
+  },
+
+  syntax: {
+    key:     '#000000',
+    string:  '#005500',
+    boolean: '#550077',
+    null:    '#999999',
+    number:  '#884400',
+  },
+
+  paneHandle:  'bg-black',
+  focusRing:   'focus:ring-2 focus:ring-black focus:ring-offset-0',
+  scrollbar:   { thumb: 'bg-black/20', thumbHover: 'bg-black/40' },
+};

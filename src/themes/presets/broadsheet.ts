@@ -381,7 +381,7 @@ export const broadsheetTheme: AppTheme = {
     number:  '#7A5A00',
   },
 
-  paneHandle:  'bg-[#E5E5E5] group-hover:bg-[#E63946] group-hover:w-0.5 group-[.dragging]:bg-[#C42D3A] group-[.dragging]:w-0.5',
+  paneHandle:  'border-l-2 border-[#E5E5E5] group-hover:border-[#E63946] group-[.dragging]:border-[#C42D3A] transition-colors duration-150',
   focusRing:   'focus:ring-2 focus:ring-[#E63946] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#CCCCCC]', thumbHover: 'bg-[#AAAAAA]' },
 };

@@ -1,5 +1,5 @@
 const STORAGE_KEY = "pane-widths-v1";
-const HANDLE_TOTAL_PX = 12; // 2 handles × 6px each
+const HANDLE_TOTAL_PX = 8; // 2 handles × 4px each
 const MIN_NAV = 12;    // minimum % for nav pane
 const MIN_TRYIT = 12;  // minimum % for try-it pane
 const MIN_DETAIL = 20; // % always reserved for center pane

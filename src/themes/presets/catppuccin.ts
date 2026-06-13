@@ -380,7 +380,7 @@ export const catppuccinTheme: AppTheme = {
     number:  '#F9E2AF',
   },
 
-  paneHandle:  'bg-[#45475A] group-hover:bg-[#CBA6F7] group-hover:w-0.5 group-[.dragging]:bg-[#89B4FA] group-[.dragging]:w-0.5',
+  paneHandle:  'border-l border-[#45475A] group-hover:border-[#CBA6F7] group-[.dragging]:border-[#89B4FA] transition-colors duration-150',
   fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-[#CBA6F7] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#45475A]', thumbHover: 'bg-[#585B70]' },

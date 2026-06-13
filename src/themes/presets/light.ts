@@ -380,7 +380,7 @@ export const lightTheme: AppTheme = {
     number:  '#d97706',
   },
 
-  paneHandle:  'bg-gray-200 group-hover:bg-blue-400 group-hover:w-0.5 group-[.dragging]:bg-blue-500 group-[.dragging]:w-0.5',
+  paneHandle:  'border-l border-gray-200 group-hover:border-blue-400 group-[.dragging]:border-blue-500 transition-colors duration-150',
   fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-blue-400 focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-gray-300', thumbHover: 'bg-gray-400' },

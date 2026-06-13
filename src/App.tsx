@@ -151,17 +151,13 @@ function AppLayout({ onSetTheme }: { onSetTheme: (name: string) => void }) {
             <Nav />
           </aside>
 
-          <div id="handle-left" className="w-1.5 shrink-0 flex items-stretch justify-center cursor-col-resize group" aria-hidden="true">
-            <div className={`w-px flex-1 transition-[background-color,width] duration-150 ${theme.paneHandle}`} />
-          </div>
+          <div id="handle-left" className={`w-1 shrink-0 cursor-col-resize group ${theme.paneHandle}`} aria-hidden="true" />
 
           <main id="detail-pane" className={slot(t.detailPane)}>
             <DetailPane />
           </main>
 
-          <div id="handle-right" className="w-1.5 shrink-0 flex items-stretch justify-center cursor-col-resize group" aria-hidden="true" style={{ display: showPlayground ? "" : "none" }}>
-            <div className={`w-px flex-1 transition-[background-color,width] duration-150 ${theme.paneHandle}`} />
-          </div>
+          <div id="handle-right" className={`w-1 shrink-0 cursor-col-resize group ${theme.paneHandle}`} aria-hidden="true" style={{ display: showPlayground ? "" : "none" }} />
 
           <aside id="try-pane" className={slot(t.tryPane)} style={{ display: showPlayground ? "" : "none" }}>
             <Playground />

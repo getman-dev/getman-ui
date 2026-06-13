@@ -380,7 +380,7 @@ export const parchmentTheme: AppTheme = {
     number:  '#8B6914',
   },
 
-  paneHandle:  'bg-[#D4C9A0] group-hover:bg-[#C4622D] group-hover:w-0.5 group-[.dragging]:bg-[#A84E22] group-[.dragging]:w-0.5',
+  paneHandle:  'border-l border-[#D4C9A0] group-hover:border-[#C4622D] group-[.dragging]:border-[#A84E22] transition-colors duration-150',
   fontFamily:  "'Georgia', 'Palatino Linotype', ui-serif, serif",
   focusRing:   'focus:ring-2 focus:ring-[#C4622D] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#D4C9A0]', thumbHover: 'bg-[#C4B888]' },

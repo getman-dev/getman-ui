@@ -1,4 +1,12 @@
-import { escapeHtml } from "./html";
+import {escapeHtml} from "./html";
+
+export interface SyntaxTheme {
+  key: string;
+  string: string;
+  boolean: string;
+  null: string;
+  number: string;
+}
 
 // Regex matches (in order): keys, strings, true/false, null, numbers
 // Operates on already-HTML-escaped text, so quotes appear as &quot;

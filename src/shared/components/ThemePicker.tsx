@@ -1,8 +1,15 @@
 /** Dropdown theme picker: trigger button with current theme name, opens a list of all themes with color swatches. */
-import { useState, useRef, useEffect } from 'react';
-import { listThemes, THEMES } from '../../themes';
-import { useTheme } from '../../themes/context';
-import { slot } from '../../themes/slot';
+import {useEffect, useRef, useState} from 'react';
+import {listThemes, THEMES} from '../../themes';
+import {useTheme} from '../../themes/context';
+import {slot, type ThemeSlot} from '../../themes/slot';
+
+export interface ThemePickerTheme {
+  dropdown: ThemeSlot;
+  item: { base: ThemeSlot; active: ThemeSlot };
+  name: ThemeSlot;
+  check: ThemeSlot;
+}
 
 interface Props {
   onSetTheme: (name: string) => void;

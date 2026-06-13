@@ -1,6 +1,15 @@
 /** Dynamic row list for array parameters — one input per item, newline-joined internally. */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface ArrayInputTheme {
+  rowInput: ThemeSlot;
+  rowInputInvalid: ThemeSlot;
+  rowIndex: ThemeSlot;
+  removeButton: ThemeSlot;
+  addButton: ThemeSlot;
+  hint: ThemeSlot;
+}
 
 interface Props {
   value: string;

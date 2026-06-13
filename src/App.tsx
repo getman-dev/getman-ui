@@ -1,14 +1,14 @@
 /** Root application component: layout, dark mode, keyboard shortcuts, hash routing. */
-import { useState, useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 import clsx from "clsx";
-import { AppProviders } from "./shared/contexts";
-import { useNav } from "./features/nav/nav-context";
-import { useModal, modalActions, modalSnapshot } from "./shared/contexts/modal-context";
-import { specActions } from "./features/spec/spec-context";
-import { authActions, authSnapshot } from "./features/auth/auth-context";
-import { playgroundSnapshot } from "./features/playground/playground-context";
-import { loadSpecFromUrl, restoreFromHash, executePlayground } from "./shared/state/actions";
-import { initResizablePanes } from "./shared/utils/resizable-panes";
+import {AppProviders} from "./shared/contexts";
+import {useNav} from "./features/nav/nav-context";
+import {modalActions, modalSnapshot, useModal} from "./shared/contexts/modal-context";
+import {specActions} from "./features/spec/spec-context";
+import {authActions, authSnapshot} from "./features/auth/auth-context";
+import {playgroundSnapshot} from "./features/playground/playground-context";
+import {executePlayground, loadSpecFromUrl, restoreFromHash} from "./shared/state/actions";
+import {initResizablePanes} from "./shared/utils/resizable-panes";
 import Nav from "./features/nav/Nav";
 import TopBar from "./shared/components/TopBar";
 import DetailPane from "./features/nav/DetailPane";
@@ -16,10 +16,25 @@ import Playground from "./features/playground/Playground";
 import LoadModal from "./shared/components/LoadModal";
 import AuthModal from "./features/auth/AuthModal";
 import CommandBar from "./shared/components/CommandBar";
-import { ErrorBoundary } from "./shared/components/ErrorBoundary";
-import { ThemeProvider, useTheme } from "./themes/context";
-import { THEMES } from "./themes";
-import { slot } from "./themes/slot";
+import {ErrorBoundary} from "./shared/components/ErrorBoundary";
+import {ThemeProvider, useTheme} from "./themes/context";
+import {THEMES} from "./themes";
+import {slot, type ThemeSlot} from "./themes/slot";
+
+export interface AppRootTheme {
+  root: ThemeSlot;
+  navPane: ThemeSlot;
+  detailPane: ThemeSlot;
+  tryPane: ThemeSlot;
+  shortcutsBackdrop: ThemeSlot;
+  shortcutsPanel: ThemeSlot;
+  shortcutsHeader: ThemeSlot;
+  shortcutsTitle: ThemeSlot;
+  shortcutsClose: ThemeSlot;
+  shortcutsRow: ThemeSlot;
+  shortcutsDesc: ThemeSlot;
+  shortcutsKbd: ThemeSlot;
+}
 
 const THEME_KEY = "api-explorer-theme";
 

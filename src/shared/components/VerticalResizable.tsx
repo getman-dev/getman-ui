@@ -1,8 +1,12 @@
 /** Generic two-pane vertical splitter with a draggable handle and localStorage persistence. */
-import { useState, useRef } from "react";
 import type React from "react";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {useRef, useState} from "react";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface VerticalResizableTheme {
+  handle: ThemeSlot;
+}
 
 const HANDLE_H = 8;
 

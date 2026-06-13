@@ -1,6 +1,11 @@
 /** JSON textarea for object-typed parameters. */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface ObjectInputTheme {
+  textarea: ThemeSlot;
+  textareaInvalid: ThemeSlot;
+}
 
 interface Props {
   value: string;

@@ -1,11 +1,21 @@
 /** Schema detail view: type header and full schema tree with example tab. */
-import type { Schema } from "../spec/openapi";
-import { useNav } from "../nav/nav-context";
-import { useSpec } from "../spec/spec-context";
-import { resolveSchema } from "../spec/ref-resolver";
+import type {Schema} from "../spec/openapi";
+import {useNav} from "../nav/nav-context";
+import {useSpec} from "../spec/spec-context";
+import {resolveSchema} from "../spec/ref-resolver";
 import SchemaViewer from "./SchemaViewer";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface SchemaDetailTheme {
+  header: ThemeSlot;
+  typeBadge: ThemeSlot;
+  schemaName: ThemeSlot;
+  description: ThemeSlot;
+  sectionLabel: ThemeSlot;
+  schemaBox: ThemeSlot;
+  typeBadgeColors: Record<string, string>;
+}
 
 function schemaTypeLabel(s: Schema): string {
   if (s.type === "array") {

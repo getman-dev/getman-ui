@@ -1,7 +1,17 @@
 /** Security scheme status rows shown above the parameter list in the playground. */
-import type { SecurityScheme, AuthValues } from "../spec/openapi";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import type {AuthValues, SecurityScheme} from "../spec/openapi";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface AuthStatusTheme {
+  sectionLabel: ThemeSlot;
+  emptyText: ThemeSlot;
+  schemeRow: ThemeSlot;
+  schemeName: ThemeSlot;
+  schemeType: ThemeSlot;
+  authorizedBadge: ThemeSlot;
+  unauthorizedBadge: ThemeSlot;
+}
 
 interface Props {
   schemeNames: string[] | null;

@@ -1,23 +1,50 @@
 /** Try-it-out panel: normalises parameters to FieldSpec and orchestrates sub-components. */
-import { useEffect, useMemo, useState } from "react";
-import type { Schema, Components, Operation, SecurityScheme, AuthValues } from "../spec/openapi";
-import { usePlayground } from "./playground-context";
-import { useSpec } from "../spec/spec-context";
-import { useAuth } from "../auth/auth-context";
-import { useServer } from "../server/server-context";
-import { executePlayground } from "../../shared/state/actions";
-import { resolveParameter, resolveSchema } from "../spec/ref-resolver";
-import { buildUrl, resolveServerUrl, getRequestBodyExample, schemaToExample } from "../spec/example-gen";
+import {useEffect, useMemo, useState} from "react";
+import type {AuthValues, Components, Operation, Schema, SecurityScheme} from "../spec/openapi";
+import {usePlayground} from "./playground-context";
+import {useSpec} from "../spec/spec-context";
+import {useAuth} from "../auth/auth-context";
+import {useServer} from "../server/server-context";
+import {executePlayground} from "../../shared/state/actions";
+import {resolveParameter, resolveSchema} from "../spec/ref-resolver";
+import {buildUrl, getRequestBodyExample, resolveServerUrl, schemaToExample} from "../spec/example-gen";
 import ServerConfig from "../server/ServerConfig";
-import type { FieldSpec } from "./FieldSpec";
+import type {FieldSpec} from "./FieldSpec";
 import ParamField from "./ParamField";
 import SendBar from "./SendBar";
 import AuthStatus from "./AuthStatus";
 import BodyEditor from "./BodyEditor";
 import ResponsePanel from "./ResponsePanel";
 import VerticalResizable from "../../shared/components/VerticalResizable";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface PlaygroundTheme {
+  container: ThemeSlot;
+  header: ThemeSlot;
+  headerTitle: ThemeSlot;
+  emptyState: ThemeSlot;
+  emptyIconWrapper: ThemeSlot;
+  emptyIcon: ThemeSlot;
+  emptyText: ThemeSlot;
+  inputLabel: ThemeSlot;
+  textInput: ThemeSlot;
+  selectInput: ThemeSlot;
+  fileInput: ThemeSlot;
+  fileInputButton: ThemeSlot; // variants: hasFile
+  bodyEditor: ThemeSlot;
+  contentTypeSelector: ThemeSlot;
+  sendButton: ThemeSlot; // variants: loading, disabled
+  responsePanel: ThemeSlot;
+  responseStatus: ThemeSlot; // variants: success, redirect, clientError, serverError
+  responseTime: ThemeSlot;
+  responseSize: ThemeSlot;
+  responseTabs: ThemeSlot;
+  responseTab: ThemeSlot; // variants: active
+  responseBody: ThemeSlot;
+  responseEmpty: ThemeSlot;
+  errorBanner: ThemeSlot;
+}
 
 /**
  * Converts a resolved Parameter into a FieldSpec, lifting schema fields to the top level.

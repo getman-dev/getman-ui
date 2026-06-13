@@ -1,12 +1,20 @@
 /** Tabbed schema visualizer: a "Schema" tree panel and an "Example" JSON panel. */
-import { useState } from "react";
-import type { Schema, Components } from "../spec/openapi";
-import { resolveSchema } from "../spec/ref-resolver";
-import { schemaToExample } from "../spec/example-gen";
-import { highlightJson } from "../../shared/utils/highlight";
+import {useState} from "react";
+import type {Components, Schema} from "../spec/openapi";
+import {resolveSchema} from "../spec/ref-resolver";
+import {schemaToExample} from "../spec/example-gen";
+import {highlightJson} from "../../shared/utils/highlight";
 import SchemaNode from "./SchemaNode";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface SchemaViewerTheme {
+  tabBar: ThemeSlot;
+  tabActive: ThemeSlot;
+  tabInactive: ThemeSlot;
+  description: ThemeSlot;
+  exampleBlock: ThemeSlot;
+}
 
 export interface SchemaViewerOptions {
   /** Pre-serialized JSON example string. Auto-generated from the schema if omitted or null. */

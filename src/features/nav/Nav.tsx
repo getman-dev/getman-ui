@@ -1,11 +1,35 @@
 /** Sidebar navigation: unified endpoint + schema list with a single search input. */
-import { useState, useMemo } from "react";
+import {useMemo, useState} from "react";
 import clsx from "clsx";
-import { useNav } from "./nav-context";
-import { useSpec } from "../spec/spec-context";
-import { selectEndpoint, selectSchema } from "../../shared/state/actions";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {useNav} from "./nav-context";
+import {useSpec} from "../spec/spec-context";
+import {selectEndpoint, selectSchema} from "../../shared/state/actions";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface NavTheme {
+  container: ThemeSlot;
+  divider: ThemeSlot;
+  searchWrapper: ThemeSlot;
+  searchInput: ThemeSlot;
+  searchIcon: ThemeSlot;
+  searchClearButton: ThemeSlot;
+  searchHint: ThemeSlot;
+  loadingSpinner: ThemeSlot;
+  tabBar: ThemeSlot;
+  tab: ThemeSlot; // variants: active
+  tagHeader: ThemeSlot;
+  tagChevron: ThemeSlot;
+  tagCount: ThemeSlot;
+  endpointItem: ThemeSlot; // variants: active
+  endpointPath: ThemeSlot;
+  methodBadge: ThemeSlot; // variants: get, post, put, patch, delete, head, options
+  schemaItem: ThemeSlot; // variants: active
+  schemaName: ThemeSlot; // variants: active
+  schemaTypeBadge: ThemeSlot;
+  schemaDescription: ThemeSlot;
+  emptyState: ThemeSlot;
+}
 
 /** Renders the sidebar with a single search input and a scrollable endpoint + schema list. */
 export default function Nav() {

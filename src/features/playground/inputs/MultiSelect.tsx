@@ -1,8 +1,17 @@
 /** Compact dropdown with checkboxes for array parameters with a fixed enum set. */
-import { useState, useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 import clsx from "clsx";
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface MultiSelectTheme {
+  trigger: ThemeSlot;
+  triggerInvalid: ThemeSlot;
+  placeholder: ThemeSlot;
+  dropdown: ThemeSlot;
+  dropdownItem: ThemeSlot;
+  optionText: ThemeSlot;
+}
 
 interface Props {
   value: string;

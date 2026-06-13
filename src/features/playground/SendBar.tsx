@@ -1,8 +1,16 @@
 /** URL preview bar and Send button for the playground. */
-import type { EndpointEntry } from "../spec/openapi";
-import { methodBadgeClasses } from "../../shared/utils/badges";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import type {EndpointEntry} from "../spec/openapi";
+import {methodBadgeClasses} from "../../shared/utils/badges";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface SendBarTheme {
+  container: ThemeSlot;
+  urlBox: ThemeSlot;
+  urlCode: ThemeSlot;
+  sendButtonActive: ThemeSlot;
+  sendButtonDisabled: ThemeSlot;
+}
 
 interface Props {
   endpoint: EndpointEntry;

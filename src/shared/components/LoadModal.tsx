@@ -1,12 +1,27 @@
 /** Load-spec modal: URL input, file upload, and Petstore shortcut. */
-import { useState } from "react";
-import { useModal } from "../contexts";
-import { useSpec, specActions } from "../../features/spec/spec-context";
-import { loadSpecFromUrl, loadSpecFromFile } from "../state/actions";
-import Modal from "./Modal";
 import * as React from "react";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {useState} from "react";
+import {useModal} from "../contexts";
+import {specActions, useSpec} from "../../features/spec/spec-context";
+import {loadSpecFromFile, loadSpecFromUrl} from "../state/actions";
+import Modal from "./Modal";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface LoadModalTheme {
+  title: ThemeSlot;
+  footerText: ThemeSlot;
+  petstoreLink: ThemeSlot;
+  urlLabel: ThemeSlot;
+  urlInput: ThemeSlot;
+  dividerLine: ThemeSlot;
+  dividerText: ThemeSlot;
+  fileLabel: ThemeSlot;
+  fileDropZone: ThemeSlot;
+  fileDropIcon: ThemeSlot;
+  fileDropText: ThemeSlot;
+  errorBanner: ThemeSlot;
+}
 
 /** Renders the spec-loading modal. Visible when modalVisible is true. */
 export default function LoadModal() {

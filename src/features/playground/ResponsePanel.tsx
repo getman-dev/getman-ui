@@ -1,9 +1,27 @@
 /** Response viewer: handles loading, empty, and populated states with body/headers tabs. */
-import { useState, useEffect, useMemo } from "react";
-import type { PlaygroundResponse } from "../spec/openapi";
-import { highlightJson } from "../../shared/utils/highlight";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {useEffect, useMemo, useState} from "react";
+import type {PlaygroundResponse} from "../spec/openapi";
+import {highlightJson} from "../../shared/utils/highlight";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface ResponsePanelTheme {
+  loadingState: ThemeSlot;
+  emptyState: ThemeSlot;
+  emptyText: ThemeSlot;
+  container: ThemeSlot;
+  tabBar: ThemeSlot;
+  tab: ThemeSlot; // variant: active
+  tabDivider: ThemeSlot;
+  headerCount: ThemeSlot;
+  copyButton: ThemeSlot; // variant: copied
+  statusNeutral: ThemeSlot;
+  statusSuccess: ThemeSlot;
+  statusError: ThemeSlot;
+  bodyContainer: ThemeSlot;
+  bodyPre: ThemeSlot;
+  headersPre: ThemeSlot;
+}
 
 interface Props {
   loading: boolean;

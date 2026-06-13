@@ -1,13 +1,38 @@
 /** Endpoint documentation view: header, parameters table, request body, and responses accordion. */
-import { useState, useEffect, useMemo } from "react";
-import type { Parameter, Response } from "../spec/openapi";
-import { useNav } from "../nav/nav-context";
-import { useSpec } from "../spec/spec-context";
-import { resolveParameter, resolveSchema, resolveResponse } from "../spec/ref-resolver";
+import {useEffect, useMemo, useState} from "react";
+import type {Parameter, Response} from "../spec/openapi";
+import {useNav} from "../nav/nav-context";
+import {useSpec} from "../spec/spec-context";
+import {resolveParameter, resolveResponse, resolveSchema} from "../spec/ref-resolver";
 import SchemaViewer from "../schema/SchemaViewer";
 import clsx from "clsx";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface EndpointTheme {
+  container: ThemeSlot;
+  header: ThemeSlot;
+  methodBadge: ThemeSlot; // variants: get, post, put, patch, delete, head, options
+  path: ThemeSlot;
+  summary: ThemeSlot;
+  description: ThemeSlot;
+  deprecated: ThemeSlot;
+  paramSection: ThemeSlot;
+  paramSectionTitle: ThemeSlot;
+  paramLocTitle: ThemeSlot;
+  paramRow: ThemeSlot;
+  paramName: ThemeSlot;
+  paramType: ThemeSlot;
+  paramRequired: ThemeSlot;
+  paramDescription: ThemeSlot;
+  mutedText: ThemeSlot;
+  responseAccordion: ThemeSlot;
+  responseHeader: ThemeSlot;
+  responseStatusCode: ThemeSlot; // variants: success, redirect, clientError, serverError
+  responseDescription: ThemeSlot;
+  bodySection: ThemeSlot;
+  bodyContentType: ThemeSlot;
+}
 
 const paramLocations = ["path", "query", "header", "cookie"] as const;
 

@@ -1,14 +1,33 @@
 /** Command bar overlay (⌘K): search across endpoints, schemas, and actions. */
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useModal } from "../contexts";
-import { useSpec } from "../contexts";
-import { modalActions } from "../contexts";
-import { authActions } from "../contexts";
-import { selectEndpoint, selectSchema } from "../state/actions";
-import { methodBadgeClasses } from "../utils/badges";
-import { escapeHtml } from "../utils/html";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {authActions, modalActions, useModal, useSpec} from "../contexts";
+import {selectEndpoint, selectSchema} from "../state/actions";
+import {methodBadgeClasses} from "../utils/badges";
+import {escapeHtml} from "../utils/html";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface CommandBarTheme {
+  backdrop: ThemeSlot;
+  container: ThemeSlot;
+  searchRow: ThemeSlot;
+  searchIcon: ThemeSlot;
+  input: ThemeSlot;
+  clearButton: ThemeSlot;
+  groupTitle: ThemeSlot;
+  resultItem: ThemeSlot; // variants: active
+  actionIcon: ThemeSlot; // variants: active
+  resultLabel: ThemeSlot;
+  resultSubtitle: ThemeSlot;
+  activeChevron: ThemeSlot;
+  emptyIcon: ThemeSlot;
+  emptyText: ThemeSlot;
+  footer: ThemeSlot;
+  shortcutText: ThemeSlot;
+  shortcutBadge: ThemeSlot;
+  specTitle: ThemeSlot;
+  highlightMark: string;
+}
 
 interface Props {
   onSetTheme: (name: string) => void;

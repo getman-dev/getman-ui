@@ -2,47 +2,42 @@
  * AppTheme — the full theme contract, assembled from per-component interfaces.
  * This file only imports types; it contains no styling values.
  */
-import type {AppRootTheme} from './components/app-root';
-import type {NavTheme} from './components/nav';
-import type {EndpointTheme} from './components/endpoint';
-import type {AuthModalTheme} from './components/auth-modal';
-import type {ServerConfigTheme} from './components/server-config';
-import type {SchemaViewerTheme} from './components/schema-viewer';
-import type {SchemaNodeTheme} from './components/schema-node';
-import type {SchemaDetailTheme} from './components/schema-detail';
-import type {PlaygroundTheme} from './components/playground';
-import type {AuthStatusTheme} from './components/auth-status';
-import type {BodyEditorTheme} from './components/body-editor';
-import type {ParamLabelTheme} from './components/param-label';
-import type {ResponsePanelTheme} from './components/response-panel';
-import type {SendBarTheme} from './components/send-bar';
-import type {
-    ScalarInputTheme,
-    BooleanSelectTheme,
-    EnumSelectTheme,
-    FileInputTheme,
-    ArrayInputTheme,
-    MultiSelectTheme,
-    ObjectInputTheme,
-} from './components/inputs';
-import type {CommandBarTheme} from './components/command-bar';
-import type {LoadModalTheme} from './components/load-modal';
-import type {ModalTheme} from './components/modal';
-import type {TopBarTheme} from './components/top-bar';
-import type {ThemePickerTheme} from './components/theme-picker';
-import type {DetailPaneTheme} from './components/detail-pane';
-import type {VerticalResizableTheme} from './components/vertical-resizable';
-import type {SyntaxTheme} from './components/syntax';
+import type {AppRootTheme} from '../App';
+import type {NavTheme} from '../features/nav/Nav';
+import type {DetailPaneTheme} from '../features/nav/DetailPane';
+import type {EndpointTheme} from '../features/endpoint/EndpointDetail';
+import type {AuthModalTheme} from '../features/auth/AuthModal';
+import type {PlaygroundTheme} from '../features/playground/Playground';
+import type {AuthStatusTheme} from '../features/playground/AuthStatus';
+import type {BodyEditorTheme} from '../features/playground/BodyEditor';
+import type {ParamLabelTheme} from '../features/playground/ParamLabel';
+import type {ResponsePanelTheme} from '../features/playground/ResponsePanel';
+import type {SendBarTheme} from '../features/playground/SendBar';
+import type {ScalarInputTheme} from '../features/playground/inputs/ScalarInput';
+import type {BooleanSelectTheme} from '../features/playground/inputs/BooleanSelect';
+import type {EnumSelectTheme} from '../features/playground/inputs/EnumSelect';
+import type {FileInputTheme} from '../features/playground/inputs/FileInput';
+import type {ArrayInputTheme} from '../features/playground/inputs/ArrayInput';
+import type {MultiSelectTheme} from '../features/playground/inputs/MultiSelect';
+import type {ObjectInputTheme} from '../features/playground/inputs/ObjectInput';
+import type {SchemaDetailTheme} from '../features/schema/SchemaDetail';
+import type {SchemaNodeTheme} from '../features/schema/SchemaNode';
+import type {SchemaViewerTheme} from '../features/schema/SchemaViewer';
+import type {ServerConfigTheme} from '../features/server/ServerConfig';
+import type {CommandBarTheme} from '../shared/components/CommandBar';
+import type {LoadModalTheme} from '../shared/components/LoadModal';
+import type {ModalTheme} from '../shared/components/Modal';
+import type {ThemePickerTheme} from '../shared/components/ThemePicker';
+import type {TopBarTheme} from '../shared/components/TopBar';
+import type {VerticalResizableTheme} from '../shared/components/VerticalResizable';
+import type {SyntaxTheme} from '../shared/utils/highlight';
 
 export type {
     AppRootTheme,
     NavTheme,
+    DetailPaneTheme,
     EndpointTheme,
     AuthModalTheme,
-    ServerConfigTheme,
-    SchemaViewerTheme,
-    SchemaNodeTheme,
-    SchemaDetailTheme,
     PlaygroundTheme,
     AuthStatusTheme,
     BodyEditorTheme,
@@ -56,12 +51,15 @@ export type {
     ArrayInputTheme,
     MultiSelectTheme,
     ObjectInputTheme,
+    SchemaDetailTheme,
+    SchemaNodeTheme,
+    SchemaViewerTheme,
+    ServerConfigTheme,
     CommandBarTheme,
     LoadModalTheme,
     ModalTheme,
-    TopBarTheme,
     ThemePickerTheme,
-    DetailPaneTheme,
+    TopBarTheme,
     VerticalResizableTheme,
     SyntaxTheme,
 };

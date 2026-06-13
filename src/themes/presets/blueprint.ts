@@ -4,13 +4,13 @@
  * method badges with no fill. All monospace, ALL-CAPS labels, technical annotation style.
  * Palette: #0a1628 navy · #1e90ff dodger blue · #7db8e8 text · #1e3a5f borders.
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 // Outlined only — no background fill.
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded-none uppercase w-[36px] text-center border bg-transparent';
 
 export const blueprintTheme: AppTheme = {
-  name: 'blueprint',
+  name: 'Blueprint',
   swatches: ['#0a1628', '#1e90ff', '#7db8e8'],
   fontFamily: "ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace",
 

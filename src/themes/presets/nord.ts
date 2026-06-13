@@ -3,12 +3,12 @@
  * Polar Night (#2E3440–#4C566A) for backgrounds, Snow Storm (#D8DEE9–#ECEFF4) for text,
  * Frost (#5E81AC–#8FBCBB) for interactive accents, Aurora colors for semantic states.
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded uppercase w-[36px] text-center';
 
 export const nordTheme: AppTheme = {
-  name: 'nord',
+  name: 'Nord',
   swatches: ['#2E3440', '#88C0D0', '#ECEFF4'],
 
   appRoot: {

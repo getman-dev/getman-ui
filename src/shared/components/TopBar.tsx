@@ -1,12 +1,26 @@
 /** Top application bar: API identity, server chip, auth, theme picker, shortcuts, and spec loader. */
-import { useSpec } from "../../features/spec/spec-context";
-import { useAuth } from "../../features/auth/auth-context";
-import { authActions } from "../../features/auth/auth-context";
-import { modalActions } from "../contexts/modal-context";
+import {useSpec} from "../../features/spec/spec-context";
+import {authActions, useAuth} from "../../features/auth/auth-context";
+import {modalActions} from "../contexts/modal-context";
 import ServerConfig from "../../features/server/ServerConfig";
 import ThemePicker from "./ThemePicker";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface TopBarTheme {
+  container: ThemeSlot;
+  specTitle: ThemeSlot;
+  specVersion: ThemeSlot;
+  specDescription: ThemeSlot;
+  noSpecIcon: ThemeSlot;
+  noSpecIconSvg: ThemeSlot;
+  noSpecTitle: ThemeSlot;
+  divider: ThemeSlot;
+  authButtonConfigured: ThemeSlot;
+  authButtonUnconfigured: ThemeSlot;
+  neutralButton: ThemeSlot;
+  loadButton: ThemeSlot;
+}
 
 interface Props {
   onSetTheme: (name: string) => void;

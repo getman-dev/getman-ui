@@ -4,13 +4,13 @@
  * and a classic CRT color palette: #33cc33 text on #030a03 background
  * with #00ff41 as the interactive accent.
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 // Bordered, square method badges — no rounding.
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded-none uppercase w-[36px] text-center border';
 
 export const terminalTheme: AppTheme = {
-  name: 'terminal',
+  name: 'Terminal',
   swatches: ['#030a03', '#00ff41', '#33cc33'],
   fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
 

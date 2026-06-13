@@ -3,12 +3,12 @@
  * All Tailwind class strings for the light appearance live here.
  * Copy this file to create a new theme; TypeScript will flag every missing slot.
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded uppercase w-[36px] text-center';
 
 export const lightTheme: AppTheme = {
-  name: 'light',
+  name: 'Light',
   swatches: ['#f9fafb', '#2563eb', '#111827'],
 
   appRoot: {

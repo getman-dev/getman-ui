@@ -3,12 +3,12 @@
  * Inspired by handwritten notebooks and aged paper. Cozy, tactile, analog.
  * Palette: cream (#F5EFD7), ink (#2C2416), rust (#C4622D), warm tan borders (#D4C9A0).
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded uppercase w-[36px] text-center';
 
 export const parchmentTheme: AppTheme = {
-  name: 'parchment',
+  name: 'Parchment',
   swatches: ['#F5EFD7', '#C4622D', '#2C2416'],
 
   appRoot: {

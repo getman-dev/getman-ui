@@ -1,10 +1,19 @@
 /** Routes between EndpointDetail, SchemaDetail, and the empty state. */
-import { useNav } from "./nav-context";
-import { useSpec, specActions } from "../spec/spec-context";
+import {useNav} from "./nav-context";
+import {specActions, useSpec} from "../spec/spec-context";
 import EndpointDetail from "../endpoint/EndpointDetail";
 import SchemaDetail from "../schema/SchemaDetail";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface DetailPaneTheme {
+    spinner: ThemeSlot;
+    errorIcon: ThemeSlot;
+    errorMessage: ThemeSlot;
+    retryLink: ThemeSlot;
+    emptyIcon: ThemeSlot;
+    emptyMessage: ThemeSlot;
+}
 
 /** Displays a spec load error with a dismiss action. */
 function SpecLoadError({ message }: { message: string }) {

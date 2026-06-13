@@ -2,13 +2,32 @@
  * Authorization modal with a tab per security scheme.
  * Handles API key, HTTP basic/bearer, OAuth 2.0, and OpenID Connect.
  */
-import { useState, useEffect } from "react";
-import type { SecurityScheme, AuthSchemeValue } from "../spec/openapi";
-import { useAuth } from "../../shared/contexts";
-import { useSpec } from "../../shared/contexts";
+import {useEffect, useState} from "react";
+import type {AuthSchemeValue, SecurityScheme} from "../spec/openapi";
+import {useAuth, useSpec} from "../../shared/contexts";
 import Modal from "../../shared/components/Modal";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface AuthModalTheme {
+  tabBar: ThemeSlot;
+  tabActive: ThemeSlot;
+  tabInactive: ThemeSlot;
+  titleIcon: ThemeSlot;
+  titleText: ThemeSlot;
+  closeButton: ThemeSlot;
+  schemeType: ThemeSlot;
+  authorizedBadge: ThemeSlot;
+  schemeDescription: ThemeSlot;
+  fieldLabel: ThemeSlot;
+  fieldLabelHint: ThemeSlot;
+  input: ThemeSlot;
+  tokenWrapper: ThemeSlot;
+  tokenPrefix: ThemeSlot;
+  tokenField: ThemeSlot;
+  saveButton: ThemeSlot;
+  clearButton: ThemeSlot;
+}
 
 function schemeTypeLabel(scheme: SecurityScheme): string {
   switch (scheme.type) {

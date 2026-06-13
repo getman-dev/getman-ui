@@ -1,6 +1,23 @@
 /** Label row for a parameter or body field: name, location/type/required/deprecated badges, constraint badges, and description tooltip. */
-import { type ThemeSlot, slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface ParamLabelTheme {
+  nameText: ThemeSlot;
+  nameDeprecated: ThemeSlot;
+  locPath: ThemeSlot;
+  locQuery: ThemeSlot;
+  locHeader: ThemeSlot;
+  locCookie: ThemeSlot;
+  locForm: ThemeSlot;
+  locDefault: ThemeSlot;
+  typeBadge: ThemeSlot;
+  requiredBadge: ThemeSlot;
+  deprecatedBadge: ThemeSlot;
+  constraintBadge: ThemeSlot;
+  tooltipIcon: ThemeSlot;
+  tooltipPopup: ThemeSlot;
+}
 
 interface Props {
   name: string;

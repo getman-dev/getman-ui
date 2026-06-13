@@ -1,6 +1,11 @@
 /** Single-value select for parameters with a fixed enum set. */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface EnumSelectTheme {
+  select: ThemeSlot;
+  selectInvalid: ThemeSlot;
+}
 
 interface Props {
   value: string;

@@ -3,12 +3,12 @@
  * Base (#1E1E2E–#45475A) for backgrounds, #CDD6F4 for text,
  * Mauve (#CBA6F7) for interactive accents, semantic Aurora-equivalent colors throughout.
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded uppercase w-[36px] text-center';
 
 export const catppuccinTheme: AppTheme = {
-  name: 'catppuccin',
+  name: 'Catppuccin',
   swatches: ['#1E1E2E', '#CBA6F7', '#CDD6F4'],
 
   appRoot: {

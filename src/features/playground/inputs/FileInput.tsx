@@ -1,6 +1,10 @@
 /** File upload input for binary-format fields in multipart/form-data request bodies. */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface FileInputTheme {
+  input: ThemeSlot;
+}
 
 interface Props {
   multiple: boolean;

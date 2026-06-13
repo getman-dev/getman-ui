@@ -1,6 +1,11 @@
 /** Three-state select for boolean parameters: absent (—), true, or false. */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
+
+export interface BooleanSelectTheme {
+  select: ThemeSlot;
+  selectInvalid: ThemeSlot;
+}
 
 interface Props {
   value: string;

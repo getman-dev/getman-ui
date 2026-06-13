@@ -1,8 +1,21 @@
 /** Recursive component that renders a single OpenAPI schema property row with type, constraints, and nested children. */
-import type { Schema, Components } from "../spec/openapi";
-import { resolveSchema } from "../spec/ref-resolver";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import type {Components, Schema} from "../spec/openapi";
+import {resolveSchema} from "../spec/ref-resolver";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface SchemaNodeTheme {
+  name: ThemeSlot;
+  typeBadge: ThemeSlot;
+  nullableBadge: ThemeSlot;
+  constraint: ThemeSlot;
+  enumValue: ThemeSlot;
+  description: ThemeSlot;
+  enumKey: ThemeSlot;
+  enumDesc: ThemeSlot;
+  nestedBorder: ThemeSlot;
+  typeBadgeColors: Record<string, string>;
+}
 
 function schemaTypeLabel(s: Schema): string {
   if (s.type === "array") {

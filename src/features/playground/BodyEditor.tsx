@@ -1,7 +1,13 @@
 /** Request body editor: JSON textarea for application/json or a file input for application/octet-stream. */
 import ParamLabel from "./ParamLabel";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface BodyEditorTheme {
+  fileInput: ThemeSlot;
+  formatButton: ThemeSlot;
+  textarea: ThemeSlot;
+}
 
 interface Props {
   required: boolean;

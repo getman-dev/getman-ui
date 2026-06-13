@@ -3,12 +3,12 @@
  * All monospace. Cozy developer-journal aesthetic: ink on warm paper, zero chrome.
  * Palette: paper (#F9F7F2), ink (#1A1814), highlight yellow (#F5E642), border tan (#D6D0C4).
  */
-import type { AppTheme } from '../contract';
+import type {AppTheme} from '../contract';
 
 const badge = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded-sm uppercase w-[36px] text-center';
 
 export const notebookTheme: AppTheme = {
-  name: 'notebook',
+  name: 'Notebook',
   swatches: ['#F9F7F2', '#F5E642', '#1A1814'],
   fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace",
 

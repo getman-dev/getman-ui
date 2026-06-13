@@ -4,11 +4,31 @@
  * Used in both the top bar and the playground via the `source` prop.
  */
 import clsx from "clsx";
-import { useServer, initServerVariables } from "./server-context";
-import { useSpec } from "../spec/spec-context";
-import { resolveServerUrl } from "../spec/example-gen";
-import { slot } from "../../themes/slot";
-import { useTheme } from "../../themes/context";
+import {initServerVariables, useServer} from "./server-context";
+import {useSpec} from "../spec/spec-context";
+import {resolveServerUrl} from "../spec/example-gen";
+import {slot, type ThemeSlot} from "../../themes/slot";
+import {useTheme} from "../../themes/context";
+
+export interface ServerConfigTheme {
+  chip: ThemeSlot; // variants: open
+  chipIcon: ThemeSlot;
+  backdrop: ThemeSlot;
+  popover: ThemeSlot;
+  popoverHeader: ThemeSlot;
+  headerIcon: ThemeSlot;
+  headerTitle: ThemeSlot;
+  closeButton: ThemeSlot;
+  sectionDivider: ThemeSlot;
+  sectionLabel: ThemeSlot;
+  serverSelect: ThemeSlot;
+  variableName: ThemeSlot;
+  variableDescription: ThemeSlot;
+  variableInput: ThemeSlot;
+  resolvedSection: ThemeSlot;
+  resolvedLabel: ThemeSlot;
+  resolvedValue: ThemeSlot;
+}
 
 interface Props {
   source: "topbar" | "playground";

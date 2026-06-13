@@ -1,6 +1,10 @@
 /** Text or number input for scalar parameter values (string, integer, number). */
-import { slot } from "../../../themes/slot";
-import { useTheme } from "../../../themes/context";
+import {slot, type ThemeSlot, useTheme} from "../../../themes";
+
+export interface ScalarInputTheme {
+  input: ThemeSlot;
+  inputInvalid: ThemeSlot;
+}
 
 interface Props {
   value: string;

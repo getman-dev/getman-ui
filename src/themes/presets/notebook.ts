@@ -9,6 +9,7 @@ const badge = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-
 
 export const notebookTheme: AppTheme = {
   name: 'notebook',
+  swatches: ['#F9F7F2', '#F5E642', '#1A1814'],
   fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace",
 
   appRoot: {

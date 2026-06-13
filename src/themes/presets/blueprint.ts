@@ -11,6 +11,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const blueprintTheme: AppTheme = {
   name: 'blueprint',
+  swatches: ['#0a1628', '#1e90ff', '#7db8e8'],
   fontFamily: "ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace",
 
   appRoot: {

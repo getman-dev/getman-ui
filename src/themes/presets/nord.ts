@@ -9,6 +9,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const nordTheme: AppTheme = {
   name: 'nord',
+  swatches: ['#2E3440', '#88C0D0', '#ECEFF4'],
 
   appRoot: {
     root:              'flex flex-col h-full overflow-hidden bg-[#2E3440]',

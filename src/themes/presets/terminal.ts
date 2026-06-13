@@ -11,6 +11,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const terminalTheme: AppTheme = {
   name: 'terminal',
+  swatches: ['#030a03', '#00ff41', '#33cc33'],
   fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
 
   appRoot: {

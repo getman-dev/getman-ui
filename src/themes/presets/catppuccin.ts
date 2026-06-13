@@ -9,6 +9,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const catppuccinTheme: AppTheme = {
   name: 'catppuccin',
+  swatches: ['#1E1E2E', '#CBA6F7', '#CDD6F4'],
 
   appRoot: {
     root:              'flex flex-col h-full overflow-hidden bg-[#1E1E2E]',

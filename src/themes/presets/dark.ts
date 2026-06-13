@@ -8,6 +8,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const darkTheme: AppTheme = {
   name: 'dark',
+  swatches: ['#1f2937', '#60a5fa', '#f3f4f6'],
 
   appRoot: {
     root:              'flex flex-col h-full overflow-hidden bg-gray-900',

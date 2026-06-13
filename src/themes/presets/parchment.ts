@@ -9,6 +9,7 @@ const methodBadgeBase = 'method-badge shrink-0 text-[9px] font-bold font-mono px
 
 export const parchmentTheme: AppTheme = {
   name: 'parchment',
+  swatches: ['#F5EFD7', '#C4622D', '#2C2416'],
 
   appRoot: {
     root:              'flex flex-col h-full overflow-hidden bg-[#F5EFD7]',

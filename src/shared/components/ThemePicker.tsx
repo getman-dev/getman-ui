@@ -1,29 +1,8 @@
 /** Dropdown theme picker: trigger button with current theme name, opens a list of all themes with color swatches. */
 import { useState, useRef, useEffect } from 'react';
-import { listThemes } from '../../themes';
+import { listThemes, THEMES } from '../../themes';
 import { useTheme } from '../../themes/context';
 import { slot } from '../../themes/slot';
-
-/** Display name for each built-in theme. */
-const THEME_LABELS: Record<string, string> = {
-  light:      'Light',
-  dark:       'Dark',
-  nord:       'Nord',
-  catppuccin: 'Catppuccin',
-  terminal:   'Terminal',
-};
-
-/**
- * Three representative hex colors (background, accent, text) shown as swatches for each theme.
- * Hardcoded so they remain accurate regardless of the currently active theme.
- */
-const THEME_SWATCHES: Record<string, [string, string, string]> = {
-  light:      ['#f9fafb', '#2563eb', '#111827'],
-  dark:       ['#1f2937', '#60a5fa', '#f3f4f6'],
-  nord:       ['#2E3440', '#88C0D0', '#ECEFF4'],
-  catppuccin: ['#1E1E2E', '#CBA6F7', '#CDD6F4'],
-  terminal:   ['#030a03', '#00ff41', '#33cc33'],
-};
 
 interface Props {
   onSetTheme: (name: string) => void;
@@ -45,7 +24,7 @@ export default function ThemePicker({ onSetTheme }: Props) {
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, [open]);
 
-  const label = THEME_LABELS[theme.name] ?? theme.name;
+  const label = theme.name;
 
   return (
     <div ref={ref} className="relative">
@@ -69,7 +48,7 @@ export default function ThemePicker({ onSetTheme }: Props) {
       {open && (
         <div className={`absolute right-0 top-full mt-1.5 z-50 w-52 ${slot(t.dropdown)}`}>
           {listThemes().map(name => {
-            const swatches = THEME_SWATCHES[name] ?? ['#888', '#888', '#888'];
+            const { swatches } = THEMES[name];
             const isActive = theme.name === name;
             return (
               <button
@@ -86,7 +65,7 @@ export default function ThemePicker({ onSetTheme }: Props) {
                     />
                   ))}
                 </div>
-                <span className={slot(t.name)}>{THEME_LABELS[name] ?? name}</span>
+                <span className={slot(t.name)}>{THEMES[name].name}</span>
                 {isActive && (
                   <svg className={slot(t.check)} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>

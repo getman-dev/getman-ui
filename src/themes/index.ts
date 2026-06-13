@@ -8,12 +8,13 @@ import { darkTheme }       from './presets/dark';
 import { nordTheme }       from './presets/nord';
 import { catppuccinTheme } from './presets/catppuccin';
 import { terminalTheme }   from './presets/terminal';
+import { parchmentTheme }  from './presets/parchment';
 
 export type { AppTheme } from './contract';
 export { useTheme, ThemeProvider } from './context';
 export { slot } from './slot';
 export type { ThemeSlot } from './slot';
-export { lightTheme, darkTheme, nordTheme, catppuccinTheme, terminalTheme };
+export { lightTheme, darkTheme, nordTheme, catppuccinTheme, terminalTheme, parchmentTheme };
 
 /** All built-in themes keyed by their preset name. */
 export const THEMES: Record<string, AppTheme> = {
@@ -22,6 +23,7 @@ export const THEMES: Record<string, AppTheme> = {
   nord:       nordTheme,
   catppuccin: catppuccinTheme,
   terminal:   terminalTheme,
+  parchment:  parchmentTheme,
 };
 
 /**

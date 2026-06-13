@@ -383,7 +383,7 @@ export const terminalTheme: AppTheme = {
     number:  '#ffb000',
   },
 
-  paneHandle:  'bg-[#1e4a1e]',
+  paneHandle:  'bg-[#1e4a1e] group-hover:bg-[#39ff14] group-hover:w-0.5 group-[.dragging]:bg-[#00ff00] group-[.dragging]:w-0.5',
   focusRing:   'focus:ring-1 focus:ring-[#33ff33] focus:ring-offset-0',
   scrollbar:   { thumb: 'bg-[#1e4a1e]', thumbHover: 'bg-[#2d6e2d]' },
 };

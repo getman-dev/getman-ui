@@ -385,7 +385,7 @@ export const brutalistTheme: AppTheme = {
     number:  '#884400',
   },
 
-  paneHandle:  'bg-black',
+  paneHandle:  'bg-black group-hover:bg-[#ffff00] group-hover:w-0.5 group-[.dragging]:bg-[#ffff00] group-[.dragging]:w-0.5',
   focusRing:   'focus:ring-2 focus:ring-black focus:ring-offset-0',
   scrollbar:   { thumb: 'bg-black/20', thumbHover: 'bg-black/40' },
 };

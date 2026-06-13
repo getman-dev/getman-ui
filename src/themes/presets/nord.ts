@@ -380,7 +380,7 @@ export const nordTheme: AppTheme = {
     number:  '#EBCB8B',
   },
 
-  paneHandle:  'bg-[#4C566A]',
+  paneHandle:  'bg-[#4C566A] group-hover:bg-[#88C0D0] group-hover:w-0.5 group-[.dragging]:bg-[#81A1C1] group-[.dragging]:w-0.5',
   fontFamily:  "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
   focusRing:   'focus:ring-2 focus:ring-[#88C0D0] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#4C566A]', thumbHover: 'bg-[#81A1C1]' },

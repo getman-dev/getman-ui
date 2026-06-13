@@ -383,7 +383,7 @@ export const blueprintTheme: AppTheme = {
     number:  '#fbbf24',
   },
 
-  paneHandle:  'bg-[#1e3a5f]',
+  paneHandle:  'bg-[#1e3a5f] group-hover:bg-[#4a9eff] group-hover:w-0.5 group-[.dragging]:bg-[#7eb8f7] group-[.dragging]:w-0.5',
   focusRing:   'focus:ring-1 focus:ring-[#1e90ff] focus:ring-offset-0',
   scrollbar:   { thumb: 'bg-[#1e3a5f]', thumbHover: 'bg-[#2a4a6f]' },
 };

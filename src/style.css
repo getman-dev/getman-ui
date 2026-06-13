@@ -80,35 +80,6 @@
 }
 
 @layer components {
-  .pane-handle {
-    width: 6px;
-    flex-shrink: 0;
-    position: relative;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    cursor: col-resize;
-    background: transparent;
-    z-index: 10;
-  }
-
-  .pane-handle-line {
-    width: 1px;
-    background: var(--handle-color);
-    transition: background-color 0.15s ease, width 0.1s ease;
-    flex: 1;
-  }
-
-  .pane-handle:hover .pane-handle-line {
-    background: rgb(147, 197, 253);
-    width: 2px;
-  }
-
-  .pane-handle.dragging .pane-handle-line {
-    background: rgb(59, 130, 246);
-    width: 2px;
-  }
-
   .nav-tag-chevron  { transition: transform 150ms ease; }
   .response-chevron { transition: transform 150ms ease; }
 

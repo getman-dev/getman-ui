@@ -381,7 +381,7 @@ export const wireframeTheme: AppTheme = {
     number:  '#92400E',
   },
 
-  paneHandle:  'bg-[#C8D8EC]',
+  paneHandle:  'bg-[#C8D8EC] group-hover:bg-[#2563EB] group-hover:w-0.5 group-[.dragging]:bg-[#2563EB] group-[.dragging]:w-0.5',
   focusRing:   'focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#C8D8EC]', thumbHover: 'bg-[#93A3B8]' },
 };

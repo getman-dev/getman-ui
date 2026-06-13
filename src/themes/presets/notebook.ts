@@ -381,7 +381,7 @@ export const notebookTheme: AppTheme = {
     number:  '#7A5A00',
   },
 
-  paneHandle:  'bg-[#D6D0C4]',
+  paneHandle:  'bg-[#D6D0C4] group-hover:bg-[#D4C200] group-hover:w-0.5 group-[.dragging]:bg-[#F5E642] group-[.dragging]:w-0.5',
   focusRing:   'focus:ring-2 focus:ring-[#D4C200] focus:ring-offset-1',
   scrollbar:   { thumb: 'bg-[#D6D0C4]', thumbHover: 'bg-[#C5BFAD]' },
 };

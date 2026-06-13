@@ -1,6 +1,6 @@
 import "./style.css";
-import { mountApiExplorer, autoMount } from "./mount";
+import {autoMount, mountApiExplorer} from "./mount";
 
-export { mountApiExplorer };
+export {mountApiExplorer};
 
 autoMount();

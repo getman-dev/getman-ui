@@ -14,6 +14,7 @@ Copy the relevant section below into a new issue and fill in the brackets.
 A clear and concise description of what the bug is.
 
 **Steps to reproduce**
+
 1. Load a spec (URL or file upload)
 2. Navigate to '...'
 3. See error
@@ -25,11 +26,13 @@ What you expected to happen.
 What actually happened. Include error messages, stack traces, or screenshots if applicable.
 
 **Spec details** *(if relevant)*
+
 - Does the bug reproduce with any OpenAPI 3.x spec, or only specific ones?
 - Can you share a minimal spec that reproduces the issue? (strip any sensitive data)
 - Are any `$ref`s, `oneOf`/`anyOf`/`allOf`, or response/parameter references involved?
 
 **Environment**
+
 - Embed method: [CDN via jsDelivr / `mountApiExplorer` in own bundle / dev server]
 - Browser: [e.g. Chrome 124, Firefox 125, Safari 17]
 - OS: [e.g. macOS 14, Ubuntu 22.04]
@@ -82,17 +85,17 @@ Bullet list of acceptance criteria — what does "complete" look like?
 
 Attach one or more labels to every issue:
 
-| Label | When to use |
-|---|---|
-| `bug` | Something is broken or behaves incorrectly |
-| `feature` | New capability or user-visible improvement |
-| `spec-rendering` | Issues with how OpenAPI schemas, refs, or examples are displayed |
-| `playground` | Issues with the Try-it-out / request execution panel |
-| `auth` | Auth schemes, credential handling, security definitions |
-| `embed` | `mountApiExplorer`, CDN loader, or host-page integration |
-| `chore` | Maintenance, deps, refactor, CI — no new behavior |
-| `docs` | Documentation only |
-| `good first issue` | Well-scoped, low risk, suitable for new contributors |
-| `help wanted` | Open to external contribution |
-| `blocked` | Cannot proceed until another issue or PR is resolved |
-| `wontfix` | Acknowledged but will not be addressed |
+| Label              | When to use                                                      |
+|--------------------|------------------------------------------------------------------|
+| `bug`              | Something is broken or behaves incorrectly                       |
+| `feature`          | New capability or user-visible improvement                       |
+| `spec-rendering`   | Issues with how OpenAPI schemas, refs, or examples are displayed |
+| `playground`       | Issues with the Try-it-out / request execution panel             |
+| `auth`             | Auth schemes, credential handling, security definitions          |
+| `embed`            | `mountApiExplorer`, CDN loader, or host-page integration         |
+| `chore`            | Maintenance, deps, refactor, CI — no new behavior                |
+| `docs`             | Documentation only                                               |
+| `good first issue` | Well-scoped, low risk, suitable for new contributors             |
+| `help wanted`      | Open to external contribution                                    |
+| `blocked`          | Cannot proceed until another issue or PR is resolved             |
+| `wontfix`          | Acknowledged but will not be addressed                           |

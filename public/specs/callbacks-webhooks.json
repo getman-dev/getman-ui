@@ -5,11 +5,24 @@
     "description": "Demonstrates OpenAPI `callbacks` (server calls your URL after an async operation) and OpenAPI 3.1 top-level `webhooks` (server-initiated events your system must handle). Covers subscription management, callback URL registration, and event payload schemas.",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://api.example.com/v1" }],
+  "servers": [
+    {
+      "url": "https://api.example.com/v1"
+    }
+  ],
   "tags": [
-    { "name": "subscriptions", "description": "Subscribe to event callbacks" },
-    { "name": "payments", "description": "Payment operations with async callbacks" },
-    { "name": "exports", "description": "Async export jobs with completion callbacks" }
+    {
+      "name": "subscriptions",
+      "description": "Subscribe to event callbacks"
+    },
+    {
+      "name": "payments",
+      "description": "Payment operations with async callbacks"
+    },
+    {
+      "name": "exports",
+      "description": "Async export jobs with completion callbacks"
+    }
   ],
   "paths": {
     "/subscriptions": {
@@ -17,15 +30,23 @@
         "operationId": "createSubscription",
         "summary": "Subscribe to events",
         "description": "Register a callback URL to receive event notifications. The server will POST to your `callbackUrl` whenever a matching event occurs.",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SubscriptionRequest" },
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRequest"
+              },
               "example": {
                 "callbackUrl": "https://yourapp.com/webhooks/events",
-                "events": ["order.created", "order.shipped", "order.delivered"],
+                "events": [
+                  "order.created",
+                  "order.shipped",
+                  "order.delivered"
+                ],
                 "secret": "whsec_abc123"
               }
             }
@@ -36,7 +57,9 @@
             "description": "Subscription created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Subscription" }
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
               }
             }
           }
@@ -51,7 +74,9 @@
                   "required": true,
                   "content": {
                     "application/json": {
-                      "schema": { "$ref": "#/components/schemas/EventPayload" }
+                      "schema": {
+                        "$ref": "#/components/schemas/EventPayload"
+                      }
                     }
                   }
                 },
@@ -61,25 +86,40 @@
                     "in": "header",
                     "required": true,
                     "description": "HMAC-SHA256 of the raw request body, signed with your subscription secret",
-                    "schema": { "type": "string", "example": "sha256=abc123def456..." }
+                    "schema": {
+                      "type": "string",
+                      "example": "sha256=abc123def456..."
+                    }
                   },
                   {
                     "name": "X-Event-ID",
                     "in": "header",
                     "description": "Unique event ID for deduplication",
-                    "schema": { "type": "string", "format": "uuid" }
+                    "schema": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
                   },
                   {
                     "name": "X-Delivery-Attempt",
                     "in": "header",
                     "description": "Delivery attempt number (1 = first try)",
-                    "schema": { "type": "integer", "minimum": 1 }
+                    "schema": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
                   }
                 ],
                 "responses": {
-                  "200": { "description": "Event acknowledged — no retry needed" },
-                  "202": { "description": "Event accepted for async processing" },
-                  "5XX": { "description": "Server error — delivery will be retried with exponential backoff" }
+                  "200": {
+                    "description": "Event acknowledged — no retry needed"
+                  },
+                  "202": {
+                    "description": "Event accepted for async processing"
+                  },
+                  "5XX": {
+                    "description": "Server error — delivery will be retried with exponential backoff"
+                  }
                 }
               }
             }
@@ -89,28 +129,48 @@
     },
     "/subscriptions/{subscriptionId}": {
       "parameters": [
-        { "name": "subscriptionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        {
+          "name": "subscriptionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       ],
       "get": {
         "operationId": "getSubscription",
         "summary": "Get a subscription",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "responses": {
           "200": {
             "description": "Subscription details",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Subscription" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
             }
           },
-          "404": { "description": "Not found" }
+          "404": {
+            "description": "Not found"
+          }
         }
       },
       "delete": {
         "operationId": "deleteSubscription",
         "summary": "Cancel a subscription",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "responses": {
-          "204": { "description": "Subscription cancelled" }
+          "204": {
+            "description": "Subscription cancelled"
+          }
         }
       }
     },
@@ -119,12 +179,16 @@
         "operationId": "initiatePayment",
         "summary": "Initiate a payment (async with callback)",
         "description": "Starts a payment flow. Processing is asynchronous — your `callbackUrl` receives a `payment.completed` or `payment.failed` event when done.",
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/PaymentRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRequest"
+              }
             }
           }
         },
@@ -132,7 +196,11 @@
           "202": {
             "description": "Payment initiated, processing asynchronously",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PaymentAccepted" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentAccepted"
+                }
+              }
             }
           }
         },
@@ -146,12 +214,16 @@
                   "required": true,
                   "content": {
                     "application/json": {
-                      "schema": { "$ref": "#/components/schemas/PaymentResultEvent" }
+                      "schema": {
+                        "$ref": "#/components/schemas/PaymentResultEvent"
+                      }
                     }
                   }
                 },
                 "responses": {
-                  "200": { "description": "Result acknowledged" }
+                  "200": {
+                    "description": "Result acknowledged"
+                  }
                 }
               }
             }
@@ -164,12 +236,16 @@
         "operationId": "startExport",
         "summary": "Start a data export job (async with callback)",
         "description": "Starts an async export. When complete, the server POSTs the download URL to your `callbackUrl`.",
-        "tags": ["exports"],
+        "tags": [
+          "exports"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ExportRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
             }
           }
         },
@@ -177,7 +253,11 @@
           "202": {
             "description": "Export job queued",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ExportJob" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportJob"
+                }
+              }
             }
           }
         },
@@ -190,12 +270,16 @@
                   "required": true,
                   "content": {
                     "application/json": {
-                      "schema": { "$ref": "#/components/schemas/ExportCompleteEvent" }
+                      "schema": {
+                        "$ref": "#/components/schemas/ExportCompleteEvent"
+                      }
                     }
                   }
                 },
                 "responses": {
-                  "200": { "description": "Callback received" }
+                  "200": {
+                    "description": "Callback received"
+                  }
                 }
               }
             }
@@ -209,18 +293,24 @@
       "post": {
         "summary": "Order created webhook",
         "description": "Fired when a new order is placed in the system. Your registered webhook endpoint must handle this event.",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/WebhookEnvelope" },
+                  {
+                    "$ref": "#/components/schemas/WebhookEnvelope"
+                  },
                   {
                     "type": "object",
                     "properties": {
-                      "data": { "$ref": "#/components/schemas/OrderCreatedData" }
+                      "data": {
+                        "$ref": "#/components/schemas/OrderCreatedData"
+                      }
                     }
                   }
                 ]
@@ -229,8 +319,12 @@
           }
         },
         "responses": {
-          "200": { "description": "Webhook processed successfully" },
-          "202": { "description": "Accepted for async processing" }
+          "200": {
+            "description": "Webhook processed successfully"
+          },
+          "202": {
+            "description": "Accepted for async processing"
+          }
         }
       }
     },
@@ -238,18 +332,24 @@
       "post": {
         "summary": "Order shipped webhook",
         "description": "Fired when an order's shipment label is created and tracking number is assigned.",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/WebhookEnvelope" },
+                  {
+                    "$ref": "#/components/schemas/WebhookEnvelope"
+                  },
                   {
                     "type": "object",
                     "properties": {
-                      "data": { "$ref": "#/components/schemas/OrderShippedData" }
+                      "data": {
+                        "$ref": "#/components/schemas/OrderShippedData"
+                      }
                     }
                   }
                 ]
@@ -258,7 +358,9 @@
           }
         },
         "responses": {
-          "200": { "description": "Webhook processed" }
+          "200": {
+            "description": "Webhook processed"
+          }
         }
       }
     },
@@ -266,18 +368,24 @@
       "post": {
         "summary": "Payment completed webhook",
         "description": "Fired when a payment transaction is finalized (either succeeded or failed).",
-        "tags": ["subscriptions"],
+        "tags": [
+          "subscriptions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/WebhookEnvelope" },
+                  {
+                    "$ref": "#/components/schemas/WebhookEnvelope"
+                  },
                   {
                     "type": "object",
                     "properties": {
-                      "data": { "$ref": "#/components/schemas/PaymentResultEvent" }
+                      "data": {
+                        "$ref": "#/components/schemas/PaymentResultEvent"
+                      }
                     }
                   }
                 ]
@@ -286,7 +394,9 @@
           }
         },
         "responses": {
-          "200": { "description": "Webhook processed" }
+          "200": {
+            "description": "Webhook processed"
+          }
         }
       }
     }
@@ -295,7 +405,10 @@
     "schemas": {
       "SubscriptionRequest": {
         "type": "object",
-        "required": ["callbackUrl", "events"],
+        "required": [
+          "callbackUrl",
+          "events"
+        ],
         "properties": {
           "callbackUrl": {
             "type": "string",
@@ -307,7 +420,13 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["order.created", "order.shipped", "order.delivered", "payment.completed", "payment.failed"]
+              "enum": [
+                "order.created",
+                "order.shipped",
+                "order.delivered",
+                "payment.completed",
+                "payment.failed"
+              ]
             },
             "minItems": 1
           },
@@ -317,113 +436,298 @@
             "description": "Shared secret used to sign webhook payloads",
             "minLength": 16
           },
-          "description": { "type": "string" }
+          "description": {
+            "type": "string"
+          }
         }
       },
       "Subscription": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid", "readOnly": true },
-          "callbackUrl": { "type": "string", "format": "uri" },
-          "events": { "type": "array", "items": { "type": "string" } },
-          "status": { "type": "string", "enum": ["active", "paused", "disabled"] },
-          "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "disabled"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
         }
       },
       "EventPayload": {
         "type": "object",
-        "required": ["id", "type", "createdAt", "data"],
+        "required": [
+          "id",
+          "type",
+          "createdAt",
+          "data"
+        ],
         "properties": {
-          "id": { "type": "string", "format": "uuid", "description": "Unique event ID — use for deduplication" },
-          "type": { "type": "string", "example": "order.created" },
-          "apiVersion": { "type": "string", "example": "2024-01-01" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "data": { "type": "object", "additionalProperties": true, "description": "Event-specific payload" }
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique event ID — use for deduplication"
+          },
+          "type": {
+            "type": "string",
+            "example": "order.created"
+          },
+          "apiVersion": {
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Event-specific payload"
+          }
         }
       },
       "WebhookEnvelope": {
         "type": "object",
-        "required": ["id", "type", "createdAt"],
+        "required": [
+          "id",
+          "type",
+          "createdAt"
+        ],
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "type": { "type": "string" },
-          "apiVersion": { "type": "string", "example": "2024-01-01" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "data": { "type": "object" }
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "apiVersion": {
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {
+            "type": "object"
+          }
         }
       },
       "OrderCreatedData": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "string", "format": "uuid" },
-          "customerId": { "type": "string", "format": "uuid" },
-          "total": { "type": "number" },
-          "currency": { "type": "string", "example": "USD" },
-          "itemCount": { "type": "integer" }
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "total": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "itemCount": {
+            "type": "integer"
+          }
         }
       },
       "OrderShippedData": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "string", "format": "uuid" },
-          "trackingNumber": { "type": "string" },
-          "carrier": { "type": "string", "example": "UPS" },
-          "estimatedDelivery": { "type": "string", "format": "date" }
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trackingNumber": {
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string",
+            "example": "UPS"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "format": "date"
+          }
         }
       },
       "PaymentRequest": {
         "type": "object",
-        "required": ["amount", "currency", "callbackUrl"],
+        "required": [
+          "amount",
+          "currency",
+          "callbackUrl"
+        ],
         "properties": {
-          "amount": { "type": "integer", "description": "Amount in smallest currency unit (e.g. cents)", "example": 2999 },
-          "currency": { "type": "string", "pattern": "^[A-Z]{3}$", "example": "USD" },
-          "description": { "type": "string" },
-          "callbackUrl": { "type": "string", "format": "uri" }
+          "amount": {
+            "type": "integer",
+            "description": "Amount in smallest currency unit (e.g. cents)",
+            "example": 2999
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$",
+            "example": "USD"
+          },
+          "description": {
+            "type": "string"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       },
       "PaymentAccepted": {
         "type": "object",
         "properties": {
-          "paymentId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string", "const": "processing" },
-          "callbackUrl": { "type": "string", "format": "uri" }
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "const": "processing"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       },
       "PaymentResultEvent": {
         "type": "object",
         "properties": {
-          "paymentId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string", "enum": ["succeeded", "failed"] },
-          "amount": { "type": "integer" },
-          "currency": { "type": "string" },
-          "failureReason": { "type": ["string", "null"] }
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "failed"
+            ]
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "failureReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "ExportRequest": {
         "type": "object",
-        "required": ["format", "callbackUrl"],
+        "required": [
+          "format",
+          "callbackUrl"
+        ],
         "properties": {
-          "format": { "type": "string", "enum": ["csv", "json", "xlsx"] },
-          "filters": { "type": "object", "additionalProperties": true },
-          "callbackUrl": { "type": "string", "format": "uri" }
+          "format": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "json",
+              "xlsx"
+            ]
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       },
       "ExportJob": {
         "type": "object",
         "properties": {
-          "jobId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string", "enum": ["queued", "processing"] },
-          "estimatedSeconds": { "type": "integer" }
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "processing"
+            ]
+          },
+          "estimatedSeconds": {
+            "type": "integer"
+          }
         }
       },
       "ExportCompleteEvent": {
         "type": "object",
         "properties": {
-          "jobId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string", "enum": ["completed", "failed"] },
-          "downloadUrl": { "type": ["string", "null"], "format": "uri" },
-          "expiresAt": { "type": ["string", "null"], "format": "date-time" },
-          "errorMessage": { "type": ["string", "null"] }
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "failed"
+            ]
+          },
+          "downloadUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "errorMessage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     }

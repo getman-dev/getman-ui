@@ -1,6 +1,6 @@
 // Core mount function — framework-agnostic entry point for embedding the API Explorer.
-import { createRoot } from "react-dom/client";
-import { createElement } from "react";
+import {createRoot} from "react-dom/client";
+import {createElement} from "react";
 import App from "./App";
 
 /**
@@ -9,11 +9,11 @@ import App from "./App";
  * @param options - Optional `url` of an OpenAPI spec to load on startup.
  */
 export function mountApiExplorer(
-  target: HTMLElement,
-  options?: { url?: string }
+    target: HTMLElement,
+    options?: { url?: string }
 ): () => void {
   const root = createRoot(target);
-  root.render(createElement(App, { initialUrl: options?.url }));
+  root.render(createElement(App, {initialUrl: options?.url}));
   return () => root.unmount();
 }
 
@@ -23,10 +23,10 @@ export function mountApiExplorer(
  */
 export function autoMount(): void {
   const mount = () =>
-    document.querySelectorAll<HTMLElement>("[data-api-explorer]").forEach(el => {
-      const url = el.getAttribute("data-api-explorer") || undefined;
-      mountApiExplorer(el, { url });
-    });
+      document.querySelectorAll<HTMLElement>("[data-api-explorer]").forEach(el => {
+        const url = el.getAttribute("data-api-explorer") || undefined;
+        mountApiExplorer(el, {url});
+      });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", mount);

@@ -6,7 +6,7 @@
 
 <!-- Bullet list of what changed. Focus on the "what" — the diff shows the "how". -->
 
-- 
+-
 
 ## Test plan
 

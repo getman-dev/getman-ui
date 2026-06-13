@@ -13,6 +13,7 @@
 <div id="root" style="height:100%"></div>
 <script type="module">
     import {mountApiExplorer} from "/src/main.js";
+
     const url = new URLSearchParams(location.search).get("url") ?? undefined;
     const unmount = mountApiExplorer(document.getElementById("root"), {
         url: url

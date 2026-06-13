@@ -2,7 +2,10 @@
 
 ## Problem
 
-Property descriptions in `SchemaNode` are rendered as a tiny inline `text-[11px]` gray span in the same flex row as the name, type badge, and constraints. They are visually indistinguishable from constraint labels and easy to miss. Top-level schema descriptions (on the schema object itself) are not shown at all. Enum value descriptions (`x-enumDescriptions`) are unsupported.
+Property descriptions in `SchemaNode` are rendered as a tiny inline `text-[11px]` gray span in the same flex row as the
+name, type badge, and constraints. They are visually indistinguishable from constraint labels and easy to miss.
+Top-level schema descriptions (on the schema object itself) are not shown at all. Enum value descriptions (
+`x-enumDescriptions`) are unsupported.
 
 ## Goals
 
@@ -31,7 +34,8 @@ export interface Schema {
 }
 ```
 
-This is the de-facto standard used by Stoplight, Redocly, and many generator tools to attach human-readable labels to each enum value.
+This is the de-facto standard used by Stoplight, Redocly, and many generator tools to attach human-readable labels to
+each enum value.
 
 ---
 
@@ -56,7 +60,8 @@ This is the de-facto standard used by Stoplight, Redocly, and many generator too
 )}
 ```
 
-**Add** per-enum-value descriptions when `x-enumDescriptions` is present. Place this after the description line, before the children block:
+**Add** per-enum-value descriptions when `x-enumDescriptions` is present. Place this after the description line, before
+the children block:
 
 ```tsx
 {resolved.enum && resolved["x-enumDescriptions"] && (
@@ -78,7 +83,8 @@ This is the de-facto standard used by Stoplight, Redocly, and many generator too
 
 ### 3. `src/features/schema/SchemaViewer.tsx`
 
-In the `renderSchemaTree` function (and before returning the tree in the tabbed/no-example layout), render the top-level schema description when present:
+In the `renderSchemaTree` function (and before returning the tree in the tabbed/no-example layout), render the top-level
+schema description when present:
 
 ```tsx
 function renderTopLevelDescription() {
@@ -103,17 +109,20 @@ The example-only branch (no `resolved`) does not show a tree, so no change neede
 ## Visual sketch
 
 **Before** (current, inline):
+
 ```
 userId  string<uuid>  *  The unique identifier assigned at account creation.
 ```
 
 **After** (own line):
+
 ```
 userId  string<uuid>  *
   The unique identifier assigned at account creation.
 ```
 
 **With x-enumDescriptions**:
+
 ```
 status  string  *
   Current lifecycle state of the account.

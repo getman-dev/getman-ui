@@ -1,5 +1,5 @@
 /** Catches render errors in its subtree and shows a recovery UI instead of a blank page. */
-import { Component, type ReactNode, type ErrorInfo } from "react";
+import {Component, type ErrorInfo, type ReactNode} from "react";
 
 interface Props {
     children: ReactNode;
@@ -10,10 +10,10 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-    state: State = { error: null };
+    state: State = {error: null};
 
     static getDerivedStateFromError(error: Error): State {
-        return { error };
+        return {error};
     }
 
     componentDidCatch(error: Error, info: ErrorInfo) {
@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Something went wrong</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{this.state.error.message}</p>
                     <button
-                        onClick={() => this.setState({ error: null })}
+                        onClick={() => this.setState({error: null})}
                         className="px-3 py-1.5 text-xs rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
                     >
                         Try to recover

@@ -1,5 +1,5 @@
 const STORAGE_KEY = "pane-widths-v1";
-const HANDLE_TOTAL_PX = 12; // 2 handles × 6px each
+const HANDLE_TOTAL_PX = 8; // 2 handles × 4px each
 const MIN_NAV = 12;    // minimum % for nav pane
 const MIN_TRYIT = 12;  // minimum % for try-it pane
 const MIN_DETAIL = 20; // % always reserved for center pane
@@ -9,7 +9,7 @@ interface StoredWidths {
   playground: number;
 }
 
-const DEFAULTS: StoredWidths = { nav: 25, playground: 25 };
+const DEFAULTS: StoredWidths = {nav: 25, playground: 25};
 
 function load(): StoredWidths {
   try {
@@ -21,12 +21,16 @@ function load(): StoredWidths {
         playground: typeof p.playground === "number" ? p.playground : DEFAULTS.playground,
       };
     }
-  } catch { /* ignore corrupt storage */ }
-  return { ...DEFAULTS };
+  } catch { /* ignore corrupt storage */
+  }
+  return {...DEFAULTS};
 }
 
 function persist(w: StoredWidths): void {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(w)); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(w));
+  } catch { /* ignore */
+  }
 }
 
 export function initResizablePanes(root: HTMLElement = document.documentElement): void {
@@ -61,7 +65,7 @@ export function initResizablePanes(root: HTMLElement = document.documentElement)
       e.preventDefault();
 
       const startX = e.clientX;
-      const startState = { ...state };
+      const startState = {...state};
       const W = usableWidth();
 
       handle.classList.add("dragging");
@@ -74,14 +78,14 @@ export function initResizablePanes(root: HTMLElement = document.documentElement)
         if (side === "left") {
           // Left handle: drag right expands nav, shrinks detail
           state.nav = Math.max(
-            MIN_NAV,
-            Math.min(startState.nav + deltaPct, 100 - MIN_DETAIL - state.playground)
+              MIN_NAV,
+              Math.min(startState.nav + deltaPct, 100 - MIN_DETAIL - state.playground)
           );
         } else {
           // Right handle: drag right shrinks tryIt, expands detail
           state.playground = Math.max(
-            MIN_TRYIT,
-            Math.min(startState.playground - deltaPct, 100 - MIN_DETAIL - state.nav)
+              MIN_TRYIT,
+              Math.min(startState.playground - deltaPct, 100 - MIN_DETAIL - state.nav)
           );
         }
 

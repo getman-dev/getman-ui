@@ -1,10 +1,11 @@
 /** Three-state select for boolean parameters: absent (—), true, or false. */
-import clsx from "clsx";
+import {slot, type ThemeSlot} from "../../../themes/slot";
+import {useTheme} from "../../../themes/context";
 
-const base =
-  "w-full text-xs border rounded-lg px-3 py-2 bg-white dark:bg-gray-800 " +
-  "text-gray-800 dark:text-gray-200 " +
-  "focus:outline-none focus:ring-1 transition-colors font-mono";
+export interface BooleanSelectTheme {
+  select: ThemeSlot;
+  selectInvalid: ThemeSlot;
+}
 
 interface Props {
   value: string;
@@ -16,18 +17,17 @@ interface Props {
  * Renders a <select> with —/true/false options.
  * A blank value means the parameter is not sent — distinct from explicitly sending false.
  */
-export default function BooleanSelect({ value, invalid, onChange }: Props) {
+export default function BooleanSelect({value, invalid, onChange}: Props) {
+  const t = useTheme().inputBoolean;
   return (
-    <select
-      className={clsx(base, invalid
-        ? "border-red-400 dark:border-red-500 focus:ring-red-400 focus:border-red-400"
-        : "border-gray-200 dark:border-gray-600 focus:ring-blue-400 focus:border-blue-400")}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      <option value="">—</option>
-      <option value="true">true</option>
-      <option value="false">false</option>
-    </select>
+      <select
+          className={invalid ? slot(t.selectInvalid) : slot(t.select)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">—</option>
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
   );
 }

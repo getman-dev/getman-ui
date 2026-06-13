@@ -1,7 +1,7 @@
 /** React Context for the try-it-out panel: params, request body, files, and response. */
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import type { EndpointEntry, PlaygroundResponse } from "../spec/openapi";
+import type {ReactNode} from "react";
+import {createContext, useCallback, useContext, useMemo, useState} from "react";
+import type {EndpointEntry, PlaygroundResponse} from "../spec/openapi";
 
 interface PlaygroundState {
   endpoint: EndpointEntry | null;
@@ -36,54 +36,62 @@ const defaultState: PlaygroundState = {
   loading: false,
 };
 
-export let playgroundSnapshot: PlaygroundState = { ...defaultState };
+export let playgroundSnapshot: PlaygroundState = {...defaultState};
 export const playgroundActions: PlaygroundContextActions = {
-  setEndpoint: () => {},
-  setParamValues: () => {},
-  setBodyValue: () => {},
-  setBodyParams: () => {},
-  setFileValues: () => {},
-  setResponse: () => {},
-  setLoading: () => {},
-  reset: () => {},
+  setEndpoint: () => {
+  },
+  setParamValues: () => {
+  },
+  setBodyValue: () => {
+  },
+  setBodyParams: () => {
+  },
+  setFileValues: () => {
+  },
+  setResponse: () => {
+  },
+  setLoading: () => {
+  },
+  reset: () => {
+  },
 };
 
 const PlaygroundContext = createContext<PlaygroundContextValue>(null!);
 
 /** Provides try-it-out panel state to the component tree. */
-export function PlaygroundProvider({ children }: { children: ReactNode }) {
+export function PlaygroundProvider({children}: { children: ReactNode }) {
   const [state, setState] = useState<PlaygroundState>(defaultState);
 
   const setEndpoint = useCallback((endpoint: EndpointEntry | null) => {
-    playgroundSnapshot = { ...playgroundSnapshot, endpoint };
-    setState(s => ({ ...s, endpoint }));
+    playgroundSnapshot = {...playgroundSnapshot, endpoint};
+    setState(s => ({...s, endpoint}));
   }, []);
   const setParamValues = useCallback((paramValues: Record<string, string>) => {
-    playgroundSnapshot = { ...playgroundSnapshot, paramValues };
-    setState(s => ({ ...s, paramValues }));
+    playgroundSnapshot = {...playgroundSnapshot, paramValues};
+    setState(s => ({...s, paramValues}));
   }, []);
   const setBodyValue = useCallback((bodyValue: string) => {
-    playgroundSnapshot = { ...playgroundSnapshot, bodyValue };
-    setState(s => ({ ...s, bodyValue }));
+    playgroundSnapshot = {...playgroundSnapshot, bodyValue};
+    setState(s => ({...s, bodyValue}));
   }, []);
   const setBodyParams = useCallback((bodyParams: Record<string, string>) => {
-    playgroundSnapshot = { ...playgroundSnapshot, bodyParams };
-    setState(s => ({ ...s, bodyParams }));
+    playgroundSnapshot = {...playgroundSnapshot, bodyParams};
+    setState(s => ({...s, bodyParams}));
   }, []);
   const setFileValues = useCallback((fileValues: Record<string, File | File[]>) => {
-    playgroundSnapshot = { ...playgroundSnapshot, fileValues };
-    setState(s => ({ ...s, fileValues }));
+    playgroundSnapshot = {...playgroundSnapshot, fileValues};
+    setState(s => ({...s, fileValues}));
   }, []);
   const setResponse = useCallback((response: PlaygroundResponse | null) => {
-    playgroundSnapshot = { ...playgroundSnapshot, response };
-    setState(s => ({ ...s, response }));
+    playgroundSnapshot = {...playgroundSnapshot, response};
+    setState(s => ({...s, response}));
   }, []);
   const setLoading = useCallback((loading: boolean) => {
-    playgroundSnapshot = { ...playgroundSnapshot, loading };
-    setState(s => ({ ...s, loading }));
+    playgroundSnapshot = {...playgroundSnapshot, loading};
+    setState(s => ({...s, loading}));
   }, []);
   const reset = useCallback((endpoint: EndpointEntry | null) => {
-    const next = { ...defaultState, endpoint };
+    const next = {...defaultState, endpoint};
     playgroundSnapshot = next;
     setState(next);
   }, []);
@@ -99,8 +107,18 @@ export function PlaygroundProvider({ children }: { children: ReactNode }) {
   playgroundActions.reset = reset;
 
   const value = useMemo(
-    () => ({ ...state, setEndpoint, setParamValues, setBodyValue, setBodyParams, setFileValues, setResponse, setLoading, reset }),
-    [state, setEndpoint, setParamValues, setBodyValue, setBodyParams, setFileValues, setResponse, setLoading, reset]
+      () => ({
+        ...state,
+        setEndpoint,
+        setParamValues,
+        setBodyValue,
+        setBodyParams,
+        setFileValues,
+        setResponse,
+        setLoading,
+        reset
+      }),
+      [state, setEndpoint, setParamValues, setBodyValue, setBodyParams, setFileValues, setResponse, setLoading, reset]
   );
   return <PlaygroundContext.Provider value={value}>{children}</PlaygroundContext.Provider>;
 }

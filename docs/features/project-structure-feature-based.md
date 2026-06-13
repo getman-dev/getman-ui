@@ -1,29 +1,33 @@
 # Project Structure: Feature-Based Reorganization
 
-| Field | Value |
-|---|---|
-| **Status** | Draft |
-| **Created** | 2026-05-17 |
-| **Type** | Refactor — no behavior change |
+| Field       | Value                                      |
+|-------------|--------------------------------------------|
+| **Status**  | Draft                                      |
+| **Created** | 2026-05-17                                 |
+| **Type**    | Refactor — no behavior change              |
 | **Related** | `docs/features/playground-param-inputs.md` |
 
 ---
 
 ## Summary
 
-Reorganize `src/` from a type-based flat layout (`components/`, `contexts/`, `parser/`, `state/`) into a feature-based layout where every feature owns its context, components, and local logic together. 
+Reorganize `src/` from a type-based flat layout (`components/`, `contexts/`, `parser/`, `state/`) into a feature-based
+layout where every feature owns its context, components, and local logic together.
 Cross-cutting concerns move to `shared/`. No runtime behavior changes — only file locations and import paths change.
 
 ---
 
 ## Motivation
 
-The current structure groups files by technical role (all contexts together, all components together) rather than by what they do. This creates friction as the codebase grows:
+The current structure groups files by technical role (all contexts together, all components together) rather than by
+what they do. This creates friction as the codebase grows:
 
-- Adding a feature requires touching `components/`, `contexts/`, and `state/` simultaneously with no clear home for feature-local files
+- Adding a feature requires touching `components/`, `contexts/`, and `state/` simultaneously with no clear home for
+  feature-local files
 - `components/` is a flat list of 11 unrelated files that will grow further with the playground refactor
 - `pages/` and `components/` are an arbitrary distinction — `DetailPane` is not meaningfully different from a component
-- The upcoming playground refactor (`playground-param-inputs.md`) will add ~10 files; without a feature folder they have nowhere clean to live
+- The upcoming playground refactor (`playground-param-inputs.md`) will add ~10 files; without a feature folder they have
+  nowhere clean to live
 - New contributors must learn which layer owns which concern before they can place a new file
 
 A feature-based structure makes the answer to "where does this file go?" obvious: find the feature it belongs to.
@@ -50,7 +54,8 @@ A feature-based structure makes the answer to "where does this file go?" obvious
 
 ## Proposed Structure
 
-This section shows only files that **currently exist** and where they will move. Files planned for creation as part of separate feature work are listed in [Planned additions](#planned-additions) below.
+This section shows only files that **currently exist** and where they will move. Files planned for creation as part of
+separate feature work are listed in [Planned additions](#planned-additions) below.
 
 ```
 src/
@@ -108,31 +113,38 @@ src/
 
 ## Feature Ownership
 
-| Feature | Owns | Depends on |
-|---|---|---|
-| `spec` | OpenAPI types, parser, ref resolver, example gen, spec context | — |
-| `nav` | Sidebar, endpoint/schema detail views, nav context | `spec` |
-| `playground` | Try-it-out panel and all sub-components, playground context | `spec`, `auth`, `server` |
-| `auth` | Auth modal, auth context | `spec` |
-| `server` | Server chip + variable editor, server context | `spec` |
-| `schema` | Schema viewer and recursive node renderer | `spec` |
-| `shared` | Modal shell, load modal, command bar, top bar, actions, utils | all features |
+| Feature      | Owns                                                           | Depends on               |
+|--------------|----------------------------------------------------------------|--------------------------|
+| `spec`       | OpenAPI types, parser, ref resolver, example gen, spec context | —                        |
+| `nav`        | Sidebar, endpoint/schema detail views, nav context             | `spec`                   |
+| `playground` | Try-it-out panel and all sub-components, playground context    | `spec`, `auth`, `server` |
+| `auth`       | Auth modal, auth context                                       | `spec`                   |
+| `server`     | Server chip + variable editor, server context                  | `spec`                   |
+| `schema`     | Schema viewer and recursive node renderer                      | `spec`                   |
+| `shared`     | Modal shell, load modal, command bar, top bar, actions, utils  | all features             |
 
 ### Why these groupings?
 
-**`spec/` owns `openapi.ts`** — the types are inseparable from the parser; they co-evolve. Any file that imports `openapi.ts` already imports parser output.
+**`spec/` owns `openapi.ts`** — the types are inseparable from the parser; they co-evolve. Any file that imports
+`openapi.ts` already imports parser output.
 
-**`nav/` owns the detail pages** — `DetailPane`, `EndpointDetail`, `SchemaDetail` are rendered by the nav routing logic. They are tightly coupled to `nav-context` (active endpoint/schema) and have no other consumers.
+**`nav/` owns the detail pages** — `DetailPane`, `EndpointDetail`, `SchemaDetail` are rendered by the nav routing logic.
+They are tightly coupled to `nav-context` (active endpoint/schema) and have no other consumers.
 
-**`schema/` is separate from `nav/`** — `SchemaViewer` and `SchemaNode` are used by both `EndpointDetail` (response schemas) and `SchemaDetail` (schema browser). They belong to neither nav nor playground exclusively.
+**`schema/` is separate from `nav/`** — `SchemaViewer` and `SchemaNode` are used by both `EndpointDetail` (response
+schemas) and `SchemaDetail` (schema browser). They belong to neither nav nor playground exclusively.
 
-**`shared/contexts/index.tsx`** — keeps the single barrel export for all contexts, so existing `import { useSpec } from "../contexts"` patterns require only a path update, not a full rewrite.
+**`shared/contexts/index.tsx`** — keeps the single barrel export for all contexts, so existing
+`import { useSpec } from "../contexts"` patterns require only a path update, not a full rewrite.
 
-**`shared/state/actions.ts`** — cross-feature operations (e.g. `applySpec` writes to spec + nav + playground contexts simultaneously) cannot belong to any single feature. `shared/state/` is its natural home.
+**`shared/state/actions.ts`** — cross-feature operations (e.g. `applySpec` writes to spec + nav + playground contexts
+simultaneously) cannot belong to any single feature. `shared/state/` is its natural home.
 
-**`LoadModal` in `shared/components/`** — it triggers `loadSpecFromUrl`/`loadSpecFromFile` from `shared/state/actions.ts` and uses `modal-context` from `shared/contexts/`. It has no feature-specific logic.
+**`LoadModal` in `shared/components/`** — it triggers `loadSpecFromUrl`/`loadSpecFromFile` from
+`shared/state/actions.ts` and uses `modal-context` from `shared/contexts/`. It has no feature-specific logic.
 
-**`TopBar` and `CommandBar` in `shared/components/`** — both span multiple features (TopBar reads spec + auth + server; CommandBar reads spec + nav + auth + modal). Neither belongs to one feature.
+**`TopBar` and `CommandBar` in `shared/components/`** — both span multiple features (TopBar reads spec + auth + server;
+CommandBar reads spec + nav + auth + modal). Neither belongs to one feature.
 
 ---
 
@@ -154,7 +166,8 @@ Move files to their new locations one feature at a time. Update all import paths
 6. `features/schema/` ← `components/SchemaViewer.tsx` + `components/SchemaNode.tsx`
 7. `features/nav/` ← `contexts/nav-context.tsx` + `components/Nav.tsx` + `pages/*`
 8. `features/playground/` ← `contexts/playground-context.tsx` + `components/Playground.tsx`
-9. `shared/components/` ← `components/Modal.tsx` + `components/LoadModal.tsx` + `components/CommandBar.tsx` + `components/TopBar.tsx`
+9. `shared/components/` ← `components/Modal.tsx` + `components/LoadModal.tsx` + `components/CommandBar.tsx` +
+   `components/TopBar.tsx`
 10. `shared/state/` ← `state/actions.ts`
 11. Update `App.tsx` import paths
 
@@ -176,45 +189,61 @@ Before and after for common import patterns:
 
 ```ts
 // spec types
-- import type { EndpointEntry } from "../types/openapi";
-+ import type { EndpointEntry } from "../features/spec/openapi";
+-
+import type {EndpointEntry} from "../types/openapi";
+
++
+import type {EndpointEntry} from "../features/spec/openapi";
 
 // context hooks
-- import { useSpec } from "../contexts";
-+ import { useSpec } from "../shared/contexts";
+-
+import {useSpec} from "../contexts";
+
++
+import {useSpec} from "../shared/contexts";
 
 // actions
-- import { selectEndpoint } from "../state/actions";
-+ import { selectEndpoint } from "../shared/state/actions";
+-
+import {selectEndpoint} from "../state/actions";
+
++
+import {selectEndpoint} from "../shared/state/actions";
 
 // parser utilities
-- import { resolveRef } from "../parser/ref-resolver";
-+ import { resolveRef } from "../features/spec/ref-resolver";
+-
+import {resolveRef} from "../parser/ref-resolver";
+
++
+import {resolveRef} from "../features/spec/ref-resolver";
 
 // within playground (relative, unchanged depth)
-- import { usePlayground } from "../contexts/playground-context";
-+ import { usePlayground } from "./playground-context";
+-
+import {usePlayground} from "../contexts/playground-context";
+
++
+import {usePlayground} from "./playground-context";
 ```
 
-> **Note:** Adding a `paths` alias in `tsconfig.json` (e.g. `@features/*`, `@shared/*`) would eliminate the relative `../` chains entirely. Recommended as a follow-up but out of scope for this refactor.
+> **Note:** Adding a `paths` alias in `tsconfig.json` (e.g. `@features/*`, `@shared/*`) would eliminate the relative
+`../` chains entirely. Recommended as a follow-up but out of scope for this refactor.
 
 ---
 
 ## Risks
 
-| Risk | Likelihood | Mitigation |
-|---|---|---|
-| Missed import path causing build failure | Medium | `npm run typecheck` catches all broken imports before shipping |
-| Circular imports between features | Low | Feature dependency graph is acyclic (see ownership table above) |
-| Git history harder to follow across renames | Low | Use `git mv` for each file so rename is tracked |
-| CLAUDE.md goes stale | Medium | Phase 3 explicitly requires updating it |
+| Risk                                        | Likelihood | Mitigation                                                      |
+|---------------------------------------------|------------|-----------------------------------------------------------------|
+| Missed import path causing build failure    | Medium     | `npm run typecheck` catches all broken imports before shipping  |
+| Circular imports between features           | Low        | Feature dependency graph is acyclic (see ownership table above) |
+| Git history harder to follow across renames | Low        | Use `git mv` for each file so rename is tracked                 |
+| CLAUDE.md goes stale                        | Medium     | Phase 3 explicitly requires updating it                         |
 
 ---
 
 ## Open Questions
 
-| # | Question |
-|---|---|
-| 1 | Should `openapi.ts` stay in `features/spec/` or move to `shared/types/` since every feature imports it? |
-| 2 | Should we add `tsconfig.json` path aliases (`@features/`, `@shared/`) in the same PR or as a follow-up? |
+| # | Question                                                                                                                                    |
+|---|---------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | Should `openapi.ts` stay in `features/spec/` or move to `shared/types/` since every feature imports it?                                     |
+| 2 | Should we add `tsconfig.json` path aliases (`@features/`, `@shared/`) in the same PR or as a follow-up?                                     |
 | 3 | Should `SchemaViewer`/`SchemaNode` live in `features/schema/` or `shared/components/` given they are used by both `nav/` and `playground/`? |

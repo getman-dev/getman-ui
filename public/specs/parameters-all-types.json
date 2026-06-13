@@ -6,14 +6,31 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "https://api.example.com/v1" }
+    {
+      "url": "https://api.example.com/v1"
+    }
   ],
   "tags": [
-    { "name": "path-params", "description": "Path parameter styles" },
-    { "name": "query-params", "description": "Query parameter styles and types" },
-    { "name": "header-params", "description": "Custom request headers" },
-    { "name": "cookie-params", "description": "Cookie-based parameters" },
-    { "name": "mixed", "description": "Endpoints combining multiple parameter types" }
+    {
+      "name": "path-params",
+      "description": "Path parameter styles"
+    },
+    {
+      "name": "query-params",
+      "description": "Query parameter styles and types"
+    },
+    {
+      "name": "header-params",
+      "description": "Custom request headers"
+    },
+    {
+      "name": "cookie-params",
+      "description": "Cookie-based parameters"
+    },
+    {
+      "name": "mixed",
+      "description": "Endpoints combining multiple parameter types"
+    }
   ],
   "paths": {
     "/path/simple/{id}": {
@@ -21,17 +38,26 @@
         "operationId": "simplePathParam",
         "summary": "Simple path parameter (default style)",
         "description": "Default `style: simple` — renders as `/path/simple/42`.",
-        "tags": ["path-params"],
+        "tags": [
+          "path-params"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "style": "simple",
-            "schema": { "type": "integer", "example": 42 }
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/path/label/{id}": {
@@ -39,17 +65,26 @@
         "operationId": "labelPathParam",
         "summary": "Label-style path parameter",
         "description": "`style: label` — renders as `/path/label/.42`.",
-        "tags": ["path-params"],
+        "tags": [
+          "path-params"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "style": "label",
-            "schema": { "type": "integer", "example": 42 }
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/path/matrix/{id}": {
@@ -57,17 +92,26 @@
         "operationId": "matrixPathParam",
         "summary": "Matrix-style path parameter",
         "description": "`style: matrix` — renders as `/path/matrix/;id=42`.",
-        "tags": ["path-params"],
+        "tags": [
+          "path-params"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "style": "matrix",
-            "schema": { "type": "integer", "example": 42 }
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/path/array/{ids}": {
@@ -75,7 +119,9 @@
         "operationId": "arrayPathParam",
         "summary": "Array in path (simple, explode=false)",
         "description": "`style: simple, explode: false` renders array values comma-separated: `/path/array/1,2,3`.",
-        "tags": ["path-params"],
+        "tags": [
+          "path-params"
+        ],
         "parameters": [
           {
             "name": "ids",
@@ -85,12 +131,22 @@
             "explode": false,
             "schema": {
               "type": "array",
-              "items": { "type": "integer" },
-              "example": [1, 2, 3]
+              "items": {
+                "type": "integer"
+              },
+              "example": [
+                1,
+                2,
+                3
+              ]
             }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/form": {
@@ -98,13 +154,22 @@
         "operationId": "formQueryParams",
         "summary": "Form-style query parameters (default)",
         "description": "Default style for query params. `explode: true` (default) renders objects as `?color=red&size=M`; `explode: false` renders as `?filter=color,red,size,M`.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "status",
             "in": "query",
             "description": "Single string value",
-            "schema": { "type": "string", "enum": ["active", "inactive", "pending"] }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "pending"
+              ]
+            }
           },
           {
             "name": "ids",
@@ -112,7 +177,12 @@
             "description": "Array of IDs with `explode: true` — renders as `?ids=1&ids=2&ids=3`",
             "style": "form",
             "explode": true,
-            "schema": { "type": "array", "items": { "type": "integer" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
           },
           {
             "name": "tags",
@@ -120,7 +190,12 @@
             "description": "Array with `explode: false` — renders as `?tags=a,b,c`",
             "style": "form",
             "explode": false,
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "filter",
@@ -131,13 +206,21 @@
             "schema": {
               "type": "object",
               "properties": {
-                "color": { "type": "string" },
-                "size": { "type": "string" }
+                "color": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "string"
+                }
               }
             }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/space-delimited": {
@@ -145,17 +228,33 @@
         "operationId": "spaceDelimitedQuery",
         "summary": "Space-delimited array query parameter",
         "description": "`style: spaceDelimited` — array renders as `?ids=1%202%203` (URL-encoded spaces).",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "ids",
             "in": "query",
             "style": "spaceDelimited",
             "explode": false,
-            "schema": { "type": "array", "items": { "type": "integer" }, "example": [1, 2, 3] }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "example": [
+                1,
+                2,
+                3
+              ]
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/pipe-delimited": {
@@ -163,17 +262,33 @@
         "operationId": "pipeDelimitedQuery",
         "summary": "Pipe-delimited array query parameter",
         "description": "`style: pipeDelimited` — array renders as `?ids=1|2|3`.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "ids",
             "in": "query",
             "style": "pipeDelimited",
             "explode": false,
-            "schema": { "type": "array", "items": { "type": "integer" }, "example": [1, 2, 3] }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "example": [
+                1,
+                2,
+                3
+              ]
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/deep-object": {
@@ -181,7 +296,9 @@
         "operationId": "deepObjectQuery",
         "summary": "Deep-object style query parameter",
         "description": "`style: deepObject` — nested object renders as `?filter[color]=red&filter[size]=M`.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "filter",
@@ -191,15 +308,31 @@
             "schema": {
               "type": "object",
               "properties": {
-                "color": { "type": "string", "example": "red" },
-                "size": { "type": "string", "example": "M" },
-                "minPrice": { "type": "number", "example": 10.0 },
-                "maxPrice": { "type": "number", "example": 99.99 }
+                "color": {
+                  "type": "string",
+                  "example": "red"
+                },
+                "size": {
+                  "type": "string",
+                  "example": "M"
+                },
+                "minPrice": {
+                  "type": "number",
+                  "example": 10.0
+                },
+                "maxPrice": {
+                  "type": "number",
+                  "example": 99.99
+                }
               }
             }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/allow-reserved": {
@@ -207,17 +340,27 @@
         "operationId": "allowReservedQuery",
         "summary": "Query parameter with allowReserved",
         "description": "`allowReserved: true` — RFC 3986 reserved characters (`:/?#[]@!$&'()*+,;=`) are passed through without percent-encoding.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "url",
             "in": "query",
             "allowReserved": true,
             "description": "A raw URL, not percent-encoded",
-            "schema": { "type": "string", "format": "uri", "example": "https://example.com/path?q=1" }
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "https://example.com/path?q=1"
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/constraints": {
@@ -225,41 +368,75 @@
         "operationId": "constrainedQueryParams",
         "summary": "Query parameters with schema constraints",
         "description": "Demonstrates `minimum`, `maximum`, `minLength`, `maxLength`, `pattern`, `enum`, and `default`.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "page",
             "in": "query",
-            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
           },
           {
             "name": "search",
             "in": "query",
-            "schema": { "type": "string", "minLength": 2, "maxLength": 100 }
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            }
           },
           {
             "name": "sort",
             "in": "query",
-            "schema": { "type": "string", "enum": ["asc", "desc"], "default": "asc" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
           },
           {
             "name": "since",
             "in": "query",
-            "schema": { "type": "string", "format": "date", "example": "2024-01-01" }
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2024-01-01"
+            }
           },
           {
             "name": "code",
             "in": "query",
             "description": "Must match pattern",
-            "schema": { "type": "string", "pattern": "^[A-Z]{3}-\\d{4}$", "example": "ABC-1234" }
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}-\\d{4}$",
+              "example": "ABC-1234"
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/query/deprecated": {
@@ -267,22 +444,33 @@
         "operationId": "deprecatedQueryParam",
         "summary": "Endpoint with a deprecated parameter",
         "description": "The `legacy_id` parameter is deprecated — use `id` instead.",
-        "tags": ["query-params"],
+        "tags": [
+          "query-params"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "query",
-            "schema": { "type": "string", "format": "uuid" }
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           {
             "name": "legacy_id",
             "in": "query",
             "deprecated": true,
             "description": "Deprecated — use `id` (UUID) instead.",
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/headers/custom": {
@@ -290,36 +478,59 @@
         "operationId": "customHeaders",
         "summary": "Endpoint with custom request headers",
         "description": "Demonstrates request headers beyond `Authorization`. Note: `Accept`, `Content-Type`, and `Authorization` cannot be defined as header parameters per the spec.",
-        "tags": ["header-params"],
+        "tags": [
+          "header-params"
+        ],
         "parameters": [
           {
             "name": "X-Request-ID",
             "in": "header",
             "required": false,
             "description": "Client-generated request ID for tracing",
-            "schema": { "type": "string", "format": "uuid", "example": "550e8400-e29b-41d4-a716-446655440000" }
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            }
           },
           {
             "name": "X-Tenant-ID",
             "in": "header",
             "required": true,
             "description": "Multi-tenant identifier",
-            "schema": { "type": "string", "example": "tenant-acme" }
+            "schema": {
+              "type": "string",
+              "example": "tenant-acme"
+            }
           },
           {
             "name": "X-API-Version",
             "in": "header",
             "description": "Explicit API version override",
-            "schema": { "type": "string", "enum": ["2023-01-01", "2024-01-01"], "default": "2024-01-01" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "2023-01-01",
+                "2024-01-01"
+              ],
+              "default": "2024-01-01"
+            }
           },
           {
             "name": "X-Idempotency-Key",
             "in": "header",
             "description": "Idempotency key to safely retry requests",
-            "schema": { "type": "string", "maxLength": 64 }
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/cookies/session": {
@@ -327,29 +538,49 @@
         "operationId": "cookieParams",
         "summary": "Cookie-based parameters",
         "description": "Reads values from request cookies. Note: browsers block JavaScript from reading/writing `HttpOnly` cookies.",
-        "tags": ["cookie-params"],
+        "tags": [
+          "cookie-params"
+        ],
         "parameters": [
           {
             "name": "session_id",
             "in": "cookie",
             "required": true,
             "description": "Session identifier cookie",
-            "schema": { "type": "string", "format": "uuid" }
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           {
             "name": "theme",
             "in": "cookie",
             "description": "UI theme preference",
-            "schema": { "type": "string", "enum": ["light", "dark", "system"], "default": "system" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "light",
+                "dark",
+                "system"
+              ],
+              "default": "system"
+            }
           },
           {
             "name": "locale",
             "in": "cookie",
             "description": "User locale preference",
-            "schema": { "type": "string", "example": "en-US" }
+            "schema": {
+              "type": "string",
+              "example": "en-US"
+            }
           }
         ],
-        "responses": { "200": { "$ref": "#/components/responses/Echo" } }
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          }
+        }
       }
     },
     "/mixed/{resourceType}/{id}": {
@@ -357,21 +588,34 @@
         "operationId": "mixedParams",
         "summary": "Endpoint combining all parameter locations",
         "description": "Uses path, query, header, and cookie parameters together.",
-        "tags": ["mixed"],
+        "tags": [
+          "mixed"
+        ],
         "parameters": [
           {
             "name": "resourceType",
             "in": "path",
             "required": true,
             "description": "Type of resource to fetch",
-            "schema": { "type": "string", "enum": ["posts", "users", "comments"], "example": "posts" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "posts",
+                "users",
+                "comments"
+              ],
+              "example": "posts"
+            }
           },
           {
             "name": "id",
             "in": "path",
             "required": true,
             "description": "Resource ID",
-            "schema": { "type": "integer", "example": 1 }
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
           },
           {
             "name": "expand",
@@ -379,7 +623,17 @@
             "description": "Related resources to expand inline",
             "style": "form",
             "explode": false,
-            "schema": { "type": "array", "items": { "type": "string", "enum": ["author", "tags", "comments"] } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "author",
+                  "tags",
+                  "comments"
+                ]
+              }
+            }
           },
           {
             "name": "fields",
@@ -387,21 +641,33 @@
             "description": "Sparse fieldset — only return listed fields",
             "style": "form",
             "explode": false,
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "X-Request-ID",
             "in": "header",
-            "schema": { "type": "string", "format": "uuid" }
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           {
             "name": "session_id",
             "in": "cookie",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": { "$ref": "#/components/responses/Echo" },
+          "200": {
+            "$ref": "#/components/responses/Echo"
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -409,7 +675,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    }
                   }
                 }
               }

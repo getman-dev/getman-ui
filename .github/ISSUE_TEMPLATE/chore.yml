@@ -1,7 +1,7 @@
 name: Chore / Refactor
 description: Maintenance, dependency update, refactor, CI, or test coverage — no new user-visible behavior
 title: "[Chore] "
-labels: ["chore"]
+labels: [ "chore" ]
 body:
   - type: textarea
     id: what_and_why

@@ -1,11 +1,10 @@
 /** Top application bar: API identity, server chip, auth, theme picker, shortcuts, and spec loader. */
 import {useSpec} from "../../features/spec/spec-context";
 import {authActions, useAuth} from "../../features/auth/auth-context";
-import {modalActions} from "../contexts/modal-context";
+import {modalActions} from "../contexts";
 import ServerConfig from "../../features/server/ServerConfig";
 import ThemePicker from "./ThemePicker";
-import {slot, type ThemeSlot} from "../../themes/slot";
-import {useTheme} from "../../themes/context";
+import {slot, type ThemeSlot, useTheme} from "../../themes";
 
 export interface TopBarTheme {
     container: ThemeSlot;
@@ -24,10 +23,12 @@ export interface TopBarTheme {
 
 interface Props {
     onSetTheme: (name: string) => void;
+    navOpen: boolean;
+    onToggleNav: () => void;
 }
 
 /** Renders the top bar with API identity, server selector, auth, theme picker, and load spec button. */
-export default function TopBar({onSetTheme}: Props) {
+export default function TopBar({onSetTheme, navOpen, onToggleNav}: Props) {
     const theme = useTheme();
     const t = theme.topBar;
     const {spec} = useSpec();
@@ -37,17 +38,25 @@ export default function TopBar({onSetTheme}: Props) {
     const servers = spec?.servers ?? [];
     const hasAuth = !!spec?.components?.securitySchemes;
     const isAuthorized = hasAuth && Object.values(authValues).some(v => v.value || v.username);
-    const monogram = info?.title.trim().charAt(0).toUpperCase() ?? "";
 
     return (
         <header className={slot(t.container)}>
 
+            <button
+                onClick={onToggleNav}
+                title={navOpen ? "Collapse sidebar" : "Expand sidebar"}
+                aria-label={navOpen ? "Collapse sidebar" : "Expand sidebar"}
+                aria-pressed={navOpen}
+                className={slot(t.neutralButton)}
+            >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                          d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm7-2v18"/>
+                </svg>
+            </button>
+
             {info ? (
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div
-                        className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
-                        <span className="text-[11px] font-bold text-white leading-none">{monogram}</span>
-                    </div>
                     <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
                             <span className={slot(t.specTitle)}>{info.title}</span>

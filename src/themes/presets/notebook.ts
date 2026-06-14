@@ -5,7 +5,7 @@
  */
 import type {AppTheme} from '../contract';
 
-const badge = 'method-badge shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded-sm uppercase w-[36px] text-center';
+const badge = 'method-badge shrink-0 text-[11px] font-bold font-mono px-[5px] py-[2px] rounded-sm uppercase w-[50px] text-center';
 
 export const notebookTheme: AppTheme = {
     name: 'Notebook',
@@ -46,25 +46,25 @@ export const notebookTheme: AppTheme = {
         tagCount: 'text-[10px] text-[#9A9182] font-mono',
         endpointItem: {
             base: 'nav-endpoint w-full flex items-center gap-2.5 px-4 py-2 text-left transition-colors text-[#5C5548] hover:bg-[#E8E3D9]/60 hover:text-[#1A1814]',
-            active: 'bg-[#F5E642]/40 text-[#1A1814]'
+            active: 'bg-[#F5E642] text-[#1A1814] '
         },
-        endpointPath: 'truncate text-[11px] font-mono',
+        endpointPath: 'truncate text-[13px] font-mono',
         methodBadge: {
             base: badge,
-            get: 'bg-[#DFF0D8] text-[#3A6B30]',
-            post: 'bg-[#F5E642] text-[#3D3520]',
-            put: 'bg-[#FFF3C0] text-[#7A5A00]',
-            delete: 'bg-[#FFE0E0] text-[#8B2020]',
-            patch: 'bg-[#FFE8D0] text-[#7A3A00]',
-            options: 'bg-[#E8E3D9] text-[#5C5548]',
-            head: 'bg-[#E8E3D9] text-[#5C5548]'
+            get: 'text-[#3A6B30]',
+            post: 'text-[#3D3520]',
+            put: 'text-[#7A5A00]',
+            delete: 'text-[#8B2020]',
+            patch: 'text-[#7A3A00]',
+            options: 'text-[#5C5548]',
+            head: 'text-[#5C5548]'
         },
         schemaItem: {
             base: 'w-full text-left gap-2.5 px-4 py-2 transition-colors hover:bg-[#E8E3D9]/60',
             active: 'bg-[#F5E642]/40'
         },
-        schemaName: {base: 'truncate text-[11px] font-mono text-[#5C5548]', active: 'text-[#1A1814]'},
-        schemaTypeBadge: 'shrink-0 text-[9px] font-bold font-mono px-[5px] py-[2px] rounded-sm bg-[#F0ECE3] text-[#7A3A00] uppercase',
+        schemaName: {base: 'truncate text-[13px] font-mono text-[#5C5548]', active: 'text-[#1A1814]'},
+        schemaTypeBadge: 'shrink-0 text-[11px] font-bold font-mono px-[5px] py-[2px] rounded-sm bg-[#F0ECE3] text-[#7A3A00] uppercase',
         schemaDescription: 'mt-0.5 text-[10px] text-[#9A9182] truncate pl-[38px]',
         emptyState: 'text-[11px] text-[#9A9182]',
     },

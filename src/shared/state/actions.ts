@@ -16,16 +16,23 @@ import {executeRequest, isCorsError} from "../utils/http-client";
  * Fetches and applies an OpenAPI spec from a URL.
  * Sets modal error on failure.
  *
- * @param url - Absolute URL pointing to a JSON or YAML spec.
+ * @param url - Absolute URL pointing to a JSON spec.
  */
 export async function loadSpecFromUrl(url: string) {
     specActions.setSpecLoading(true);
     try {
+        const isYaml = url.endsWith(".yaml") || url.endsWith(".yml");
+        if (isYaml) {
+            throw new Error("YAML specs are not supported. Convert to JSON first (e.g. with `swagger-cli convert spec.yaml spec.json`).");
+        }
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
         const contentType = res.headers.get("content-type") ?? "";
+        if (contentType.includes("yaml")) {
+            throw new Error("YAML specs are not supported. Convert to JSON first (e.g. with `swagger-cli convert spec.yaml spec.json`).");
+        }
         const text = await res.text();
-        await parseAndApplySpec(text, contentType.includes("yaml") || url.endsWith(".yaml") || url.endsWith(".yml"));
+        await parseAndApplySpec(text);
     } catch (err) {
         specActions.setLoadError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -37,26 +44,25 @@ export async function loadSpecFromUrl(url: string) {
  * Reads and applies an OpenAPI spec from a File object.
  * Sets modal error on failure.
  *
- * @param file - A .json or .yaml/.yml file chosen by the user.
+ * @param file - A .json file chosen by the user.
  */
 export async function loadSpecFromFile(file: File) {
     try {
+        if (file.name.endsWith(".yaml") || file.name.endsWith(".yml")) {
+            specActions.setLoadError("YAML specs are not supported. Convert to JSON first (e.g. with `swagger-cli convert spec.yaml spec.json`).");
+            return;
+        }
         const text = await file.text();
-        await parseAndApplySpec(text, file.name.endsWith(".yaml") || file.name.endsWith(".yml"));
+        await parseAndApplySpec(text);
     } catch (err) {
         specActions.setLoadError(`Failed to read file: ${err instanceof Error ? err.message : String(err)}`);
     }
 }
 
-async function parseAndApplySpec(text: string, isYaml: boolean) {
+async function parseAndApplySpec(text: string) {
     let parsed: OpenAPISpec;
     try {
-        if (isYaml) {
-            const jsYaml = await import("js-yaml");
-            parsed = jsYaml.load(text) as OpenAPISpec;
-        } else {
-            parsed = JSON.parse(text) as OpenAPISpec;
-        }
+        parsed = JSON.parse(text) as OpenAPISpec;
     } catch (err) {
         specActions.setLoadError(`Failed to parse spec: ${err instanceof Error ? err.message : String(err)}`);
         return;

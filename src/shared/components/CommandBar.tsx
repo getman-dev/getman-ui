@@ -2,7 +2,6 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {authActions, modalActions, useModal, useSpec} from "../contexts";
 import {selectEndpoint, selectSchema} from "../state/actions";
-import {methodBadgeClasses} from "../utils/badges";
 import {escapeHtml} from "../utils/html";
 import {slot, type ThemeSlot} from "../../themes/slot";
 import {useTheme} from "../../themes/context";
@@ -76,6 +75,7 @@ function hl(text: string, q: string, markClass: string): string {
 /** Renders the ⌘K command palette overlay. Visible when commandBarVisible is true. */
 export default function CommandBar({onSetTheme}: Props) {
   const t = useTheme().commandBar;
+  const endpointTheme = useTheme().endpoint;
   const {commandBarVisible} = useModal();
   const {spec, groups: specGroups} = useSpec();
 
@@ -323,7 +323,7 @@ export default function CommandBar({onSetTheme}: Props) {
                         >
                           {item.kind === "endpoint" && item.method ? (
                               <span
-                                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase shrink-0 w-14 text-center ${methodBadgeClasses(item.method)}`}>
+                                  className={slot(endpointTheme.methodBadge, {[item.method.toLowerCase()]: true})}>
                         {item.method}
                       </span>
                           ) : (

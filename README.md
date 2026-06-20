@@ -39,7 +39,7 @@ No framework required on the consumer side. Works in React, Vue, Angular, plain 
 
 ## Quick start
 
-Add a container, load the script from jsDelivr, and call `mountApiExplorer`:
+Add a container, load the script from jsDelivr, and call `launch`:
 
 ```html
 <!doctype html>
@@ -48,9 +48,9 @@ Add a container, load the script from jsDelivr, and call `mountApiExplorer`:
 
   <div id="api-docs" style="height:100%"></div>
 
-  <script src="https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.0.0/dist/loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.0.0/dist/getman-ui.js"></script>
   <script>
-      GetMan.mountApiExplorer(
+      GetMan.launch(
       document.getElementById('api-docs'),
       { url: 'https://petstore3.swagger.io/api/v3/openapi.json' }
     );
@@ -69,12 +69,12 @@ The script injects all required styles and fonts — no separate CSS import need
 
 ## API
 
-### `GetMan.mountApiExplorer(target, options?)`
+### `GetMan.launch(target, options?)`
 
 Mounts the explorer into `target` and returns a cleanup function.
 
 ```ts
-const unmount = GetMan.mountApiExplorer(
+const unmount = GetMan.launch(
   document.getElementById('api-docs'),
   { url: 'https://api.example.com/openapi.json' }
 );
@@ -103,7 +103,7 @@ export function ApiDocs() {
 
   useEffect(() => {
     if (!ref.current) return;
-      const unmount = GetMan.mountApiExplorer(ref.current, {
+      const unmount = GetMan.launch(ref.current, {
       url: '/openapi.json',
     });
     return unmount;
@@ -123,7 +123,7 @@ const container = useTemplateRef('container');
 let unmount: (() => void) | undefined;
 
 onMounted(() => {
-  unmount = GetMan.mountApiExplorer(container.value!, {
+  unmount = GetMan.launch(container.value!, {
     url: '/openapi.json',
   });
 });
@@ -138,13 +138,13 @@ onUnmounted(() => unmount?.());
 
 ### Plain HTML (self-hosted)
 
-If you host `loader.js` yourself instead of using jsDelivr:
+If you host `getman-ui.js` yourself instead of using jsDelivr:
 
 ```html
 <div id="api-docs" style="height:100vh"></div>
-<script src="/assets/loader.js"></script>
+<script src="/assets/getman-ui.js"></script>
 <script>
-    GetMan.mountApiExplorer(
+    GetMan.launch(
     document.getElementById('api-docs'),
     { url: '/openapi.json' }
   );
@@ -196,13 +196,13 @@ spec URL.
 
 ```bash
 npm run typecheck   # type-check only (tsc --noEmit)
-npm run build:lib   # builds dist/loader.js — the embeddable IIFE
+npm run build:lib   # builds dist/getman-ui.js — the embeddable IIFE
 npm run build       # builds the full standalone app
 ```
 
 ### Releasing
 
-Tag and push — CI builds `loader.js` and attaches it to the release. The jsDelivr CDN URL goes live immediately after:
+Tag and push — CI builds `getman-ui.js` and attaches it to the release. The jsDelivr CDN URL goes live immediately after:
 
 ```bash
 git tag v1.x.y
@@ -210,7 +210,7 @@ git push origin v1.x.y
 ```
 
 ```
-https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.x.y/dist/loader.js
+https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.x.y/dist/getman-ui.js
 ```
 
 ---

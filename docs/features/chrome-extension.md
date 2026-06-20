@@ -63,7 +63,7 @@ extension/
 ```
 
 The extension is a separate build target (e.g. `npm run build:ext`) that produces a `dist-ext/` folder ready to load as
-an unpacked extension or publish to the Chrome Web Store. It imports `mountApiExplorer` from the main library bundle (
+an unpacked extension or publish to the Chrome Web Store. It imports `launch` from the main library bundle (
 `dist/loader.js`), bundled into the extension via Vite.
 
 ---
@@ -101,7 +101,7 @@ The background worker calls `chrome.action.setIcon` and `chrome.action.setBadgeT
     - Fall back to asking the user via a small inline prompt.
       b. Hide the Swagger UI container (`display: none`).
       c. Create a full-width, full-height `<div id="api-explorer-root">` sibling to the Swagger container.
-      d. Call `mountApiExplorer(rootEl, { url: specUrl })`.
+      d. Call `launch(rootEl, { url: specUrl })`.
       e. Inject the floating toggle button.
 
 ---
@@ -125,7 +125,7 @@ survives unmounting).
 **Behavior when clicked (enabled → disabled)**:
 
 1. Send `DISABLE_ORIGIN { origin }` to background (persists in `chrome.storage.local`).
-2. Unmount API Explorer (`cleanup()` from `mountApiExplorer` return value).
+2. Unmount API Explorer (`cleanup()` from `launch` return value).
 3. Remove `api-explorer-root` div.
 4. Restore Swagger UI container (`display: ""`).
 5. Send `SET_ICON disabled` to background.

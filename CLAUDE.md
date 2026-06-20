@@ -3,7 +3,7 @@
 > **Maintenance rule**: keep this file up to date. Whenever the architecture, file structure, conventions, or key
 > decisions change, update the relevant section before finishing the task.
 
-An OpenAPI 3.x UI embedded via a `mountApiExplorer(target, options)` function. Built with **React 19 + TypeScript**,
+An OpenAPI 3.x UI embedded via a `launch(target, options)` function. Built with **React 19 + TypeScript**,
 Vite, and Tailwind. No Shadow DOM.
 
 ## Commands
@@ -26,9 +26,9 @@ Feature-based layout: each feature owns its context, components, and local logic
 src/
   App.tsx             # Root component: AppProviders wrapper + AppInner (layout, dark mode,
                       # keyboard shortcuts, hash routing, initResizablePanes)
-  mount.ts            # mountApiExplorer(target, options) — creates a React root and renders App
-  loader.ts           # Library entry — injects fonts + styles, re-exports mountApiExplorer
-  main.tsx            # Dev entry — imports styles, re-exports mountApiExplorer
+  mount.ts            # launch(target, options) — creates a React root and renders App
+  loader.ts           # Library entry — injects fonts + styles, re-exports launch
+  main.tsx            # Dev entry — imports styles, re-exports launch
   features/
     spec/
       openapi.ts        # TypeScript interfaces for OpenAPI 3.x spec + internal app types
@@ -113,7 +113,7 @@ Components import context hooks (`useXxx()`) for reads and may call `xxxActions`
 `shared/state/actions.ts` is called on spec load and on `hashchange`. Navigation actions (`selectEndpoint`,
 `selectSchema`) write to `history` directly.
 
-**Mount function**: `mountApiExplorer(target, options?)` in `mount.ts` calls
+**Mount function**: `launch(target, options?)` in `mount.ts` calls
 `createRoot(target).render(createElement(App, { initialUrl: options?.url }))` and returns an unmount cleanup function.
 Consumers call it from any JS context — query params, config objects, etc.
 

@@ -15,7 +15,7 @@ between a component and its visual appearance, so changing or extending themes r
 ## Constraints
 
 - No Shadow DOM — this is an embedded widget; styles must not leak.
-- `mountApiExplorer(target, options)` remains the primary integration surface.
+- `launch(target, options)` remains the primary integration surface.
 - Must keep working with the existing Tailwind v4 setup — no new CSS tooling.
 - TypeScript strict mode is on; the theme contract must be fully type-safe.
 - Bundle size impact from theme data should be negligible.
@@ -483,15 +483,15 @@ or misspelled slot. No other files change.
 
 ```ts
 // Preset name
-mountApiExplorer(el, {theme: 'nord'});
+launch(el, {theme: 'nord'});
 
 // Custom AppTheme object
-mountApiExplorer(el, {theme: myBrandTheme});
+launch(el, {theme: myBrandTheme});
 
 // Partial override merged onto a base preset
 import {lightTheme} from '@api-explorer/themes';
 
-mountApiExplorer(el, {
+launch(el, {
     theme: mergeTheme(lightTheme, {
         nav: {container: 'bg-brand-950 border-r border-brand-800'}
     })
@@ -597,7 +597,7 @@ and the scrollbar styles still work without changes.
 - [ ] Add theme name to `AppTheme` for display
 - [ ] Theme selector in `TopBar` (dropdown or command bar action)
 - [ ] Persist selection to `localStorage` under `api-explorer-theme`
-- [ ] Expose `setTheme(name)` on the return value of `mountApiExplorer`
+- [ ] Expose `setTheme(name)` on the return value of `launch`
 
 ---
 

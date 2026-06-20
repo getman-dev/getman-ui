@@ -7,7 +7,7 @@ spec URL. Self-hosted on a custom server.
 
 ## Constraints
 
-- Embed model: `mountApiExplorer(el, { url })` or `data-api-explorer="<url>"` attribute auto-mount.
+- Embed model: `launch(el, { url })` or `data-api-explorer="<url>"` attribute auto-mount.
 - Spec delivery: URL passed at mount time (no file-upload UX required for embedders).
 - Must-haves: endpoint docs, playground, IIFE build.
 - Auth and schema improvements are not beta blockers.
@@ -22,7 +22,7 @@ spec URL. Self-hosted on a custom server.
 
 **Priority: P0 — bug**
 
-When `mountApiExplorer(el, { url: "..." })` is called and the fetch fails (404, network error, CORS-blocked),
+When `launch(el, { url: "..." })` is called and the fetch fails (404, network error, CORS-blocked),
 `loadSpecFromUrl` calls `modalActions.setModalError(...)` but the LoadModal is closed (default state). The error is
 stored but never displayed — the user sees a permanently empty UI with no explanation.
 
@@ -110,14 +110,14 @@ patterns.
 <div id="api-docs" style="height:100vh"></div>
 <script src="https://your-host.com/loader.js"></script>
 <script>
-    ApiExplorer.mountApiExplorer(
+    ApiExplorer.launch(
             document.getElementById('api-docs'),
             {url: 'https://api.example.com/openapi.json'}
     );
 </script>
 ```
 
-> The IIFE exposes `window.ApiExplorer.mountApiExplorer`. The `name` in `vite.config.ts` is `"ApiExplorer"` — document
+> The IIFE exposes `window.ApiExplorer.launch`. The `name` in `vite.config.ts` is `"ApiExplorer"` — document
 > this explicitly. Do not suggest ESM imports; the lib build is IIFE-only.
 
 #### Required container CSS

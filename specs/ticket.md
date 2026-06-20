@@ -33,7 +33,7 @@ What actually happened. Include error messages, stack traces, or screenshots if 
 
 **Environment**
 
-- Embed method: [CDN via jsDelivr / `mountApiExplorer` in own bundle / dev server]
+- Embed method: [CDN via jsDelivr / `launch` in own bundle / dev server]
 - Browser: [e.g. Chrome 124, Firefox 125, Safari 17]
 - OS: [e.g. macOS 14, Ubuntu 22.04]
 - Version / commit: [e.g. v1.2.0 or git SHA]
@@ -92,7 +92,7 @@ Attach one or more labels to every issue:
 | `spec-rendering`   | Issues with how OpenAPI schemas, refs, or examples are displayed |
 | `playground`       | Issues with the Try-it-out / request execution panel             |
 | `auth`             | Auth schemes, credential handling, security definitions          |
-| `embed`            | `mountApiExplorer`, CDN loader, or host-page integration         |
+| `embed`            | `launch`, CDN loader, or host-page integration         |
 | `chore`            | Maintenance, deps, refactor, CI — no new behavior                |
 | `docs`             | Documentation only                                               |
 | `good first issue` | Well-scoped, low risk, suitable for new contributors             |

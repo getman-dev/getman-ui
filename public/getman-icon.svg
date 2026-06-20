@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+
+  <!-- Outer black ring -->
+  <circle cx="100" cy="100" r="100" fill="#111"/>
+  <!-- Yellow comic background -->
+  <circle cx="100" cy="100" r="95" fill="#FBBF24"/>
+
+  <!-- Halftone dots (bottom right quadrant for comic feel) -->
+  <clipPath id="clip-circle">
+    <circle cx="100" cy="100" r="95"/>
+  </clipPath>
+  <g clip-path="url(#clip-circle)" opacity="0.18">
+    <circle cx="130" cy="130" r="3" fill="#92400E"/>
+    <circle cx="145" cy="130" r="3" fill="#92400E"/>
+    <circle cx="160" cy="130" r="3" fill="#92400E"/>
+    <circle cx="138" cy="142" r="3" fill="#92400E"/>
+    <circle cx="153" cy="142" r="3" fill="#92400E"/>
+    <circle cx="168" cy="142" r="3" fill="#92400E"/>
+    <circle cx="145" cy="154" r="3" fill="#92400E"/>
+    <circle cx="160" cy="154" r="3" fill="#92400E"/>
+    <circle cx="153" cy="166" r="3" fill="#92400E"/>
+    <circle cx="168" cy="166" r="3" fill="#92400E"/>
+    <circle cx="160" cy="178" r="3" fill="#92400E"/>
+  </g>
+
+  <!-- Red cape (behind body) -->
+  <path d="M54 124 L100 194 L146 124" fill="#DC2626" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Cape inner shading line -->
+  <path d="M72 124 L100 180 L128 124" fill="none" stroke="#B91C1C" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Green suit body -->
+  <path d="M54 124 Q54 108 100 108 Q146 108 146 124 L146 188 L54 188 Z" fill="#16A34A" stroke="#111" stroke-width="3"/>
+  <!-- Suit center line -->
+  <line x1="100" y1="108" x2="100" y2="188" stroke="#15803D" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Shoulder caps -->
+  <ellipse cx="54" cy="120" rx="19" ry="12" fill="#16A34A" stroke="#111" stroke-width="2.5"/>
+  <ellipse cx="146" cy="120" rx="19" ry="12" fill="#16A34A" stroke="#111" stroke-width="2.5"/>
+
+  <!-- Neck -->
+  <rect x="87" y="99" width="26" height="18" rx="5" fill="#FB923C" stroke="#111" stroke-width="2"/>
+
+  <!-- Head -->
+  <circle cx="100" cy="72" r="35" fill="#FB923C" stroke="#111" stroke-width="3.5"/>
+
+  <!-- Hair -->
+  <path d="M65 67 Q100 38 135 67 Q130 46 100 42 Q70 46 65 67Z" fill="#1C1917" stroke="#111" stroke-width="1"/>
+
+  <!-- Eyebrows (above mask, on forehead) -->
+  <path d="M70 63 Q80 59 88 63" stroke="#1C1917" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M112 63 Q120 59 130 63" stroke="#1C1917" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Green mask band -->
+  <path d="M65 67 Q100 59 135 67 L135 82 Q100 76 65 82 Z" fill="#16A34A" stroke="#111" stroke-width="2"/>
+
+  <!-- Eye whites -->
+  <ellipse cx="82" cy="74" rx="9.5" ry="7" fill="white" stroke="#111" stroke-width="1.5"/>
+  <ellipse cx="118" cy="74" rx="9.5" ry="7" fill="white" stroke="#111" stroke-width="1.5"/>
+
+  <!-- Pupils -->
+  <circle cx="83.5" cy="74" r="4" fill="#111"/>
+  <circle cx="119.5" cy="74" r="4" fill="#111"/>
+
+  <!-- Eye shine -->
+  <circle cx="85" cy="72" r="1.5" fill="white"/>
+  <circle cx="121" cy="72" r="1.5" fill="white"/>
+
+  <!-- Nose (subtle) -->
+  <path d="M98 83 Q100 87 102 83" stroke="#E97316" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Confident smirk -->
+  <path d="M86 91 Q100 102 114 91" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Dimple right -->
+  <circle cx="114" cy="91" r="1.5" fill="#E97316"/>
+
+  <!-- Chest shield / emblem -->
+  <path d="M81 122 L81 153 Q100 166 119 153 L119 122 Z" fill="#FBBF24" stroke="#111" stroke-width="2.5"/>
+  <!-- Shield inner highlight -->
+  <path d="M88 127 L88 148 Q100 156 112 148 L112 127 Z" fill="none" stroke="#F59E0B" stroke-width="1" opacity="0.6"/>
+
+  <!-- GET text on shield -->
+  <text
+    x="100"
+    y="149"
+    font-family="'Arial Black', Impact, 'Helvetica Neue', sans-serif"
+    font-size="20"
+    font-weight="900"
+    fill="#111"
+    text-anchor="middle"
+    letter-spacing="-0.5">GET</text>
+
+</svg>

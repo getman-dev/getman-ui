@@ -9,13 +9,13 @@ export default defineConfig(({mode}) => ({
         ...(mode === "lib" && {
             lib: {
                 entry: "src/loader.ts",
-                name: "ApiExplorer",
-                fileName: "loader",
+                name: "GetMan",
+                fileName: "getman-ui",
                 formats: ["iife"],
             },
             rollupOptions: {
                 output: {
-                    entryFileNames: "[name].js",
+                    entryFileNames: "getman-ui.js",
                 },
             },
         }),

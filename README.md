@@ -48,7 +48,7 @@ Add a container, load the script from jsDelivr, and call `mountApiExplorer`:
 
   <div id="api-docs" style="height:100%"></div>
 
-  <script src="https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.0.0/dist/loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.0.0/dist/getman-ui.js"></script>
   <script>
       GetMan.mountApiExplorer(
       document.getElementById('api-docs'),
@@ -138,11 +138,11 @@ onUnmounted(() => unmount?.());
 
 ### Plain HTML (self-hosted)
 
-If you host `loader.js` yourself instead of using jsDelivr:
+If you host `getman-ui.js` yourself instead of using jsDelivr:
 
 ```html
 <div id="api-docs" style="height:100vh"></div>
-<script src="/assets/loader.js"></script>
+<script src="/assets/getman-ui.js"></script>
 <script>
     GetMan.mountApiExplorer(
     document.getElementById('api-docs'),
@@ -196,13 +196,13 @@ spec URL.
 
 ```bash
 npm run typecheck   # type-check only (tsc --noEmit)
-npm run build:lib   # builds dist/loader.js — the embeddable IIFE
+npm run build:lib   # builds dist/getman-ui.js — the embeddable IIFE
 npm run build       # builds the full standalone app
 ```
 
 ### Releasing
 
-Tag and push — CI builds `loader.js` and attaches it to the release. The jsDelivr CDN URL goes live immediately after:
+Tag and push — CI builds `getman-ui.js` and attaches it to the release. The jsDelivr CDN URL goes live immediately after:
 
 ```bash
 git tag v1.x.y
@@ -210,7 +210,7 @@ git push origin v1.x.y
 ```
 
 ```
-https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.x.y/dist/loader.js
+https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.x.y/dist/getman-ui.js
 ```
 
 ---

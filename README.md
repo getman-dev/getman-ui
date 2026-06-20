@@ -39,7 +39,7 @@ No framework required on the consumer side. Works in React, Vue, Angular, plain 
 
 ## Quick start
 
-Add a container, load the script from jsDelivr, and call `mountApiExplorer`:
+Add a container, load the script from jsDelivr, and call `launch`:
 
 ```html
 <!doctype html>
@@ -50,7 +50,7 @@ Add a container, load the script from jsDelivr, and call `mountApiExplorer`:
 
   <script src="https://cdn.jsdelivr.net/gh/getman-dev/getman@v1.0.0/dist/getman-ui.js"></script>
   <script>
-      GetMan.mountApiExplorer(
+      GetMan.launch(
       document.getElementById('api-docs'),
       { url: 'https://petstore3.swagger.io/api/v3/openapi.json' }
     );
@@ -69,12 +69,12 @@ The script injects all required styles and fonts — no separate CSS import need
 
 ## API
 
-### `GetMan.mountApiExplorer(target, options?)`
+### `GetMan.launch(target, options?)`
 
 Mounts the explorer into `target` and returns a cleanup function.
 
 ```ts
-const unmount = GetMan.mountApiExplorer(
+const unmount = GetMan.launch(
   document.getElementById('api-docs'),
   { url: 'https://api.example.com/openapi.json' }
 );
@@ -103,7 +103,7 @@ export function ApiDocs() {
 
   useEffect(() => {
     if (!ref.current) return;
-      const unmount = GetMan.mountApiExplorer(ref.current, {
+      const unmount = GetMan.launch(ref.current, {
       url: '/openapi.json',
     });
     return unmount;
@@ -123,7 +123,7 @@ const container = useTemplateRef('container');
 let unmount: (() => void) | undefined;
 
 onMounted(() => {
-  unmount = GetMan.mountApiExplorer(container.value!, {
+  unmount = GetMan.launch(container.value!, {
     url: '/openapi.json',
   });
 });
@@ -144,7 +144,7 @@ If you host `getman-ui.js` yourself instead of using jsDelivr:
 <div id="api-docs" style="height:100vh"></div>
 <script src="/assets/getman-ui.js"></script>
 <script>
-    GetMan.mountApiExplorer(
+    GetMan.launch(
     document.getElementById('api-docs'),
     { url: '/openapi.json' }
   );

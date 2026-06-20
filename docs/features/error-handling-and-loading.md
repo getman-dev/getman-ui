@@ -12,7 +12,7 @@ Three independent gaps exist in the current error and loading story, all identif
 **1. Silent spec load failure (P0 bug)**
 `loadSpecFromUrl` in `shared/state/actions.ts:29` calls `modalActions.setModalError(...)` on failure. But the
 `LoadModal` only renders this error when `modalVisible` is `true` — and during a programmatic embed (
-`mountApiExplorer(el, { url })`) the modal is never opened. The error is stored in context and then never displayed. The
+`launch(el, { url })`) the modal is never opened. The error is stored in context and then never displayed. The
 user sees a permanently empty UI with no explanation.
 
 **2. Missing loading state (P0 UX)**
@@ -39,7 +39,7 @@ embedded context the browser console is not visible to end users.
 **Entry point 1 — Programmatic embed (broken)**
 
 ```
-mountApiExplorer(el, { url: "https://example.com/bad.json" })
+launch(el, { url: "https://example.com/bad.json" })
   → AppInner.useEffect → loadSpecFromUrl(url)
   → fetch fails → catch → modalActions.setModalError("Failed to load: HTTP 404")
   → modalError is set, but modalVisible = false (modal was never opened)
@@ -244,10 +244,10 @@ them outside the boundary preserves the user's ability to re-load a different sp
 
 ## Acceptance criteria
 
-- [ ] `mountApiExplorer(el, { url: "https://example.com/bad.json" })` renders a visible error banner inside `el`, not a
+- [ ] `launch(el, { url: "https://example.com/bad.json" })` renders a visible error banner inside `el`, not a
   blank div.
 - [ ] The error banner can be dismissed.
-- [ ] `mountApiExplorer(el, { url: "https://example.com/openapi.json" })` shows a centered spinner in the nav and detail
+- [ ] `launch(el, { url: "https://example.com/openapi.json" })` shows a centered spinner in the nav and detail
   panes during the fetch, then the spec.
 - [ ] Throwing an error inside `SchemaNode` or `EndpointDetail` renders the error boundary fallback with a "Try to
   recover" button, not a blank page.

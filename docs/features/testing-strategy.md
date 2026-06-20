@@ -15,7 +15,7 @@ The project currently has zero tests. The main sources of complexity are:
   `Playground.tsx`, and `SchemaNode.tsx` (recursive).
 - **Cross-context actions** — `shared/state/actions.ts` orchestrates state mutations across multiple contexts (eager
   snapshot pattern). Bugs here tend to cascade.
-- **Mount function** — `mountApiExplorer` is the public API surface; regressions here affect all embedders.
+- **Mount function** — `launch` is the public API surface; regressions here affect all embedders.
 
 The tech stack is Vite + React 19 + TypeScript. No test runner is installed.
 
@@ -111,7 +111,7 @@ describe('parseSpec', () => {
 
 - Does not cover rendering behavior, component interactions, or visual regressions.
 - A bug in how a component reads from context won't be caught.
-- Does not test the `mountApiExplorer` public API end-to-end.
+- Does not test the `launch` public API end-to-end.
 
 ---
 

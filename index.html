@@ -12,10 +12,10 @@
 <body class="h-full">
 <div id="root" style="height:100%"></div>
 <script type="module">
-    import {mountApiExplorer} from "/src/main.js";
+    import {launch} from "/src/main.js";
 
     const url = new URLSearchParams(location.search).get("url") ?? undefined;
-    const unmount = mountApiExplorer(document.getElementById("root"), {
+    const unmount = launch(document.getElementById("root"), {
         url: url
     });
 </script>

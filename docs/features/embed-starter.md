@@ -23,7 +23,7 @@ The Embed Starter removes that friction entirely. The target audience is:
 
 - **Developers** dropping the explorer into a docs site who want to customise colours, hide the Playground, add their
   logo, etc.
-- **Non-developers** (DevRel, product) who need a working snippet fast without touching `mountApiExplorer` internals.
+- **Non-developers** (DevRel, product) who need a working snippet fast without touching `launch` internals.
 
 The feature also forces a clean, documented `ExplorerOptions` contract that the mount API should have had from day one.
 
@@ -92,7 +92,7 @@ export interface ExplorerOptions {
 }
 ```
 
-`mountApiExplorer(target, options?: ExplorerOptions)` — the signature widens; existing callers passing only `{ url }`
+`launch(target, options?: ExplorerOptions)` — the signature widens; existing callers passing only `{ url }`
 are unaffected.
 
 `App` props mirror the same shape: `{ initialUrl?, theme?, features?, i18n? }`.  
@@ -138,7 +138,7 @@ Clicking it opens the Embed Starter as a full-screen overlay (similar to the sho
 │  ── APPEARANCE ─────  │  │  <script src="loader.js">       │   │
 │  Primary color  [●]   │  │  </script>                      │   │
 │  Logo URL       [  ]  │  │  <script>                       │   │
-│  Default theme  [○●]  │  │    mountApiExplorer(...)        │   │
+│  Default theme  [○●]  │  │    launch(...)        │   │
 │  Font family    [▾]   │  │  </script>                      │   │
 │                       │  └─────────────────────────────────┘   │
 │  ── LANGUAGE ───────  │                                         │
@@ -195,7 +195,7 @@ the intent.
 ### Live preview
 
 Rendered in a sandboxed `<iframe>` on the right side. The iframe's `src` is a blob URL built from a minimal HTML page
-that calls `mountApiExplorer` with the current `ExplorerOptions`. It is rebuilt on every debounced config change.
+that calls `launch` with the current `ExplorerOptions`. It is rebuilt on every debounced config change.
 
 Using an iframe (rather than rendering `<App>` inline) avoids CSS and state collisions between the Starter UI and the
 preview instance, and makes the preview an honest representation of what the embed code actually produces.
@@ -231,13 +231,13 @@ Default-value options are **omitted** from the generated JSON blobs to keep the 
 
 #### JavaScript tab
 
-Uses the `mountApiExplorer` function directly. Suitable for SPAs or environments where the script is bundled.
+Uses the `launch` function directly. Suitable for SPAs or environments where the script is bundled.
 
 ```html
 <div id="api-explorer" style="height: 100vh;"></div>
 <script src="https://cdn.example.com/api-explorer/loader.js"></script>
 <script>
-  mountApiExplorer(document.getElementById('api-explorer'), {
+  launch(document.getElementById('api-explorer'), {
     url: 'https://api.example.com/openapi.json',
     theme: {
       primaryColor: '#E11D48',
@@ -256,14 +256,14 @@ A thin wrapper component pattern. Suitable for React projects that import the li
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { mountApiExplorer } from '@your-org/api-explorer';
+import { launch } from '@your-org/api-explorer';
 
 export function ApiExplorer() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
-    return mountApiExplorer(ref.current, {
+    return launch(ref.current, {
       url: 'https://api.example.com/openapi.json',
       theme: { primaryColor: '#E11D48', defaultDark: true },
       features: { showAuth: false },
@@ -312,14 +312,14 @@ it; the overlay close button clears it.
 
 ## Acceptance criteria
 
-- [ ] `mountApiExplorer(el, { theme: { primaryColor: '#E11D48' } })` visually changes all blue accents to rose-600
+- [ ] `launch(el, { theme: { primaryColor: '#E11D48' } })` visually changes all blue accents to rose-600
   without any other code changes.
-- [ ] `mountApiExplorer(el, { features: { showTryIt: false } })` hides the Playground panel and its resize handle
+- [ ] `launch(el, { features: { showTryIt: false } })` hides the Playground panel and its resize handle
   completely.
-- [ ] `mountApiExplorer(el, { features: { showLoadSpec: false } })` removes the "Load spec" button from the TopBar.
-- [ ] `mountApiExplorer(el, { theme: { logo: 'https://example.com/logo.png' } })` replaces the monogram tile with the
+- [ ] `launch(el, { features: { showLoadSpec: false } })` removes the "Load spec" button from the TopBar.
+- [ ] `launch(el, { theme: { logo: 'https://example.com/logo.png' } })` replaces the monogram tile with the
   logo image.
-- [ ] `mountApiExplorer(el, { theme: { defaultDark: true } })` starts in dark mode even when the OS is in light mode.
+- [ ] `launch(el, { theme: { defaultDark: true } })` starts in dark mode even when the OS is in light mode.
 - [ ] Opening the Embed Starter with a spec already loaded pre-populates the URL field.
 - [ ] Toggling any feature switch updates both the live preview and all three code tabs within 300 ms.
 - [ ] Generated HTML, JS, and React snippets each paste into a real page and produce a working explorer with the
@@ -337,8 +337,8 @@ it; the overlay close button clears it.
    `/* replace with your CDN URL */`. Revisit once we publish to a CDN or npm.
 2. **`data-` attribute parsing** — the auto-mount path in `loader.ts` currently only reads `data-api-explorer` for the
    URL. We need to also parse `data-explorer-theme` and `data-explorer-features` JSON blobs and pass them to
-   `mountApiExplorer`. This is a small addition to `loader.ts`.
-3. **iframe preview isolation** — on `localhost` the blob-URL iframe can call `mountApiExplorer` from the parent window,
+   `launch`. This is a small addition to `loader.ts`.
+3. **iframe preview isolation** — on `localhost` the blob-URL iframe can call `launch` from the parent window,
    but in a cross-origin deploy the library must be bundled into the blob. Investigate whether passing `loader.js`
    content as an inline `<script>` inside the blob HTML is acceptable, or if we need a dedicated `/preview` route.
 4. **Language strings** — before shipping the language dropdown as anything other than a code-gen hint, we need an i18n

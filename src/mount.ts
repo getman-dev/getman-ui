@@ -8,7 +8,7 @@ import App from "./App";
  * @param target - The DOM element to render into.
  * @param options - Optional `url` of an OpenAPI spec to load on startup.
  */
-export function mountApiExplorer(
+export function launch(
     target: HTMLElement,
     options?: { url?: string }
 ): () => void {
@@ -25,7 +25,7 @@ export function autoMount(): void {
   const mount = () =>
       document.querySelectorAll<HTMLElement>("[data-api-explorer]").forEach(el => {
         const url = el.getAttribute("data-api-explorer") || undefined;
-        mountApiExplorer(el, {url});
+        launch(el, {url});
       });
 
   if (document.readyState === "loading") {

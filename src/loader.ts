@@ -1,7 +1,7 @@
 import styles from "./style.css?inline";
-import {autoMount, mountApiExplorer} from "./mount";
+import {autoMount, launch} from "./mount";
 
-export {mountApiExplorer};
+export {launch};
 
 function ensureFonts() {
   if (document.querySelector("link[data-api-explorer-fonts]")) return;

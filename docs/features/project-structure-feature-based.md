@@ -45,7 +45,7 @@ A feature-based structure makes the answer to "where does this file go?" obvious
 
 ## Non-goals
 
-- Changing the public `mountApiExplorer` API or bundle output
+- Changing the public `launch` API or bundle output
 - Moving `style.css`, `vite-env.d.ts`, entry points (`main.tsx`, `mount.ts`, `loader.ts`)
 - Splitting contexts into smaller pieces or changing the state architecture
 - Adding path aliases (beneficial, but a separate task)

@@ -15,7 +15,7 @@
 - [ ] Tested in browser against a real OpenAPI 3.x spec
 - [ ] Tested edge cases (e.g. `$ref`, `oneOf`/`anyOf`/`allOf`, missing fields, empty spec)
 - [ ] Tested in both light and dark mode
-- [ ] Tested the embed path (`mountApiExplorer`) if touching mount/loader code
+- [ ] Tested the embed path (`launch`) if touching mount/loader code
 - [ ] `npm run typecheck` passes
 - [ ] `npm run build:lib` produces a valid bundle
 
